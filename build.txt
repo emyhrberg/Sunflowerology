@@ -1,0 +1,3 @@
+displayName = Jam of Science
+author = Erky &amp; Cotlim
+version = 0.1
