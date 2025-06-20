@@ -1,5 +1,4 @@
-﻿using ScienceJam.Content.Biomes;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
 
 namespace ScienceJam.Common.Systems
