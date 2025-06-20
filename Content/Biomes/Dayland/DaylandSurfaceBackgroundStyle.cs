@@ -33,28 +33,9 @@ namespace ScienceJam.Backgrounds
             return BackgroundTextureLoader.GetBackgroundSlot(Mod, "Assets/Textures/Backgrounds/DaylandBiomeSurfaceFar");
         }
 
-        private static int SurfaceFrameCounter;
-        private static int SurfaceFrame;
         public override int ChooseMiddleTexture()
         {
-            if (++SurfaceFrameCounter > 12)
-            {
-                SurfaceFrame = (SurfaceFrame + 1) % 4;
-                SurfaceFrameCounter = 0;
-            }
-            switch (0)
-            {
-                case 0:
-                    return BackgroundTextureLoader.GetBackgroundSlot(Mod, "Assets/Textures/Backgrounds/DaylandBiomeSurfaceMid0");
-                case 1:
-                    return BackgroundTextureLoader.GetBackgroundSlot(Mod, "Assets/Textures/Backgrounds/DaylandBiomeSurfaceMid1");
-                case 2:
-                    return BackgroundTextureLoader.GetBackgroundSlot(Mod, "Assets/Textures/Backgrounds/DaylandBiomeSurfaceMid2");
-                case 3:
-                    return BackgroundTextureLoader.GetBackgroundSlot(Mod, "Assets/Textures/Backgrounds/DaylandBiomeSurfaceMid3"); // You can use the full path version of GetBackgroundSlot too
-                default:
-                    return -1;
-            }
+            return BackgroundTextureLoader.GetBackgroundSlot(Mod, "Assets/Textures/Backgrounds/DaylandBiomeSurfaceMid");
         }
 
         public override int ChooseCloseTexture(ref float scale, ref double parallax, ref float a, ref float b)

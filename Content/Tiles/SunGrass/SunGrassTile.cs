@@ -11,7 +11,6 @@ namespace ScienceJam.Content.Tiles.SunGrass
 {
     public class SunGrassTile : ModTile
     {
-        private Asset<Texture2D> glowTexture;
         public override void SetStaticDefaults()
         {
             Main.tileLighted[Type] = true;
@@ -40,9 +39,6 @@ namespace ScienceJam.Content.Tiles.SunGrass
             DustType = ModContent.DustType<SunGrassSparkle>();
 
             AddMapEntry(new Color(200, 200, 200));
-
-            //glowTexture = ModContent.Request<Texture2D>(Texture + "_Glow");
-
         }
 
         public override void NumDust(int i, int j, bool fail, ref int num)
@@ -66,35 +62,6 @@ namespace ScienceJam.Content.Tiles.SunGrass
                 }
 
             }
-        }
-        public override bool CanPlace(int i, int j)
-        {
-            //Main.NewText(Framing.GetTileSafely(i, j).TileType);
-            //return Framing.GetTileSafely(i, j).HasTile;
-            return true;
-        }
-        public override void PlaceInWorld(int i, int j, Item item)
-        {
-            /*8if (Framing.GetTileSafely(i, j).TileType == 0)
-            {
-                Framing.GetTileSafely(i, j).ResetToType(Type);
-            }*/
-
-        }
-
-        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
-        {
-            /*
-            Tile tile = Main.tile[i, j];
-
-            Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
-
-            spriteBatch.Draw(
-                glowTexture.Value,
-                new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero,
-                new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 16),
-                Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-            */
         }
         public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
         {
@@ -143,7 +110,6 @@ namespace ScienceJam.Content.Tiles.SunGrass
                 KillTile(i, j, ref _, ref _, ref _);
                 return true;
             }
-            return base.CanReplace(i, j, tileTypeBeingPlaced);
         }
     }
 }
