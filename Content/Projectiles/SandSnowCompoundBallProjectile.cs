@@ -39,7 +39,7 @@ namespace ScienceJam.Content.Projectiles
         public override void PostAI()
         {
             base.PostAI();
-            Projectile.velocity *= 0.8f;
+            Projectile.velocity *= 0.85f;
         }
     }
 
