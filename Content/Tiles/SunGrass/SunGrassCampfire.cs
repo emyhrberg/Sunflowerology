@@ -12,7 +12,7 @@ using Terraria.ModLoader;
 using Terraria.ObjectData;
 using Terraria.Utilities;
 
-namespace ScienceJam.Content.Tiles
+namespace ScienceJam.Content.Tiles.SunGrass
 {
     // Campfires are special tiles that support the block swap feature and the biome torch feature. ExampleSurfaceBiome shows how the biome campfire is assigned.
     public class SunGrassCampfire : ModTile

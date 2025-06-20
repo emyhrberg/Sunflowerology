@@ -10,14 +10,17 @@ namespace ScienceJam.Common.Systems
 {
     internal class SmartCursorSystem : ModSystem
     {
+        // Static list to hold the relationship between grass seeds and the tiles they can be placed on.
+        public static List<Tuple<int, int, int>> GrassTileRelationship = new();
+
         public override void Load()
         {
-            Terraria.GameContent.On_SmartCursorHelper.Step_GrassSeeds += SmartCursorCustomSeedModification;
+            On_SmartCursorHelper.Step_GrassSeeds += SmartCursorCustomSeedModification;
         }
 
         public override void Unload()
         {
-            Terraria.GameContent.On_SmartCursorHelper.Step_GrassSeeds -= SmartCursorCustomSeedModification;
+            On_SmartCursorHelper.Step_GrassSeeds -= SmartCursorCustomSeedModification;
         }
 
         public static void SmartCursorCustomSeedModification(Terraria.GameContent.On_SmartCursorHelper.orig_Step_GrassSeeds orig, object providedInfo, ref int focusedX, ref int focusedY)
@@ -32,7 +35,6 @@ namespace ScienceJam.Common.Systems
             FieldInfo providedInfo_mouse_field = nestType[0].GetField("mouse");
             FieldInfo sCH_targets_field = typeof(SmartCursorHelper).GetField("_targets", BindingFlags.NonPublic | BindingFlags.Static);
 
-
             Item providedInfo_item = (Item)providedInfo_item_field.GetValue(providedInfo);
             int providedInfo_reachableStartX = (int)providedInfo_reachableStartX_field.GetValue(providedInfo);
             int providedInfo_reachableEndX = (int)providedInfo_reachableEndX_field.GetValue(providedInfo);
@@ -41,12 +43,7 @@ namespace ScienceJam.Common.Systems
             Vector2 providedInfo_mouse = (Vector2)providedInfo_mouse_field.GetValue(providedInfo);
             List<Tuple<int, int>> targets = (List<Tuple<int, int>>)sCH_targets_field.GetValue(null);
 
-
-
-
-
             //Main.NewText($"{}");
-
 
             //Main.NewText($"{sCH_targets.GetValue(null)}");
 
@@ -66,16 +63,15 @@ namespace ScienceJam.Common.Systems
                 {
                     Tile tile = Main.tile[i, j];
 
-                    bool flag = !ScienceJam.IsTileSolid(i - 1, j) ||
-                        !ScienceJam.IsTileSolid(i, j + 1) ||
-                        !ScienceJam.IsTileSolid(i + 1, j) ||
-                        !ScienceJam.IsTileSolid(i, j - 1);
+                    bool flag = IsTileSolid(i - 1, j) ||
+                        !IsTileSolid(i, j + 1) ||
+                        !IsTileSolid(i + 1, j) ||
+                        !IsTileSolid(i, j - 1);
 
-                    bool flag2 = !ScienceJam.IsTileSolid(i - 1, j - 1) ||
-                        !ScienceJam.IsTileSolid(i - 1, j + 1) ||
-                        !ScienceJam.IsTileSolid(i + 1, j + 1) ||
-                        !ScienceJam.IsTileSolid(i + 1, j - 1);
-
+                    bool flag2 = !IsTileSolid(i - 1, j - 1) ||
+                        !IsTileSolid(i - 1, j + 1) ||
+                        !IsTileSolid(i + 1, j + 1) ||
+                        !IsTileSolid(i + 1, j - 1);
 
                     if (tile.HasTile && !tile.IsActuated && (flag || flag2))
                     {
@@ -97,7 +93,7 @@ namespace ScienceJam.Common.Systems
                                 flag3 = tile.TileType == 57;
                                 break;
                         }
-                        foreach (var l in ScienceJam.GrassTileRelationship)
+                        foreach (var l in GrassTileRelationship)
                         {
                             if (type == l.Item1)
                             {
@@ -144,6 +140,18 @@ namespace ScienceJam.Common.Systems
             providedInfo_mouse_field.SetValue(providedInfo, providedInfo_mouse);
             sCH_targets_field.SetValue(null, targets);
             //orig(providedInfo, ref focusedX, ref focusedY);
+        }
+
+        /// <summary>
+        /// Checks if a tile is solid, meaning it has a tile and is not actuated, and is in the Main.tileSolid array.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public static bool IsTileSolid(int x, int y)
+        {
+            Tile tile = Framing.GetTileSafely(x, y);
+            return tile.HasTile && tile.HasUnactuatedTile && Main.tileSolid[tile.TileType];
         }
     }
 }

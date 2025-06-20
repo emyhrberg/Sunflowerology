@@ -13,7 +13,7 @@ namespace ScienceJam.Common.Players
             if (!Conf.C.ShowMessageWhenEnteringWorld) return;
 
             string msg = "";
-            msg += "Welcome to SCIENCE JAM!\n";
+            msg += "\n";
 
             Main.NewText(msg, Color.LightGray);
         }

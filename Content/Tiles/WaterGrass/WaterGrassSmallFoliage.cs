@@ -1,14 +1,14 @@
-﻿using Terraria.Audio;
+﻿using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.Enums;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
-using Terraria;
-using Terraria.Enums;
 
-namespace ScienceJam.Content.Tiles
+namespace ScienceJam.Content.Tiles.WaterGrass
 {
-    internal class SunGrassSmallFoliage : ModTile
+    internal class WaterGrassSmallFoliage : ModTile
     {
 
         // Token: 0x060002C7 RID: 711 RVA: 0x000100A4 File Offset: 0x0000E2A4
@@ -38,7 +38,7 @@ namespace ScienceJam.Content.Tiles
             TileObjectData.newTile.UsesCustomCanPlace = true;
             TileObjectData.newTile.AnchorValidTiles = new int[]
             {
-                ModContent.TileType<SunGrassTile>()
+                ModContent.TileType<WaterGrassTile>()
             };
             TileObjectData.addTile(Type);
             HitSound = new SoundStyle?(SoundID.Grass);

@@ -1,8 +1,8 @@
-using ScienceJam.Content.Biomes;
-using ScienceJam.Content.Dusts;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using ScienceJam.Content.Biomes;
+using ScienceJam.Content.Dusts;
 using Terraria;
 using Terraria.Enums;
 using Terraria.GameContent.Drawing;
@@ -11,7 +11,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
-namespace ScienceJam.Content.Tiles
+namespace ScienceJam.Content.Tiles.SunGrass
 {
     //// Torches are special tiles that support the block swap feature and the biome torch feature. ExampleSurfaceBiome shows how the biome torch is assigned.
     public class SunGrassTorch : ModTile

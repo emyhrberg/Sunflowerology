@@ -1,10 +1,11 @@
 using ScienceJam.Content.Dusts;
+using ScienceJam.Content.Tiles.SunGrass;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Content.Tiles
+namespace ScienceJam.Content.Tiles.WaterGrass
 {
     public class WaterGrassTile : ModTile
     {

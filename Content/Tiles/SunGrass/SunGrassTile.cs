@@ -1,13 +1,13 @@
-using ScienceJam.Content.Biomes;
-using ScienceJam.Content.Dusts;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using ScienceJam.Content.Biomes;
+using ScienceJam.Content.Dusts;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Content.Tiles
+namespace ScienceJam.Content.Tiles.SunGrass
 {
     public class SunGrassTile : ModTile
     {

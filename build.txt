@@ -2,3 +2,4 @@ displayName = Jam of Science
 author = Erky &amp; Cotlim
 version = 0.1
 dllReferences = ModLiquidLib, StructureHelper
+buildIgnore = Assets/Photoshop*, Assets/Workshop*

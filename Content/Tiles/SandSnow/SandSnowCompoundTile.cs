@@ -1,14 +1,14 @@
 
-using ScienceJam.Content.Projectiles;
-using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using ScienceJam.Common.Configs;
+using ScienceJam.Content.Projectiles;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using ScienceJam.Common.Configs;
 
-namespace ScienceJam.Content.Tiles
+namespace ScienceJam.Content.Tiles.SandSnow
 {
     public class SandSnowCompoundTile : ModTile
     {
