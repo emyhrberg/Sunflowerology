@@ -10,7 +10,6 @@ namespace ScienceJam.Content.Biomes
 {
     public class DaylandSurfaceBiome : ModBiome
     {
-        public override ModWaterStyle WaterStyle => ModContent.GetInstance<DaylandWaterStyle>();
         public override ModSurfaceBackgroundStyle SurfaceBackgroundStyle => ModContent.GetInstance<DaylandSurfaceBackgroundStyle>();
         public override CaptureBiome.TileColorStyle TileColorStyle => CaptureBiome.TileColorStyle.Normal;
 

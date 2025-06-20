@@ -82,11 +82,6 @@ namespace ScienceJam.Content.Tiles.SunGrass
 
         }
 
-        public override void ChangeWaterfallStyle(ref int style)
-        {
-            style = ModContent.GetInstance<DaylandWaterfallStyle>().Slot;
-        }
-
         public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
         {
             /*
