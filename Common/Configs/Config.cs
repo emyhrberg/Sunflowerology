@@ -9,7 +9,7 @@ namespace ScienceJam.Common.Configs
     {
         public override ConfigScope Mode => ConfigScope.ClientSide;
 
-        [Header("Jam of biomology")]
+        [Header("JamOfBiomology")]
 
         [DefaultValue(true)]
         public bool ShowMessageWhenEnteringWorld;
