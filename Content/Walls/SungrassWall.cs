@@ -1,22 +1,23 @@
-using CotlimsCoolMod.Content.Dusts;
-using Microsoft.Xna.Framework;
+using ScienceJam.Content.Dusts;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace CotlimsCoolMod.Content.Walls
+namespace ScienceJam.Content.Walls
 {
-	public class SungrassWall : ModWall
-	{
-		public override void SetStaticDefaults() {
-			Main.wallHouse[Type] = true;
+    public class SungrassWall : ModWall
+    {
+        public override void SetStaticDefaults()
+        {
+            Main.wallHouse[Type] = true;
 
-			DustType = ModContent.DustType<Sparkle>();
+            DustType = ModContent.DustType<Sparkle>();
 
-			AddMapEntry(new Color(150, 150, 150));
-		}
+            AddMapEntry(new Color(150, 150, 150));
+        }
 
-		public override void NumDust(int i, int j, bool fail, ref int num) {
-			num = fail ? 1 : 3;
-		}
-	}
+        public override void NumDust(int i, int j, bool fail, ref int num)
+        {
+            num = fail ? 1 : 3;
+        }
+    }
 }

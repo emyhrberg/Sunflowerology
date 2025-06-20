@@ -13,6 +13,9 @@ namespace ScienceJam.Common.Configs
 
         [DefaultValue(true)]
         public bool ShowMessageWhenEnteringWorld;
+
+        [DefaultValue(true)]
+        public bool DestabilizeTiles = true;
     }
 
 

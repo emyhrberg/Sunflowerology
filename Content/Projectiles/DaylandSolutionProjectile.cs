@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria;
-using Microsoft.Xna.Framework;
-using CotlimsCoolMod.Content.Walls;
-using CotlimsCoolMod.Content.Tiles;
+using ScienceJam.Content.Walls;
+using ScienceJam.Content.Tiles;
 
-namespace CotlimsCoolMod.Content.Projectiles
+namespace ScienceJam.Content.Projectiles
 {
     public class DaylandSolutionProjectile : ModProjectile
     {

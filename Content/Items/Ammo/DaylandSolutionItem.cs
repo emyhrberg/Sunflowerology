@@ -1,13 +1,9 @@
-﻿using CotlimsCoolMod.Content.Projectiles;
-using CotlimsCoolMod.Content.Tiles;
-using CotlimsCoolMod.Content.Walls;
-using Microsoft.Xna.Framework;
-using System;
+﻿using ScienceJam.Content.Projectiles;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace CotlimsCoolMod.Content.Items.Ammo
+namespace ScienceJam.Content.Items.Ammo
 {
     public class DaylandSolutionItem : ModItem
     {
@@ -38,5 +34,5 @@ namespace CotlimsCoolMod.Content.Items.Ammo
         }
     }
 
-    
+
 }

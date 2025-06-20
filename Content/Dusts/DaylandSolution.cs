@@ -1,11 +1,12 @@
 using Terraria.ModLoader;
 
-namespace CotlimsCoolMod.Content.Dusts
+namespace ScienceJam.Content.Dusts
 {
-	public class DaylandSolution : ModDust
-	{
-		public override void SetStaticDefaults() {
-			UpdateType = 110;
-		}
-	}
+    public class DaylandSolution : ModDust
+    {
+        public override void SetStaticDefaults()
+        {
+            UpdateType = 110;
+        }
+    }
 }

@@ -1,21 +1,15 @@
 ﻿
-using CotlimsCoolMod.Content.Tiles;
-using CotlimsCoolMod.Helper;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using ScienceJam.Content.Tiles;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Terraria;
 using Terraria.Audio;
-using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ObjectData;
 
-namespace CotlimsCoolMod.Content.Items.Placeable
+namespace ScienceJam.Content.Items.Placeable
 {
     public class SunGrassSeed : ModItem
     {
@@ -35,7 +29,7 @@ namespace CotlimsCoolMod.Content.Items.Placeable
             Item.createTile = -1;
             Item.width = 22;
             Item.height = 18;
-            CotlimsCoolMod.GrassTileRelationship.Add(
+            ScienceJam.GrassTileRelationship.Add(
                 new(Type, tileOnWhatPlace, tileToPlace));
             ItemID.Sets.GrassSeeds[Type] = true;
         }
@@ -56,7 +50,7 @@ namespace CotlimsCoolMod.Content.Items.Placeable
 
             if (tile.HasTile && !tile.IsActuated)
             {
-                if (tile.TileType == tileOnWhatPlace && CCMUtils.WithinPlacementRange(player, i, j))
+                if (tile.TileType == tileOnWhatPlace && SJUtils.WithinPlacementRange(player, i, j))
                 {
                     Main.tile[i, j].TileType = (ushort)tileToPlace;
 
@@ -116,15 +110,15 @@ namespace CotlimsCoolMod.Content.Items.Placeable
                 {
                     Tile tile = Main.tile[i, j];
 
-                    bool flag = !CotlimsCoolMod.IsTileSolid(i - 1, j) ||
-                        !CotlimsCoolMod.IsTileSolid(i, j + 1) ||
-                        !CotlimsCoolMod.IsTileSolid(i + 1, j) ||
-                        !CotlimsCoolMod.IsTileSolid(i, j - 1);
+                    bool flag = !ScienceJam.IsTileSolid(i - 1, j) ||
+                        !ScienceJam.IsTileSolid(i, j + 1) ||
+                        !ScienceJam.IsTileSolid(i + 1, j) ||
+                        !ScienceJam.IsTileSolid(i, j - 1);
 
-                    bool flag2 = !CotlimsCoolMod.IsTileSolid(i - 1, j - 1) ||
-                        !CotlimsCoolMod.IsTileSolid(i - 1, j + 1) ||
-                        !CotlimsCoolMod.IsTileSolid(i + 1, j + 1) ||
-                        !CotlimsCoolMod.IsTileSolid(i + 1, j - 1);
+                    bool flag2 = !ScienceJam.IsTileSolid(i - 1, j - 1) ||
+                        !ScienceJam.IsTileSolid(i - 1, j + 1) ||
+                        !ScienceJam.IsTileSolid(i + 1, j + 1) ||
+                        !ScienceJam.IsTileSolid(i + 1, j - 1);
 
 
                     if (tile.HasTile && !tile.IsActuated && (flag || flag2))
@@ -147,7 +141,7 @@ namespace CotlimsCoolMod.Content.Items.Placeable
                                 flag3 = tile.TileType == 57;
                                 break;
                         }
-                        foreach (var l in CotlimsCoolMod.GrassTileRelationship)
+                        foreach (var l in ScienceJam.GrassTileRelationship)
                         {
                             if (type == l.Item1)
                             {

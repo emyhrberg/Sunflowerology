@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Helpers
+namespace ScienceJam.Helper
 {
     /// <summary>
     /// Static class to hold all assets used in the mod.

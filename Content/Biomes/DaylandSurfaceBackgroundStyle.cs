@@ -1,6 +1,6 @@
 using Terraria.ModLoader;
 
-namespace CotlimsCoolMod.Backgrounds
+namespace ScienceJam.Backgrounds
 {
     public class DaylandSurfaceBackgroundStyle : ModSurfaceBackgroundStyle
     {

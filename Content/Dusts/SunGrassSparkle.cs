@@ -1,10 +1,10 @@
 using Terraria;
 using Terraria.ModLoader;
 
-namespace CotlimsCoolMod.Content.Dusts
+namespace ScienceJam.Content.Dusts
 {
-	public class SunGrassSparkle : ModDust
-	{
+    public class SunGrassSparkle : ModDust
+    {
         public override void OnSpawn(Dust dust)
         {
             dust.velocity *= 0.4f; // Multiply the dust's start velocity by 0.4, slowing it down

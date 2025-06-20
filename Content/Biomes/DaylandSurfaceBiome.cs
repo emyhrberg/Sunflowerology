@@ -1,15 +1,12 @@
-﻿using CotlimsCoolMod.Backgrounds;
-using CotlimsCoolMod.Common.Systems;
-using CotlimsCoolMod.Content.Items.Placeable;
-using Microsoft.Xna.Framework;
-using ReLogic.Content;
+﻿using ScienceJam.Backgrounds;
+using ScienceJam.Common.Systems;
+using ScienceJam.Content.Items.Placeable;
 using System;
 using Terraria;
 using Terraria.Graphics.Capture;
-using Terraria.Graphics.Effects;
 using Terraria.ModLoader;
 
-namespace CotlimsCoolMod.Content.Biomes
+namespace ScienceJam.Content.Biomes
 {
     // Shows setting up two basic biomes. For a more complicated example, please request.
     public class DaylandSurfaceBiome : ModBiome
@@ -54,7 +51,7 @@ namespace CotlimsCoolMod.Content.Biomes
         public override void OnInBiome(Player player)
         {
             base.OnInBiome(player);
-            
+
         }
         // Declare biome priority. The default is BiomeLow so this is only necessary if it needs a higher priority.
         public override SceneEffectPriority Priority => SceneEffectPriority.BiomeLow;
@@ -62,7 +59,7 @@ namespace CotlimsCoolMod.Content.Biomes
         public override void Load()
         {
             base.Load();
-            
+
         }
 
         public static void SetCotlandCollor(On_Main.orig_SetBackColor orig, Main.InfoToSetBackColor info, out Color sunColor, out Color moonColor)
@@ -72,14 +69,14 @@ namespace CotlimsCoolMod.Content.Biomes
             orig(info, out sunColor, out moonColor);
             if (influence > 0.01f && !Main.dayTime)
             {
-                
+
                 double time = Main.time;
-                
+
                 bool dayTime = Main.dayTime;
-                
+
                 Main.time = Main.time / Main.nightLength * Main.dayLength;
                 Main.dayTime = true;
-                
+
                 orig(info, out sunColor, out moonColor);
                 Color biomeTimeColor = new Color(Main.ColorOfTheSkies.ToVector4());
                 biomeTimeColor.B = (byte)((float)biomeTimeColor.B * 0.8f);
@@ -87,12 +84,12 @@ namespace CotlimsCoolMod.Content.Biomes
                 Main.dayTime = dayTime;
 
                 orig(info, out sunColor, out moonColor);
-                moonColor = new Color((sunColor.ToVector4()* (1f - influence) + (sunColor.ToVector4() + Main.DiscoColor.ToVector4()) * influence / 2f));
+                moonColor = new Color((sunColor.ToVector4() * (1f - influence) + (sunColor.ToVector4() + Main.DiscoColor.ToVector4()) * influence / 2f));
                 sunColor = moonColor;
                 Main.ColorOfTheSkies = new Color(biomeTimeColor.ToVector4() * influence + Main.ColorOfTheSkies.ToVector4() * (1f - influence));
 
             }
-            
+
 
 
             //Main.NewText($"{((float)Main.ColorOfTheSkies.R + ((float)Main.DiscoColor.R / 255f * range - range / 2f))}");

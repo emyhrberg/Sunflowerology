@@ -1,12 +1,10 @@
-using CotlimsCoolMod.Content.Dusts;
-using Humanizer;
-using Microsoft.Xna.Framework;
+using ScienceJam.Content.Dusts;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace CotlimsCoolMod.Content.Biomes
+namespace ScienceJam.Content.Biomes
 {
     public class DaylandWaterStyle : ModWaterStyle
     {

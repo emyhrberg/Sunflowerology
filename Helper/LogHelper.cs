@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.CompilerServices;
-using Terraria;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Helpers
+namespace ScienceJam.Helper
 {
     public static class Log
     {
