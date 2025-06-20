@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<!-- Import tModLoader mod properties -->
 	<Import Project="..\tModLoader.targets" />
@@ -10,6 +10,18 @@
 
 	<!-- References -->
 
+	<ItemGroup>
+		<Reference Include="StructureHelper">
+			<HintPath>lib\StructureHelper.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="ModLiquidLib">
+			<HintPath>\lib\ModLiquidLib.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+	
     <!-- Publicize tModLoader for easy access to private fields -->
 	<ItemGroup>
 		<PackageReference Include="Krafs.Publicizer" PrivateAssets="true" Version="2.2.1" />
