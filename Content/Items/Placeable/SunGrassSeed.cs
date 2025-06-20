@@ -1,5 +1,7 @@
 ﻿
+using ScienceJam.Common.Systems;
 using ScienceJam.Content.Tiles;
+using ScienceJam.Content.Tiles.SunGrass;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -25,7 +27,7 @@ namespace ScienceJam.Content.Items.Placeable
             Item.createTile = -1;
             Item.width = 22;
             Item.height = 18;
-            ScienceJam.GrassTileRelationship.Add(
+            SmartCursorSystem.GrassTileRelationship.Add(
                 new(Type, tileOnWhatPlace, tileToPlace));
             ItemID.Sets.GrassSeeds[Type] = true;
         }

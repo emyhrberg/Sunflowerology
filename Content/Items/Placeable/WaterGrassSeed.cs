@@ -1,6 +1,8 @@
 ﻿using System.Linq;
+using ScienceJam.Common.Systems;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -16,14 +18,14 @@ namespace ScienceJam.Content.Items.Placeable
         public override void SetDefaults()
         {
 
-            Item.DefaultToPlaceableTile(ModContent.TileType<Tiles.WaterGrassTile>());
+            Item.DefaultToPlaceableTile(ModContent.TileType<Tiles.WaterGrass.WaterGrassTile>());
             Item.width = 22;
             Item.height = 18;
             Item.channel = true;
             //ItemID.Sets.ExtractinatorMode[Item.type] = Item.type;
             ItemID.Sets.GrassSeeds[Type] = true;
-            ScienceJam.GrassTileRelationship.Add(
-                new(Type, TileID.Sand, ModContent.TileType<Tiles.WaterGrassTile>())
+            SmartCursorSystem.GrassTileRelationship.Add(
+                new(Type, TileID.Sand, ModContent.TileType<Tiles.WaterGrass.WaterGrassTile>())
                 );
             Item.createTile = -1;
         }
@@ -45,7 +47,7 @@ namespace ScienceJam.Content.Items.Placeable
 
             if (tile.HasTile && !tile.IsActuated && player.channel)
             {
-                foreach (var l in ScienceJam.GrassTileRelationship.Where(t => t.Item1 == Type))
+                foreach (var l in SmartCursorSystem.GrassTileRelationship.Where(t => t.Item1 == Type))
                 {
                     if (tile.TileType == l.Item2)
                     {

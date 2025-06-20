@@ -1,9 +1,10 @@
 ﻿using System;
+using ScienceJam.Content.Tiles;
+using ScienceJam.Content.Tiles.SunGrass;
+using ScienceJam.Content.Walls;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
-using ScienceJam.Content.Walls;
-using ScienceJam.Content.Tiles;
 
 namespace ScienceJam.Content.Projectiles
 {

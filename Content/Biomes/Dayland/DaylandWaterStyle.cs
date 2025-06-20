@@ -1,6 +1,6 @@
-using ScienceJam.Content.Dusts;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using ScienceJam.Content.Dusts;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -8,12 +8,10 @@ namespace ScienceJam.Content.Biomes
 {
     public class DaylandWaterStyle : ModWaterStyle
     {
-
-
         private Asset<Texture2D> rainTexture;
         public override void Load()
         {
-            rainTexture = Mod.Assets.Request<Texture2D>("Content/Biomes/DaylandRain");
+            rainTexture = Mod.Assets.Request<Texture2D>("Content/Biomes/Dayland/DaylandRain");
         }
 
         public override int ChooseWaterfallStyle()

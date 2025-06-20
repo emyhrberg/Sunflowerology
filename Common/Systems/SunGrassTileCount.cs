@@ -1,6 +1,7 @@
-﻿using ScienceJam.Content.Tiles;
+﻿using System;
 using Microsoft.Xna.Framework;
-using System;
+using ScienceJam.Content.Tiles;
+using ScienceJam.Content.Tiles.SunGrass;
 using Terraria;
 using Terraria.ModLoader;
 

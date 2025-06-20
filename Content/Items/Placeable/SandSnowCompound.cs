@@ -1,4 +1,5 @@
 ﻿using ScienceJam.Content.Tiles;
+using ScienceJam.Content.Tiles.SandSnow;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;

@@ -8,7 +8,7 @@ namespace ScienceJam.Content.Items.Placeable
     {
         public override void SetDefaults()
         {
-            Item.DefaultToPlaceableTile(ModContent.TileType<Tiles.SunGrassCampfire>(), 0);
+            Item.DefaultToPlaceableTile(ModContent.TileType<Tiles.SunGrass.SunGrassCampfire>(), 0);
         }
 
         public override void AddRecipes()
