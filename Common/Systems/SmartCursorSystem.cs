@@ -10,7 +10,9 @@ namespace ScienceJam.Common.Systems
 {
     internal class SmartCursorSystem : ModSystem
     {
-        // Static list to hold the relationship between grass seeds and the tiles they can be placed on.
+        /// <summary>
+        /// Static list to hold the relationship between grass seeds and the tiles they can be placed on.
+        /// </summary>
         public static List<Tuple<int, int, int>> GrassTileRelationship = new();
 
         public override void Load()
@@ -23,123 +25,82 @@ namespace ScienceJam.Common.Systems
             On_SmartCursorHelper.Step_GrassSeeds -= SmartCursorCustomSeedModification;
         }
 
-        public static void SmartCursorCustomSeedModification(Terraria.GameContent.On_SmartCursorHelper.orig_Step_GrassSeeds orig, object providedInfo, ref int focusedX, ref int focusedY)
+        public static void SmartCursorCustomSeedModification(Terraria.GameContent.On_SmartCursorHelper.orig_Step_GrassSeeds orig, object providedInfo1, ref int focusedX, ref int focusedY)
         {
-            //orig(providedInfo, ref focusedX, ref focusedY);
-            Type[] nestType = typeof(SmartCursorHelper).GetNestedTypes(BindingFlags.NonPublic);
-            FieldInfo providedInfo_item_field = nestType[0].GetField("item");
-            FieldInfo providedInfo_reachableStartX_field = nestType[0].GetField("reachableStartX");
-            FieldInfo providedInfo_reachableEndX_field = nestType[0].GetField("reachableEndX");
-            FieldInfo providedInfo_reachableStartY_field = nestType[0].GetField("reachableStartY");
-            FieldInfo providedInfo_reachableEndY_field = nestType[0].GetField("reachableEndY");
-            FieldInfo providedInfo_mouse_field = nestType[0].GetField("mouse");
-            FieldInfo sCH_targets_field = typeof(SmartCursorHelper).GetField("_targets", BindingFlags.NonPublic | BindingFlags.Static);
-
-            Item providedInfo_item = (Item)providedInfo_item_field.GetValue(providedInfo);
-            int providedInfo_reachableStartX = (int)providedInfo_reachableStartX_field.GetValue(providedInfo);
-            int providedInfo_reachableEndX = (int)providedInfo_reachableEndX_field.GetValue(providedInfo);
-            int providedInfo_reachableStartY = (int)providedInfo_reachableStartY_field.GetValue(providedInfo);
-            int providedInfo_reachableEndY = (int)providedInfo_reachableEndY_field.GetValue(providedInfo);
-            Vector2 providedInfo_mouse = (Vector2)providedInfo_mouse_field.GetValue(providedInfo);
-            List<Tuple<int, int>> targets = (List<Tuple<int, int>>)sCH_targets_field.GetValue(null);
-
-            //Main.NewText($"{}");
-
-            //Main.NewText($"{sCH_targets.GetValue(null)}");
-
+            var providedInfo = (SmartCursorHelper.SmartCursorUsageInfo)providedInfo1;
             if (focusedX > -1 || focusedY > -1)
-            {
                 return;
-            }
-            int type = providedInfo_item.type;
+
+            int type = providedInfo.item.type;
             if (type < 0 || !ItemID.Sets.GrassSeeds[type])
-            {
                 return;
-            }
-            targets.Clear();
-            for (int i = providedInfo_reachableStartX; i <= providedInfo_reachableEndX; i++)
+
+            SmartCursorHelper._targets.Clear();
+            for (int i = providedInfo.reachableStartX; i <= providedInfo.reachableEndX; i++)
             {
-                for (int j = providedInfo_reachableStartY; j <= providedInfo_reachableEndY; j++)
+                for (int j = providedInfo.reachableStartY; j <= providedInfo.reachableEndY; j++)
                 {
                     Tile tile = Main.tile[i, j];
-
-                    bool flag = IsTileSolid(i - 1, j) ||
-                        !IsTileSolid(i, j + 1) ||
-                        !IsTileSolid(i + 1, j) ||
-                        !IsTileSolid(i, j - 1);
-
-                    bool flag2 = !IsTileSolid(i - 1, j - 1) ||
-                        !IsTileSolid(i - 1, j + 1) ||
-                        !IsTileSolid(i + 1, j + 1) ||
-                        !IsTileSolid(i + 1, j - 1);
-
-                    if (tile.HasTile && !tile.IsActuated && (flag || flag2))
+                    bool flag = !Main.tile[i - 1, j].active() || !Main.tile[i, j + 1].active() || !Main.tile[i + 1, j].active() || !Main.tile[i, j - 1].active();
+                    bool flag2 = !Main.tile[i - 1, j - 1].active() || !Main.tile[i - 1, j + 1].active() || !Main.tile[i + 1, j + 1].active() || !Main.tile[i + 1, j - 1].active();
+                    if (tile.active() && !tile.inActive() && (flag || flag2))
                     {
-                        bool flag3;
+                        bool flag3 = false;
                         switch (type)
                         {
                             default:
-                                flag3 = tile.TileType == 0;
+                                flag3 = tile.type == 0;
                                 break;
                             case 59:
                             case 2171:
-                                flag3 = tile.TileType == 0 || tile.TileType == 59;
+                                flag3 = tile.type == 0 || tile.type == 59;
                                 break;
                             case 194:
                             case 195:
-                                flag3 = tile.TileType == 59;
+                                flag3 = tile.type == 59;
                                 break;
                             case 5214:
-                                flag3 = tile.TileType == 57;
+                                flag3 = tile.type == 57;
                                 break;
                         }
-                        foreach (var l in GrassTileRelationship)
+
+                        foreach(var relationship in GrassTileRelationship)
                         {
-                            if (type == l.Item1)
+                            if (relationship.Item1 == type && relationship.Item2 == tile.type)
                             {
-                                flag3 = tile.TileType == l.Item2;
-                                if (flag3)
-                                {
-                                    break;
-                                }
+                                flag3 = true;
+                                break;
                             }
                         }
 
                         if (flag3)
-                            targets.Add(new Tuple<int, int>(i, j));
+                            SmartCursorHelper._targets.Add(new Tuple<int, int>(i, j));
                     }
                 }
             }
-            if (targets.Count > 0)
-            {
 
+            if (SmartCursorHelper._targets.Count > 0)
+            {
                 float num = -1f;
-                Tuple<int, int> tuple = targets[0];
-                for (int k = 0; k < targets.Count; k++)
+                Tuple<int, int> tuple = SmartCursorHelper._targets[0];
+                for (int k = 0; k < SmartCursorHelper._targets.Count; k++)
                 {
-                    float num2 = Vector2.Distance(new Vector2((float)targets[k].Item1, (float)targets[k].Item2) * 16f + Vector2.One * 8f, providedInfo_mouse);
+                    float num2 = Vector2.Distance(new Vector2(SmartCursorHelper._targets[k].Item1, SmartCursorHelper._targets[k].Item2) * 16f + Vector2.One * 8f, providedInfo.mouse);
                     if (num == -1f || num2 < num)
                     {
                         num = num2;
-                        tuple = targets[k];
+                        tuple = SmartCursorHelper._targets[k];
                     }
                 }
-                if (Collision.InTileBounds(tuple.Item1, tuple.Item2, providedInfo_reachableStartX, providedInfo_reachableStartY, providedInfo_reachableEndX, providedInfo_reachableEndY))
+
+                if (Collision.InTileBounds(tuple.Item1, tuple.Item2, providedInfo.reachableStartX, providedInfo.reachableStartY, providedInfo.reachableEndX, providedInfo.reachableEndY))
                 {
                     focusedX = tuple.Item1;
                     focusedY = tuple.Item2;
                 }
             }
-            targets.Clear();
 
-            providedInfo_item_field.SetValue(providedInfo, providedInfo_item);
-            providedInfo_reachableStartX_field.SetValue(providedInfo, providedInfo_reachableStartX);
-            providedInfo_reachableEndX_field.SetValue(providedInfo, providedInfo_reachableEndX);
-            providedInfo_reachableStartY_field.SetValue(providedInfo, providedInfo_reachableStartY);
-            providedInfo_reachableEndY_field.SetValue(providedInfo, providedInfo_reachableEndY);
-            providedInfo_mouse_field.SetValue(providedInfo, providedInfo_mouse);
-            sCH_targets_field.SetValue(null, targets);
-            //orig(providedInfo, ref focusedX, ref focusedY);
+            SmartCursorHelper._targets.Clear();
         }
 
         /// <summary>
