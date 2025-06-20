@@ -1,4 +1,6 @@
-﻿using Terraria;
+﻿using Microsoft.Xna.Framework;
+using System;
+using Terraria;
 using Terraria.ModLoader;
 
 namespace ScienceJam.Common.Systems
@@ -17,28 +19,28 @@ namespace ScienceJam.Common.Systems
         public static void SetDaylandCollor(On_Main.orig_SetBackColor orig, Main.InfoToSetBackColor info, out Color sunColor, out Color moonColor)
         {
             float influence = SunGrassTileCount.SunGrassTileInfluence;
+
+            double realTime = Main.time;
+            bool realDayTime = Main.dayTime;
+
+            Main.time = Main.dayLength / 2;
+            Main.dayTime = true;
+
             orig(info, out sunColor, out moonColor);
-            if (influence > 0.01f && !Main.dayTime)
-            {
-                double time = Main.time;
+            Vector4 colorOfMidday = Main.ColorOfTheSkies.ToVector4();
 
-                bool dayTime = Main.dayTime;
+            float rate = 0.5f;
 
-                Main.time = Main.time / Main.nightLength * Main.dayLength;
-                Main.dayTime = true;
+            Main.time = realTime;
+            Main.dayTime = realDayTime;
 
-                orig(info, out sunColor, out moonColor);
-                Color biomeTimeColor = new Color(Main.ColorOfTheSkies.ToVector4());
-                biomeTimeColor.B = (byte)((float)biomeTimeColor.B * 0.8f);
-                Main.time = time;
-                Main.dayTime = dayTime;
+            orig(info, out sunColor, out moonColor);
+            Vector4 colorReal = Main.ColorOfTheSkies.ToVector4();
+            colorReal.X = Math.Min(colorOfMidday.X, colorReal.X + (colorOfMidday.X * rate) * influence);
+            colorReal.Y = Math.Min(colorOfMidday.Y, colorReal.Y + (colorOfMidday.Y * rate) * influence);
+            colorReal.Z = Math.Min(colorOfMidday.Z, colorReal.Z + (colorOfMidday.Z * rate) * influence);
 
-                orig(info, out sunColor, out moonColor);
-                moonColor = new Color((sunColor.ToVector4() * (1f - influence) + (sunColor.ToVector4() + Main.DiscoColor.ToVector4()) * influence / 2f));
-                sunColor = moonColor;
-                Main.ColorOfTheSkies = new Color(biomeTimeColor.ToVector4() * influence + Main.ColorOfTheSkies.ToVector4() * (1f - influence));
-
-            }
+            Main.ColorOfTheSkies = new Color(colorReal);
         }
 
     }
