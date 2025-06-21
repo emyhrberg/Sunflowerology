@@ -39,7 +39,12 @@ namespace ScienceJam.Content.Tiles.SunGrass
             TileID.Sets.CanBeDugByShovel[Type] = true;
             TileID.Sets.DoesntPlaceWithTileReplacement[Type] = true;
             TileID.Sets.ChecksForMerge[Type] = true;
+            TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);
 
+            // This is the important line!
+            TileObjectData.newTile.HookPostPlaceMyPlayer = ModContent.GetInstance<SunGrassTileEntity>().Generic_HookPostPlaceMyPlayer;
+
+            TileObjectData.addTile(Type);
             DustType = ModContent.DustType<SunGrassSparkle>();
 
             AddMapEntry(new Color(200, 200, 200));
@@ -159,7 +164,7 @@ namespace ScienceJam.Content.Tiles.SunGrass
 
             counter++;
             counter = Math.Clamp(counter, 0, 50);
-            if (!needCheckForSunflower && !Main.rand.NextBool(5))
+            if (!needCheckForSunflower && !Main.rand.NextBool(100))
             {
                 return;
             }
