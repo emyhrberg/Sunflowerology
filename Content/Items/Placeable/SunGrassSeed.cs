@@ -55,6 +55,7 @@ namespace ScienceJam.Content.Items.Placeable
                     SoundEngine.PlaySound(SoundID.Dig, player.Center);
                     WorldGen.TileFrame(i, j);
                     WorldGen.DiamondTileFrame(i, j);
+                    ModContent.GetInstance<SunGrassTileEntity>().Place(i, j);
                     NetMessage.SendTileSquare(-1, i, j, 1);
                     return true;
                 }

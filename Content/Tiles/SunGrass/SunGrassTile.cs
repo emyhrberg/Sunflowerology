@@ -2,10 +2,14 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using ScienceJam.Content.Biomes;
 using ScienceJam.Content.Dusts;
+using System;
+using System.IO;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
+using Terraria.ObjectData;
 
 namespace ScienceJam.Content.Tiles.SunGrass
 {
@@ -53,6 +57,7 @@ namespace ScienceJam.Content.Tiles.SunGrass
                 fail = true;
                 effectOnly = true;
                 Framing.GetTileSafely(i, j).TileType = TileID.Grass;
+                ModContent.GetInstance<SunGrassTileEntity>().Kill(i, j);
                 WorldGen.SquareTileFrame(i, j);
                 NetMessage.SendTileSquare(-1, i, j, 1);
                 SoundEngine.PlaySound(SoundID.Grass);
@@ -132,6 +137,59 @@ namespace ScienceJam.Content.Tiles.SunGrass
                 bool _ = false;
                 KillTile(i, j, ref _, ref _, ref _);
                 return true;
+            }
+        }
+    }
+    public class SunGrassTileEntity : ModTileEntity
+    {
+        int counter = 0;
+        bool needCheckForSunflower => counter >= 50;
+        public override bool IsTileValidForEntity(int x, int y)
+        {
+            Tile tile = Main.tile[x, y];
+            return tile.HasTile && tile.TileType == ModContent.TileType<SunGrassTile>();
+        }
+
+        public override void Update()
+        {
+            if (!WorldGen.InWorld(Position.X, Position.Y, 10))
+            {
+                return;
+            }
+
+            counter++;
+            counter = Math.Clamp(counter, 0, 50);
+            if (!needCheckForSunflower && !Main.rand.NextBool(5))
+            {
+                return;
+            }
+            counter = 0;
+            int i = Position.X;
+            int j = Position.Y;
+
+            bool sunflowerNearby = false;
+
+            for (int k = -3; k <= 3 && !sunflowerNearby; k++)
+            {
+                for (int l = -3; l <= 3 && !sunflowerNearby; l++)
+                {
+                    if (k * k + l * l <= 9 && WorldGen.InWorld(i + k, j + l, 10))
+                    {
+                        Tile tile = Framing.GetTileSafely(i + k, j + l);
+                        if (tile.HasTile && tile.TileType == TileID.Sunflower)
+                        {
+                            sunflowerNearby = true;
+                        }
+                    }
+                }
+            }
+
+            if (!sunflowerNearby)
+            {
+                Main.tile[i, j].type = (ushort)TileID.Grass;
+                WorldGen.SquareTileFrame(i, j);
+                Kill(i, j);
+                return;
             }
         }
     }
