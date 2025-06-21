@@ -45,6 +45,11 @@ Items: {
 		DisplayName: Water Grass Seed
 		Tooltip: ""
 	}
+
+	DeadSunflowerItem: {
+		DisplayName: Dead Sunflower Item
+		Tooltip: ""
+	}
 }
 
 Projectiles: {

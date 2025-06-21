@@ -23,7 +23,7 @@ namespace ScienceJam.Common.Configs
         [DefaultValue(25)]
         public int HowFastSunGrassDecays = 25;
 
-        [DefaultValue(0.5f)]
+        [DefaultValue(60f)]
         public int HowMuchYouNeedBlocksForDayland = 60;
     }
 

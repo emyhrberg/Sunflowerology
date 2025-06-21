@@ -20,6 +20,11 @@ namespace ScienceJam.Common.Systems
         {
             float influence = SunGrassTileCount.SunGrassTileInfluence;
 
+            if (influence < 0.01f)
+            {
+                orig(info, out sunColor, out moonColor);
+                return;
+            }
             double realTime = Main.time;
             bool realDayTime = Main.dayTime;
 

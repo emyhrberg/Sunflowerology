@@ -176,7 +176,7 @@ namespace ScienceJam.Content.Tiles.SunGrass
 
             if (!sunflowerNearby)
             {
-                Main.tile[i, j].type = (ushort)TileID.Grass;
+                Main.tile[i, j].type = TileID.Grass;
                 WorldGen.SquareTileFrame(i, j);
                 Kill(i, j);
                 return;
