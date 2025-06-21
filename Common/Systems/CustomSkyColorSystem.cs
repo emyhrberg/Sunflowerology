@@ -29,7 +29,7 @@ namespace ScienceJam.Common.Systems
             orig(info, out sunColor, out moonColor);
             Vector4 colorOfMidday = Main.ColorOfTheSkies.ToVector4();
 
-            float rate = 0.5f;
+            float rate = 0.4f;
 
             Main.time = realTime;
             Main.dayTime = realDayTime;

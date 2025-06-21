@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using ScienceJam.Content.Biomes;
@@ -15,6 +16,7 @@ namespace ScienceJam.Content.Tiles.SunGrass
 {
     public class SunGrassTile : ModTile
     {
+        public static Asset<Texture2D> glowTexture;
         public override void SetStaticDefaults()
         {
             Main.tileLighted[Type] = true;
@@ -40,7 +42,6 @@ namespace ScienceJam.Content.Tiles.SunGrass
             TileID.Sets.DoesntPlaceWithTileReplacement[Type] = true;
             TileID.Sets.ChecksForMerge[Type] = true;
             TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);
-
             // This is the important line!
             TileObjectData.newTile.HookPostPlaceMyPlayer = ModContent.GetInstance<SunGrassTileEntity>().Generic_HookPostPlaceMyPlayer;
 
@@ -48,6 +49,8 @@ namespace ScienceJam.Content.Tiles.SunGrass
             DustType = ModContent.DustType<SunGrassSparkle>();
 
             AddMapEntry(new Color(200, 200, 200));
+
+            glowTexture = ModContent.Request<Texture2D>(Texture + "_Glow");
         }
 
         public override void NumDust(int i, int j, bool fail, ref int num)
@@ -87,30 +90,6 @@ namespace ScienceJam.Content.Tiles.SunGrass
                 return;
             }
 
-            bool sunflowerNearby = false;
-
-            for (int k = -3; k <= 3 && !sunflowerNearby; k++)
-            {
-                for (int l = -3; l <= 3 && !sunflowerNearby; l++)
-                {
-                    if (k * k + l * l <= 9 && WorldGen.InWorld(i + k, j + l, 10))
-                    {
-                        Tile tile = Framing.GetTileSafely(i + k, j + l);
-                        if (tile.HasTile && tile.TileType == TileID.Sunflower)
-                        {
-                            sunflowerNearby = true;
-                        }
-                    }
-                }
-            }
-
-            if (!sunflowerNearby)
-            {
-                Main.tile[i, j].type = (ushort)TileID.Grass;
-                WorldGen.SquareTileFrame(i, j);
-                return;
-            }
-
             Tile upperTile = Framing.GetTileSafely(i, j - 1);
 
             if (!upperTile.HasTile && Main.tile[i, j].HasTile && Utils.NextBool(Main.rand, 4) && upperTile.LiquidAmount == 0)
@@ -144,11 +123,15 @@ namespace ScienceJam.Content.Tiles.SunGrass
                 return true;
             }
         }
+        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
+        {
+            SJUtils.DrawGlowmask(i, j);
+        }
     }
     public class SunGrassTileEntity : ModTileEntity
     {
         int counter = 0;
-        bool needCheckForSunflower => counter >= 50;
+        bool needCheckForSunflower => counter == 0;
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];
@@ -163,22 +146,23 @@ namespace ScienceJam.Content.Tiles.SunGrass
             }
 
             counter++;
-            counter = Math.Clamp(counter, 0, 50);
-            if (!needCheckForSunflower && !Main.rand.NextBool(100))
+            counter %= 25;
+            if (!needCheckForSunflower || !Main.rand.NextBool(10))
             {
                 return;
             }
             counter = 0;
             int i = Position.X;
             int j = Position.Y;
+            const int radius = 25;
 
             bool sunflowerNearby = false;
 
-            for (int k = -3; k <= 3 && !sunflowerNearby; k++)
+            for (int k = -radius; k <= radius && !sunflowerNearby; k++)
             {
-                for (int l = -3; l <= 3 && !sunflowerNearby; l++)
+                for (int l = -radius; l <= radius && !sunflowerNearby; l++)
                 {
-                    if (k * k + l * l <= 9 && WorldGen.InWorld(i + k, j + l, 10))
+                    if (k * k + l * l <= radius * radius && WorldGen.InWorld(i + k, j + l, 10))
                     {
                         Tile tile = Framing.GetTileSafely(i + k, j + l);
                         if (tile.HasTile && tile.TileType == TileID.Sunflower)
