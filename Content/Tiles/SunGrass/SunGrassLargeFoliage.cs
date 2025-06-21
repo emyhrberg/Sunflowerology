@@ -8,7 +8,7 @@ using Terraria.ObjectData;
 
 namespace ScienceJam.Content.Tiles.SunGrass
 {
-    internal class SunGrassSmallFoliage : ModTile
+    internal class SunGrassLargeFoliage : ModTile
     {
         public override void SetStaticDefaults()
         {
@@ -17,11 +17,11 @@ namespace ScienceJam.Content.Tiles.SunGrass
             TileObjectData.newTile.Height = 1;
             TileObjectData.newTile.CoordinateHeights = new int[]
             {
-                20
+                32
             };
-            TileObjectData.newTile.DrawYOffset = 2;
+            TileObjectData.newTile.DrawYOffset = -10;
             TileObjectData.newTile.StyleHorizontal = true;
-            TileObjectData.newTile.RandomStyleRange = 22;
+            TileObjectData.newTile.RandomStyleRange = 8;
             TileObjectData.newTile.StyleMultiplier = 1;
             TileObjectData.newTile.CoordinateWidth = 16;
             TileObjectData.newTile.CoordinatePadding = 2;
@@ -45,7 +45,7 @@ namespace ScienceJam.Content.Tiles.SunGrass
         public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
         {
             Tile tile = Main.tile[i, j];
-            tile.TileFrameX %= 18 * 22; // 18 pixels per frame, 22 frames total
+            tile.TileFrameX %= 18 * 8; // 18 pixels per frame, 8 frames total
             return base.TileFrame(i, j, ref resetFrame, ref noBreak);
         }
 

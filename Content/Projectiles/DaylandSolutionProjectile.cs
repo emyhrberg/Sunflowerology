@@ -91,7 +91,6 @@ namespace ScienceJam.Content.Projectiles
                         int type = Main.tile[k, l].TileType;
                         int wall = Main.tile[k, l].WallType;
 
-                        // Convert all walls to ExampleWall (or ExampleWallUnsafe for SpiderUnsafe)
                         if (wall != 0 && wall != ModContent.WallType<SungrassWallUnsafe>())
                         {
                             if (wall == WallID.SpiderUnsafe)
@@ -102,38 +101,14 @@ namespace ScienceJam.Content.Projectiles
                             NetMessage.SendTileSquare(-1, k, l, 1);
                         }
 
-                        // If the tile is stone, convert to ExampleBlock
-                        if (TileID.Sets.Conversion.Grass[type])
+                        if (TileID.Sets.Conversion.Grass[type] && type != ModContent.TileType<SunGrassTile>())
                         {
                             Main.tile[k, l].TileType = (ushort)ModContent.TileType<SunGrassTile>();
+                            ModContent.GetInstance<SunGrassTileEntity>().Place(k, l);
                             WorldGen.TileFrame(k, l);
                             WorldGen.DiamondTileFrame(k, l);
                             NetMessage.SendTileSquare(-1, k, l, 1);
                         }
-                        // If the tile is sand, convert to ExampleSand
-                        /*
-                        else if (TileID.Sets.Conversion.Sand[type])
-                        {
-                            Main.tile[k, l].TileType = (ushort)ModContent.TileType<ExampleSand>();
-                            WorldGen.SquareTileFrame(k, l);
-                            NetMessage.SendTileSquare(-1, k, l, 1);
-                        }
-                        // If the tile is a chair, convert to ExampleChair
-                        else if (type == TileID.Chairs && Main.tile[k, l - 1].TileType == TileID.Chairs)
-                        {
-                            Main.tile[k, l].TileType = (ushort)ModContent.TileType<ExampleChair>();
-                            Main.tile[k, l - 1].TileType = (ushort)ModContent.TileType<ExampleChair>();
-                            WorldGen.SquareTileFrame(k, l);
-                            NetMessage.SendTileSquare(-1, k, l, 1);
-                        }
-                        // If the tile is a workbench, convert to ExampleWorkBench
-                        else if (type == TileID.WorkBenches && Main.tile[k - 1, l].TileType == TileID.WorkBenches)
-                        {
-                            Main.tile[k, l].TileType = (ushort)ModContent.TileType<ExampleWorkbench>();
-                            Main.tile[k - 1, l].TileType = (ushort)ModContent.TileType<ExampleWorkbench>();
-                            WorldGen.SquareTileFrame(k, l);
-                            NetMessage.SendTileSquare(-1, k, l, 1);
-                        }*/
                     }
                 }
             }

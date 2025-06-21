@@ -95,7 +95,13 @@ namespace ScienceJam.Content.Tiles.SunGrass
 
             if (!upperTile.HasTile && Main.tile[i, j].HasTile && Utils.NextBool(Main.rand, 4) && upperTile.LiquidAmount == 0)
             {
-                WorldGen.PlaceObject(i, j - 1, ModContent.TileType<SunGrassSmallFoliage>(), true, Main.rand.Next(22), 0, -1, -1);
+                WorldGen.PlaceObject(i, j - 1, ModContent.TileType<SunGrassSmallFoliage>(), true, 0, 0, -1, -1);
+                WorldGen.TileFrame(i, j - 1);
+            }
+            else if (upperTile.HasTile && Main.tile[i, j].HasTile && upperTile.type == ModContent.TileType<SunGrassSmallFoliage>() && Utils.NextBool(Main.rand, 4))
+            {
+                upperTile.type = (ushort)ModContent.TileType<SunGrassLargeFoliage>();
+                WorldGen.TileFrame(i, j - 1);
             }
         }
 
@@ -141,6 +147,11 @@ namespace ScienceJam.Content.Tiles.SunGrass
 
         public override void Update()
         {
+            if(!IsTileValidForEntity(Position.X, Position.Y))
+            {
+                Kill(Position.X, Position.Y);
+            }
+
             if (!WorldGen.InWorld(Position.X, Position.Y, 10))
             {
                 return;

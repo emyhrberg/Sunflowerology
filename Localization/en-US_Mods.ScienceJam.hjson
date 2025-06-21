@@ -90,3 +90,5 @@ Configs: {
 		}
 	}
 }
+
+NPCs.BigBunny.DisplayName: Big Bunny

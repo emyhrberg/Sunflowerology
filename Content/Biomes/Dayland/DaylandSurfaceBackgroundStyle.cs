@@ -11,7 +11,7 @@ namespace ScienceJam.Backgrounds
             {
                 if (i == Slot)
                 {
-                    fades[i] += transitionSpeed / 8;
+                    fades[i] += transitionSpeed;
                     if (fades[i] > 1f)
                     {
                         fades[i] = 1f;
@@ -19,7 +19,7 @@ namespace ScienceJam.Backgrounds
                 }
                 else
                 {
-                    fades[i] -= transitionSpeed / 8;
+                    fades[i] -= transitionSpeed;
                     if (fades[i] < 0f)
                     {
                         fades[i] = 0f;
