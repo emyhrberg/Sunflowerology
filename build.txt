@@ -1,4 +1,4 @@
-displayName = Jam of Science
+displayName = Sunflowerology: The Study of Sunflowers
 author = Erky &amp; Cotlim
 version = 0.1
 dllReferences = ModLiquidLib, StructureHelper
