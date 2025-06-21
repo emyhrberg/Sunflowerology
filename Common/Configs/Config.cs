@@ -16,6 +16,15 @@ namespace ScienceJam.Common.Configs
 
         [DefaultValue(true)]
         public bool DestabilizeTiles = true;
+
+        [DefaultValue(3)]
+        public int RadiusOfSunflower = 3;
+
+        [DefaultValue(25)]
+        public int HowFastSunGrassDecays = 25;
+
+        [DefaultValue(0.5f)]
+        public int HowMuchYouNeedBlocksForDayland = 60;
     }
 
 

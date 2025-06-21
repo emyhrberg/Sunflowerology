@@ -68,5 +68,20 @@ Configs: {
 			Label: Destabilize Tiles
 			Tooltip: ""
 		}
+
+		RadiusOfSunflower: {
+			Label: Radius Of Sunflower
+			Tooltip: ""
+		}
+
+		HowFastSunGrassDecays: {
+			Label: How Fast Sun Grass Decays
+			Tooltip: ""
+		}
+
+		HowMuchYouNeedBlocksForDayland: {
+			Label: How Much You Need Blocks For Dayland
+			Tooltip: ""
+		}
 	}
 }

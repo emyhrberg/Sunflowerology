@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using ScienceJam.Common.Configs;
 using ScienceJam.Content.Tiles;
 using ScienceJam.Content.Tiles.SunGrass;
 using Terraria;
@@ -11,7 +12,7 @@ namespace ScienceJam.Common.Systems
     {
         private static int sunGrassTileCount = 0;
         private static float sunGrassTileInfluence = 0f;
-        private const float maxSunGrassTileCount = 60f;
+        private static int maxSunGrassTileCount => Conf.C.HowMuchYouNeedBlocksForDayland;
 
         public override void TileCountsAvailable(ReadOnlySpan<int> tileCounts)
         {

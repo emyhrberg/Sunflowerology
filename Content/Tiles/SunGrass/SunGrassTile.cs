@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using ScienceJam.Common.Configs;
 using ScienceJam.Content.Biomes;
 using ScienceJam.Content.Dusts;
 using System;
@@ -146,7 +147,7 @@ namespace ScienceJam.Content.Tiles.SunGrass
             }
 
             counter++;
-            counter %= 25;
+            counter %= Conf.C.HowFastSunGrassDecays;
             if (!needCheckForSunflower || !Main.rand.NextBool(10))
             {
                 return;
@@ -154,7 +155,7 @@ namespace ScienceJam.Content.Tiles.SunGrass
             counter = 0;
             int i = Position.X;
             int j = Position.Y;
-            const int radius = 25;
+            int radius = Conf.C.RadiusOfSunflower;
 
             bool sunflowerNearby = false;
 
