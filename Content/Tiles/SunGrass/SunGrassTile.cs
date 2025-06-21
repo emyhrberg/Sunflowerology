@@ -1,16 +1,11 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using ScienceJam.Common.Configs;
-using ScienceJam.Content.Biomes;
 using ScienceJam.Content.Dusts;
-using System;
-using System.IO;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 
 namespace ScienceJam.Content.Tiles.SunGrass

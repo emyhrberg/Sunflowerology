@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Helper
+namespace ScienceJam.Helpers
 {
     public static class Log
     {

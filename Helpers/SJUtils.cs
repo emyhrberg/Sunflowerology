@@ -9,7 +9,7 @@ using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Helper
+namespace ScienceJam.Helpers
 {
     public static class SJUtils
     {
