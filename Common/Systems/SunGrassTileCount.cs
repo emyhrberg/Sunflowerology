@@ -11,6 +11,7 @@ namespace ScienceJam.Common.Systems
     {
         private static int sunGrassTileCount = 0;
         private static float sunGrassTileInfluence = 0f;
+        private const float maxSunGrassTileCount = 60f;
 
         public override void TileCountsAvailable(ReadOnlySpan<int> tileCounts)
         {
@@ -23,7 +24,7 @@ namespace ScienceJam.Common.Systems
         {
             if (!Main.gameMenu)
             {
-                sunGrassTileInfluence = MathHelper.Lerp(sunGrassTileInfluence, Math.Clamp(sunGrassTileCount, 0f, 40f) / 40f, 0.05f);
+                sunGrassTileInfluence = MathHelper.Lerp(sunGrassTileInfluence, Math.Clamp(sunGrassTileCount, 0f, maxSunGrassTileCount) / maxSunGrassTileCount, 0.05f);
             }
             else
             {

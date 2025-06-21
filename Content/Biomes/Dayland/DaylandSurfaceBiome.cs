@@ -22,7 +22,7 @@ namespace ScienceJam.Content.Biomes
 
         public override bool IsBiomeActive(Player player)
         {
-            bool b1 = SunGrassTileCount.SunGrassTileInfluence >= 0.8f;
+            bool b1 = SunGrassTileCount.SunGrassTileInfluence >= 0.9f;
             bool b3 = player.ZoneSkyHeight || player.ZoneOverworldHeight;
             return b1 && b3;
         }

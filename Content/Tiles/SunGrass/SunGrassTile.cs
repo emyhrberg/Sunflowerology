@@ -70,14 +70,37 @@ namespace ScienceJam.Content.Tiles.SunGrass
             g = 0.4f;
             b = 0f;
         }
-
         public unsafe override void RandomUpdate(int i, int j)
         {
             if (!WorldGen.InWorld(i, j, 10))
             {
                 return;
             }
-            Framing.GetTileSafely(i, j + 1);
+
+            bool sunflowerNearby = false;
+
+            for (int k = -3; k <= 3 && !sunflowerNearby; k++)
+            {
+                for (int l = -3; l <= 3 && !sunflowerNearby; l++)
+                {
+                    if (k * k + l * l <= 9 && WorldGen.InWorld(i + k, j + l, 10))
+                    {
+                        Tile tile = Framing.GetTileSafely(i + k, j + l);
+                        if (tile.HasTile && tile.TileType == TileID.Sunflower)
+                        {
+                            sunflowerNearby = true;
+                        }
+                    }
+                }
+            }
+
+            if (!sunflowerNearby)
+            {
+                Main.tile[i, j].type = (ushort)TileID.Grass;
+                WorldGen.SquareTileFrame(i, j);
+                return;
+            }
+
             Tile upperTile = Framing.GetTileSafely(i, j - 1);
 
             if (!upperTile.HasTile && Main.tile[i, j].HasTile && Utils.NextBool(Main.rand, 4) && upperTile.LiquidAmount == 0)
