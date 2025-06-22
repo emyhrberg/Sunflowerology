@@ -30,6 +30,8 @@
 	<ItemGroup>
 	  <Folder Include="Assets\Photoshop\Items\" />
 	  <Folder Include="Common\Systems\" />
+	  <Folder Include="Content\Tiles\NewFolder1\" />
+	  <Folder Include="Content\Tiles\NewFolder\" />
 	</ItemGroup>
 
 </Project>
