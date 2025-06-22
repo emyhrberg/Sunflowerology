@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ScienceJam.Content.Tiles.SunGrass;
-using ScienceJam.Content.Walls;
 using System.Reflection;
 using System.Threading;
 using Terraria;
