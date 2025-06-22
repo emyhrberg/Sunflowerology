@@ -8,7 +8,7 @@ using Terraria.ModLoader.IO;
 using Terraria.ModLoader.UI;
 using Terraria.ObjectData;
 
-namespace ScienceJam.Content.Tiles
+namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 {
     internal class SproutTile : ModTile
     {
@@ -229,22 +229,35 @@ namespace ScienceJam.Content.Tiles
 
         private void CheckIfGrowenUp()
         {
-            if (pairedEntity.growthAmount >= 100 && growthAmount >= 100 && Pairing == PairingState.OnRight)
+            if (pairedEntity?.growthAmount >= 100 && growthAmount >= 100 && Pairing == PairingState.OnRight)
             {
-                var growthAmount1 = growthAmount;
-                int growthAmount2 = (int)pairedEntity?.growthAmount;
-                var i = Position.X;
-                var j = Position.Y;
-                WorldGen.KillTile(Position.X, Position.Y, false, false, true);
+                int growthAmount1 = growthAmount;
+                int growthAmount2 = (int)pairedEntity.growthAmount;
+
+                int i = Position.X;
+                int j = Position.Y;
+
+                // Знищуємо старі плитки
+                WorldGen.KillTile(i, j, false, false, true);
                 WorldGen.KillTile(pairedEntity.Position.X, pairedEntity.Position.Y, false, false, true);
-                WorldGen.PlaceTile(Position.X, Position.Y, ModContent.TileType<SeedlingTile>(), true, true);
-                if (TileEntity.TryGet(i, j, out SeedlingEntity tileEntity))
+
+                // Ставимо мультітайл
+                if (WorldGen.PlaceObject(i, j, ModContent.TileType<SeedlingTile>()))
                 {
-                    tileEntity.growthAmount1 = growthAmount1;
-                    tileEntity.growthAmount2 = growthAmount2;
+                    NetMessage.SendObjectPlacement(-1, i, j, ModContent.TileType<SeedlingTile>(), 0, 0, -1, -1);
+
+                    // Створюємо TileEntity вручну
+                    int id = ModContent.GetInstance<SeedlingEntity>().Place(i, j);
+                    if (id != -1 && TileEntity.ByID.TryGetValue(id, out TileEntity entity) && entity is SeedlingEntity seedlingEntity)
+                    {
+                        seedlingEntity.growthAmount1 = growthAmount1;
+                        seedlingEntity.growthAmount2 = growthAmount2;
+                    }
                 }
             }
         }
+
+
 
         public override void SaveData(TagCompound tag)
         {

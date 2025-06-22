@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace ScienceJam.Content.Items.Placeable
     {
         public override void SetDefaults()
         {
-            Item.DefaultToPlaceableTile(ModContent.TileType<Tiles.SproutTile>());
+            Item.DefaultToPlaceableTile(ModContent.TileType<SproutTile>());
             Item.width = 30;
             Item.height = 28;
             Item.maxStack = 9999;

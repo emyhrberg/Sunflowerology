@@ -8,7 +8,7 @@ using Terraria.ModLoader.IO;
 using Terraria.ModLoader.UI;
 using Terraria.ObjectData;
 
-namespace ScienceJam.Content.Tiles
+namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 {
     internal class SeedlingTile : ModTile
     {
