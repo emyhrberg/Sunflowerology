@@ -237,22 +237,23 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 int i = Position.X;
                 int j = Position.Y;
 
-                // Знищуємо старі плитки
+                // Kill the current tile and the paired entity's tile
                 WorldGen.KillTile(i, j, false, false, true);
                 WorldGen.KillTile(pairedEntity.Position.X, pairedEntity.Position.Y, false, false, true);
 
-                // Ставимо мультітайл
+                // Place the new tile
                 if (WorldGen.PlaceObject(i, j, ModContent.TileType<SeedlingTile>()))
                 {
-                    NetMessage.SendObjectPlacement(-1, i, j, ModContent.TileType<SeedlingTile>(), 0, 0, -1, -1);
 
-                    // Створюємо TileEntity вручну
-                    int id = ModContent.GetInstance<SeedlingEntity>().Place(i, j);
+
+                    // Get the ID of the newly placed tile entity
+                    int id = ModContent.GetInstance<SeedlingEntity>().Place(i, j-1);
                     if (id != -1 && TileEntity.ByID.TryGetValue(id, out TileEntity entity) && entity is SeedlingEntity seedlingEntity)
                     {
                         seedlingEntity.growthAmount1 = growthAmount1;
                         seedlingEntity.growthAmount2 = growthAmount2;
                     }
+                    NetMessage.SendObjectPlacement(-1, i, j, ModContent.TileType<SeedlingTile>(), 0, 0, -1, -1);
                 }
             }
         }

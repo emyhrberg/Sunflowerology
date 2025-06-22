@@ -58,6 +58,32 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             Tile tile = Main.tile[x, y];
             return tile.HasTile && tile.TileType == ModContent.TileType<SeedlingTile>();
         }
+
+        public override void SaveData(TagCompound tag)
+        {
+            tag[nameof(growthAmount1)] = growthAmount1;
+            tag[nameof(growthAmount2)] = growthAmount2;
+        }
+
+        public override void LoadData(TagCompound tag)
+        {
+            growthAmount1 = tag.GetInt(nameof(growthAmount1));
+            growthAmount2 = tag.GetInt(nameof(growthAmount2));
+        }
+
+        public override void NetSend(BinaryWriter writer)
+        {
+            writer.Write(growthAmount1);
+            writer.Write(growthAmount2);
+
+        }
+
+        public override void NetReceive(BinaryReader reader)
+        {
+            growthAmount1 = reader.ReadInt32();
+            growthAmount2 = reader.ReadInt32();
+        }
+
     }
 
 }
