@@ -13,7 +13,7 @@ using Terraria.ModLoader.Utilities;
 
 namespace ScienceJam.Content.NPC
 {
-    internal class BigBunny : ModNPC
+    internal abstract class BigBunny : ModNPC
     {
         private enum ActionState
         {

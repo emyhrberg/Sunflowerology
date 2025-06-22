@@ -50,6 +50,11 @@ Items: {
 		DisplayName: Dead Sunflower Item
 		Tooltip: ""
 	}
+
+	SunflowerSeedItem: {
+		DisplayName: Sunflower Seed Item
+		Tooltip: ""
+	}
 }
 
 Projectiles: {
