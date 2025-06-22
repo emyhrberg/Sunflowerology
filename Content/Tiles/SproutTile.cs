@@ -5,6 +5,7 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Terraria.ModLoader.UI;
 using Terraria.ObjectData;
 
 namespace ScienceJam.Content.Tiles
@@ -50,6 +51,18 @@ namespace ScienceJam.Content.Tiles
         {
             ModContent.GetInstance<SproutEntity>().Kill(i, j);
         }
+
+        public override void MouseOver(int i, int j)
+        {
+            if (TileEntity.TryGet(i, j, out SproutEntity tileEntity))
+            {
+                Player player = Main.LocalPlayer;
+                player.noThrow = 2;
+                player.cursorItemIconEnabled = true;
+                player.cursorItemIconID = -1;
+                player.cursorItemIconText = $"{tileEntity.growthAmount}";
+            }
+        }
     }
     public enum PairingState
     {
@@ -73,6 +86,9 @@ namespace ScienceJam.Content.Tiles
             }
         }
         public SproutEntity pairedEntity;
+        public int growthAmount = 0;
+        public const int HowOftenUpdate = 30;
+        public int updateCounter = 0;
         public bool IsPaired => Pairing != PairingState.None;
         public override bool IsTileValidForEntity(int x, int y)
         {
@@ -184,6 +200,15 @@ namespace ScienceJam.Content.Tiles
         //TODO: Slow down the update rate of this entity, so it doesn't check every frame.
         public override void Update()
         {
+            // Update only every HowOftenUpdate frames
+            updateCounter++;
+            updateCounter %= HowOftenUpdate;
+            if (updateCounter != 0)
+            {
+                return;
+            }
+
+
             if (!IsPaired)
             {
                 if (CheckUnpairedSprout(PairingState.OnRight)) return;
@@ -191,27 +216,59 @@ namespace ScienceJam.Content.Tiles
             }
             else
             {
-                CheckIfWalidPairing();
+                if (Main.rand.NextBool(10) || true)
+                {
+                    pairedEntity.growthAmount++;
+                    growthAmount++;
+                }
+
+                CheckIfGrowenUp();
+
             }
         }
+
+        private void CheckIfGrowenUp()
+        {
+            if (pairedEntity.growthAmount >= 100 && growthAmount >= 100 && Pairing == PairingState.OnRight)
+            {
+                var growthAmount1 = growthAmount;
+                int growthAmount2 = (int)pairedEntity?.growthAmount;
+                var i = Position.X;
+                var j = Position.Y;
+                WorldGen.KillTile(Position.X, Position.Y, false, false, true);
+                WorldGen.KillTile(pairedEntity.Position.X, pairedEntity.Position.Y, false, false, true);
+                WorldGen.PlaceTile(Position.X, Position.Y, ModContent.TileType<SeedlingTile>(), true, true);
+                if (TileEntity.TryGet(i, j, out SeedlingEntity tileEntity))
+                {
+                    tileEntity.growthAmount1 = growthAmount1;
+                    tileEntity.growthAmount2 = growthAmount2;
+                }
+            }
+        }
+
         public override void SaveData(TagCompound tag)
         {
             tag[nameof(Pairing)] = (int)Pairing;
+            tag[nameof(growthAmount)] = growthAmount;
         }
 
         public override void LoadData(TagCompound tag)
         {
             SetUpPairedEntity((PairingState)tag.GetInt(nameof(Pairing)));
+            growthAmount = tag.GetInt(nameof(growthAmount));
         }
 
         public override void NetSend(BinaryWriter writer)
         {
             writer.Write((int)Pairing);
+            writer.Write(growthAmount);
+
         }
 
         public override void NetReceive(BinaryReader reader)
         {
             SetUpPairedEntity((PairingState)reader.ReadInt32());
+            growthAmount = reader.ReadInt32();
         }
 
         public override void OnKill()
