@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -36,9 +37,9 @@ namespace ScienceJam.Content.Tiles
         {
             if (TileEntity.TryGet(i, j, out SproutEntity tileEntity))
             {
-                if (tileEntity.Pairing == PairingState.OnRight)
+                if (tileEntity.sproutData.pairing == PairingState.OnRight)
                     tileFrameY = 20;
-                else if (tileEntity.Pairing == PairingState.OnLeft)
+                else if (tileEntity.sproutData.pairing == PairingState.OnLeft)
                     tileFrameY = 40;
                 else
                     tileFrameY = 0;
@@ -59,87 +60,197 @@ namespace ScienceJam.Content.Tiles
     public class SproutEntity : ModTileEntity
     {
 
-        public PairingState Pairing;
+        public SproutData sproutData;
 
-        public bool IsPaired => Pairing != PairingState.None;
+        public SproutEntity() : base()
+        {
+            sproutData = new SproutData()
+            {
+                parent = this,
+                pairing = PairingState.None,
+                pairedSproudData = null
+            };
+        }
+
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];
             return tile.HasTile && tile.TileType == ModContent.TileType<SproutTile>();
         }
+
         public override void Update()
         {
-            if (!IsPaired)
+            if (!sproutData.IsPaired)
             {
-                if (CheckUnpairedSprouts(Position.X, Position.Y, PairingState.OnRight))
+                if (sproutData.CheckUnpairedSprouts(PairingState.OnRight))
                 {
                     return;
                 }
-                if (CheckUnpairedSprouts(Position.X, Position.Y, PairingState.OnLeft))
+                if (sproutData.CheckUnpairedSprouts(PairingState.OnLeft))
                 {
                     return;
                 }
             }
             else
             {
-                int pairedX = Position.X + (Pairing == PairingState.OnRight ? 1 : -1);
+                int pairedX = Position.X + (sproutData.pairing == PairingState.OnRight ? 1 : -1);
                 int pairedY = Position.Y;
                 Tile pairedTile = Framing.GetTileSafely(pairedX, pairedY);
 
-                if (!pairedTile.HasTile || pairedTile.IsActuated || pairedTile.TileType != ModContent.TileType<SproutTile>() || !TryGet(pairedX, pairedY, out SproutEntity pairedEntity) || !pairedEntity.IsPaired || pairedEntity.Pairing != (Pairing == PairingState.OnRight ? PairingState.OnLeft : PairingState.OnRight))
+                if (!pairedTile.HasTile || pairedTile.IsActuated || pairedTile.TileType != ModContent.TileType<SproutTile>() || !TryGet(pairedX, pairedY, out SproutEntity pairedEntity) || !pairedEntity.sproutData.IsPaired || pairedEntity.sproutData.pairing != SproutData.GetOposite(sproutData.pairing))
                 {
-                    Pairing = PairingState.None;
-                    NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
+                    sproutData.RemovePairing();
                 }
             }
         }
 
         public override void SaveData(TagCompound tag)
         {
-            tag[nameof(Pairing)] = (int)Pairing;
+            tag[nameof(sproutData.pairing)] = (int)sproutData.pairing;
         }
 
         public override void LoadData(TagCompound tag)
         {
-            Pairing = (PairingState)tag.GetInt(nameof(Pairing));
+            sproutData = new SproutData()
+            {
+                parent = this,
+                pairing = (PairingState)tag.GetInt(nameof(sproutData.pairing))
+            };
+            sproutData.SetUpPairedSproutData();
         }
 
         public override void NetSend(BinaryWriter writer)
         {
-            writer.Write((int)Pairing);
+            writer.Write((int)sproutData.pairing);
         }
 
         public override void NetReceive(BinaryReader reader)
         {
-            Pairing = (PairingState)reader.ReadInt32();
+            sproutData.pairing = (PairingState)reader.ReadInt32();
+        }
+
+        override public void OnKill()
+        {
+            sproutData.pairedSproudData?.RemovePairing();
+            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
         }
 
 
+    }
+
+    public class SproutData
+    {
+        public ModTileEntity parent;
+        public PairingState pairing;
+        public int X => parent.Position.X;
+        public int Y => parent.Position.Y;
+        public int TypeOfEntity => parent.Type;
+        public SproutData pairedSproudData;
+        public bool IsPaired => pairing != PairingState.None;
+
         /// <summary>
-        /// Checks for unpaired sprouts adjacent to the current sprout and pairs them if found.
+        /// Checks for an unpaired sprout on the specified side (left or right) and pairs it with this sprout if found.
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
         /// <param name="side"></param>
-        /// <returns>Returns true if a pairing was made, false otherwise.</returns></returns>
-        private bool CheckUnpairedSprouts(int x, int y, PairingState side)
+        /// <returns></returns>
+        public bool CheckUnpairedSprouts(PairingState side)
         {
-            int i = x + (side == PairingState.OnRight ? 1 : -1);
-            int j = y;
+            // Coordinates for the paired sprout based on the current sprout's position and pairing side
+            int i = X + (side == PairingState.OnRight ? 1 : -1);
+            int j = Y;
+
+            // Get the tile at the paired coordinates
             Tile tile = Framing.GetTileSafely(i, j);
+
+            // Check if the tile is a sprout tile and if it has a tile entity
             if (tile.HasTile && !tile.IsActuated &&
-                tile.type == ModContent.TileType<SproutTile>() && TryGet(i, j, out SproutEntity tileEntityOnRight))
+                tile.type == ModContent.TileType<SproutTile>() && TileEntity.TryGet(i, j, out SproutEntity tileEntityOnSide))
             {
-                if (!tileEntityOnRight.IsPaired)
+                // If the tile entity is found and it is not paired, pair it with this sprout
+                if (!tileEntityOnSide.sproutData.IsPaired)
                 {
-                    tileEntityOnRight.Pairing = side == PairingState.OnRight ? PairingState.OnLeft : PairingState.OnRight;
-                    Pairing = side;
-                    NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, x, y);
-                    NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, i, j);
+                    tileEntityOnSide.sproutData.pairing = GetOposite(side);
+                    pairing = side;
+                    tileEntityOnSide.sproutData.pairedSproudData = this;
+                    pairedSproudData = tileEntityOnSide.sproutData;
+                    NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, TypeOfEntity, X, Y);
+                    NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, TypeOfEntity, i, j);
                     return true; // Successfully paired
                 }
             }
             return false;
+        }
+
+        public void SetUpPairedSproutData()
+        {
+            if (!IsPaired) { return; }
+            if (!GetPairedSproutData())
+            {
+                //Log.Warn($"Sprout at ({x}, {y}) with pairing {pairing} could not find a paired sprout. This may cause issues in the future.");
+            }
+            else
+            {
+                //Log.Info($"Sprout at ({x}, {y}) successfully paired with sprout at ({pairedSproudData.x}, {pairedSproudData.y}) with pairing {pairedSproudData.pairing}.");
+            }
+        }
+
+        /// <summary>
+        /// Attempts to find and set the paired sprout data based on the current sprout's position and pairing state.
+        /// </summary>
+        /// <returns>True if a paired sprout was found and set, false otherwise.</returns>
+        private bool GetPairedSproutData()
+        {
+            // Coordinates for the paired sprout based on the current sprout's position and pairing side
+            int i = X + (pairing == PairingState.OnRight ? 1 : -1);
+            int j = Y;
+
+            // Get the tile at the paired coordinates
+            Tile tile = Framing.GetTileSafely(i, j);
+
+            // Check if the tile is a sprout tile and if it has a tile entity
+            if (tile.HasTile && !tile.IsActuated &&
+                tile.type == ModContent.TileType<SproutTile>() && TileEntity.TryGet(i, j, out SproutEntity tileEntityOnRight))
+            {
+                // If the tile entity is found and its pairing state matches the opposite of the current sprout's pairing state,
+                if (tileEntityOnRight.sproutData.pairing == GetOposite(pairing))
+                {
+                    // Set the paired sprout data
+                    tileEntityOnRight.sproutData.pairedSproudData = this;
+                    pairedSproudData = tileEntityOnRight.sproutData;
+                    NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, TypeOfEntity, X, Y);
+                    NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, TypeOfEntity, i, j);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Removes the pairing of this sprout with its paired sprout, if any.
+        /// </summary>
+        internal void RemovePairing()
+        {
+            pairedSproudData = null;
+            pairing = PairingState.None;
+            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, TypeOfEntity, X, Y);
+        }
+
+        /// <summary>
+        /// Returns the opposite pairing state of the given state.
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        public static PairingState GetOposite(PairingState state)
+        {
+            if (state == PairingState.OnRight)
+            {
+                return PairingState.OnLeft;
+            }
+            else if (state == PairingState.OnLeft)
+            {
+                return PairingState.OnRight;
+            }
+            return PairingState.None;
         }
     }
 }
