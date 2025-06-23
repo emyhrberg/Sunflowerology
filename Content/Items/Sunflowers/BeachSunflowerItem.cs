@@ -1,7 +1,7 @@
 ﻿using ScienceJam.Content.Tiles.BeachSunflower;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Content.Items.Placeable
+namespace ScienceJam.Content.Items.Sunflowers
 {
     internal class BeachSunflowerItem : ModItem
     {

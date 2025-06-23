@@ -60,6 +60,11 @@ Items: {
 		DisplayName: Beach Sunflower Item
 		Tooltip: ""
 	}
+
+	BeachSunflowerSeedItem: {
+		DisplayName: Beach Sunflower Seed Item
+		Tooltip: ""
+	}
 }
 
 Projectiles: {

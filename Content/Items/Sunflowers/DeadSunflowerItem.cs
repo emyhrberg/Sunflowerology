@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ScienceJam.Content.Tiles.DeadSunflower;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Content.Items.Placeable
+namespace ScienceJam.Content.Items.Sunflowers
 {
     internal class DeadSunflowerItem : ModItem
     {
         public override void SetDefaults()
         {
-            Item.DefaultToPlaceableTile(ModContent.TileType<Tiles.DeadSunflowerTile>());
+            Item.DefaultToPlaceableTile(ModContent.TileType<DeadSunflowerTile>());
             Item.width = 30;
             Item.height = 28;
             Item.maxStack = 9999;

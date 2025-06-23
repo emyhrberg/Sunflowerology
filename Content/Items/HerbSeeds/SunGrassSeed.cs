@@ -1,13 +1,11 @@
-﻿
-using ScienceJam.Common.Systems;
-using ScienceJam.Content.Tiles;
+﻿using ScienceJam.Common.Systems;
 using ScienceJam.Content.Tiles.SunGrass;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Content.Items.Placeable
+namespace ScienceJam.Content.Items.HerbSeeds
 {
     public class SunGrassSeed : ModItem
     {

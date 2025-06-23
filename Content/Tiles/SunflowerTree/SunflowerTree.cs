@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using ScienceJam.Content.Items.Placeable;
+using ScienceJam.Content.Items.SunflowerSeeds;
 using ScienceJam.Content.Tiles.SunGrass;
 using Terraria;
 using Terraria.GameContent;

@@ -8,7 +8,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
-namespace ScienceJam.Content.Tiles
+namespace ScienceJam.Content.Tiles.DeadSunflower
 {
     internal class DeadSunflowerTile : ModTile
     {

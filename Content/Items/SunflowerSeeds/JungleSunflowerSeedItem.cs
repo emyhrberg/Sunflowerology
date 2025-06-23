@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
-using StructureHelper.Content.GUI;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
-namespace ScienceJam.Content.Items.Placeable
+namespace ScienceJam.Content.Items.SunflowerSeeds
 {
-    internal class SunflowerSeedItem : ModItem
+    internal class JungleSunflowerSeedItem : ModItem
     {
         public SeedData sproutData = new();
         public int Dry = 5;//Dry, Water, Wild, Sun, Cave, Hot, Cold, Evil, Good, Honey
@@ -26,7 +24,7 @@ namespace ScienceJam.Content.Items.Placeable
         {
             Item.DefaultToPlaceableTile(ModContent.TileType<SproutTile>());
             Item.width = 22;
-            Item.height = 18;
+            Item.height = 22;
             Item.maxStack = 9999;
             Item.value = 1000;
             Item.consumable = true;
