@@ -67,18 +67,21 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 player.cursorItemIconText = $"Growth: {tileEntity.growthAmount}, Diff: {tileEntity.seedSurroundingDifference}";
                 foreach (var seedTag in SeedTags.AllTags)
                 {
-                    player.cursorItemIconText += $"\n{seedTag}: {tileEntity.sproutData[seedTag]}, S:{tileEntity.surroundingAreaData[seedTag]}";
+                    player.cursorItemIconText += $"\n{seedTag}: {tileEntity.seedData[seedTag]}, S:" +
+                        $"{tileEntity.surroundingAreaData[seedTag]}, D: " +
+                        $"{tileEntity.seedSurroundingDifferenceDetailed[seedTag]}";
                 }
             }
         }
     }
-    
+
     public class SproutEntity : ModTileEntity
     {
         //Seed Data
-        public SeedData sproutData = new SeedData();
+        public SeedData seedData = new SeedData();
         public SeedData surroundingAreaData = new SeedData();
         public static SeedData transferData = new SeedData();
+        public SeedData seedSurroundingDifferenceDetailed = new();
         public float seedSurroundingDifference = 0f;
 
         //Sprout Data
@@ -108,7 +111,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         public int updateCounter = 0;
         public static List<(int, int, SeedData, SeedData)> seedlingPosToGrow = new();
 
-        
+
         public bool IsPaired => Pairing != PairingState.None;
         public override bool IsTileValidForEntity(int x, int y)
         {
@@ -246,27 +249,52 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             }
         }*/
 
-        private static void GrowSeedling(int i, int j, SeedData sproutData1, SeedData sproutData2)
+        private static void GrowSeedling(int i, int j, SeedData sd, SeedData errorSd)
         {
             Random r = new Random();
             int rInt = r.Next(0, 3);
-            if (WorldGen.PlaceObject(i, j, ModContent.TileType<SeedlingTile>(), mute: true, random: rInt))
+            if (!WorldGen.PlaceObject(i, j, ModContent.TileType<SeedlingTile>(), mute: true, random: rInt))
             {
-                // Get the ID of the newly placed tile entity
-                int id = ModContent.GetInstance<SeedlingEntity>().Place(i, j - 1);
-                if (id != -1 && TileEntity.ByID.TryGetValue(id, out TileEntity entity) && entity is SeedlingEntity seedlingEntity)
+                return;
+            }
+
+            int id = ModContent.GetInstance<SeedlingEntity>().Place(i, j - 1);
+            if (id != -1 && TileEntity.ByID.TryGetValue(id, out TileEntity entity) && entity is SeedlingEntity seedlingEntity)
+            {
+                RandomizeRedusingError(sd, errorSd, r, seedlingEntity);
+            }
+            NetMessage.SendObjectPlacement(-1, i, j, ModContent.TileType<SeedlingTile>(), 0, 0, -1, -1);
+        }
+
+        private static void RandomizeRedusingError(SeedData sd, SeedData errorSd, Random r, SeedlingEntity seedlingEntity)
+        {
+            var originalSproutData = sd;
+            foreach (string seedTag in SeedTags.AllTags)
+            {
+                int rrInt = r.Next(0, 10);
+                if (rrInt == 0)
                 {
-                    seedlingEntity.seedData = (sproutData1 + sproutData2) / 2;
+                    seedlingEntity.seedData[seedTag] =
+                        (int)Math.Round(originalSproutData[seedTag] - ((float)errorSd[seedTag] * 2f / 3f));
                 }
-                NetMessage.SendObjectPlacement(-1, i, j, ModContent.TileType<SeedlingTile>(), 0, 0, -1, -1);
+                else if (rrInt > 0 && rrInt < 9)
+                {
+                    seedlingEntity.seedData[seedTag] =
+                        (int)Math.Round(originalSproutData[seedTag] + (float)errorSd[seedTag] / 4f);
+                }
+                else if (rrInt == 9)
+                {
+                    seedlingEntity.seedData[seedTag] =
+                        (int)Math.Round(originalSproutData[seedTag] + (float)errorSd[seedTag] * 3f / 4f);
+                }
             }
         }
+
         private void CheckIfGrowenUp()
         {
             if (pairedEntity?.growthAmount >= 100 && growthAmount >= 100 && Pairing == PairingState.OnRight)
             {
-                var sproutData1 = sproutData;
-                var sproutData2 = pairedEntity.sproutData;
+                var sd = (seedData + pairedEntity.seedData) / 2;
 
                 int i = Position.X;
                 int j = Position.Y;
@@ -277,7 +305,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 
                 // Place the new tile
 
-                seedlingPosToGrow.Add((i, j, sproutData1, sproutData2));
+                seedlingPosToGrow.Add((i, j, sd, seedSurroundingDifferenceDetailed));
             }
         }
         private void CalculateSurroundings()
@@ -320,7 +348,8 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         }
         private void CalculateDifference()
         {
-            var diff = surroundingAreaData - sproutData;
+            seedSurroundingDifferenceDetailed = surroundingAreaData - (seedData + pairedEntity.seedData) / 2;
+            var diff = seedSurroundingDifferenceDetailed.Clone();
             foreach (var seedTag in SeedTags.AllTags)
             {
                 diff[seedTag] = Math.Abs(diff[seedTag]);
@@ -329,9 +358,9 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         }
         public override void PostGlobalUpdate()
         {
-            foreach (var (i, j, sproutData1, sproutData2) in seedlingPosToGrow)
+            foreach (var (i, j, sd, errorSd) in seedlingPosToGrow)
             {
-                GrowSeedling(i, j, sproutData1, sproutData2);
+                GrowSeedling(i, j, sd, errorSd);
             }
             seedlingPosToGrow.Clear();
         }
@@ -365,7 +394,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                     CalculateDifference();
                 }
 
-                if (Main.rand.NextBool(10) || true)
+                if (Main.rand.NextBool((int)seedSurroundingDifference + 1))
                 {
                     growthAmount += 10;
                 }
@@ -378,7 +407,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             tag[nameof(growthAmount)] = growthAmount;
             foreach (var seedTag in SeedTags.AllTags)
             {
-                tag[seedTag] = sproutData[seedTag];
+                tag[seedTag] = seedData[seedTag];
             }
         }
         public override void LoadData(TagCompound tag)
@@ -391,16 +420,16 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 {
                     if (tag.TryGet(seedTag, out int val))
                     {
-                        sproutData[seedTag] = val;
+                        seedData[seedTag] = val;
                     }
                     else
                     {
-                        sproutData[seedTag] = 0;
+                        seedData[seedTag] = 0;
                     }
                 }
                 catch
                 {
-                    sproutData[seedTag] = 0; // If the tag is not found or fails, set it to 0
+                    seedData[seedTag] = 0; // If the tag is not found or fails, set it to 0
                 }
 
             }
@@ -411,7 +440,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             writer.Write(growthAmount);
             foreach (var seedTag in SeedTags.AllTags)
             {
-                writer.Write(sproutData[seedTag]);
+                writer.Write(seedData[seedTag]);
             }
 
         }
@@ -421,7 +450,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             growthAmount = reader.ReadInt32();
             foreach (var seedTag in SeedTags.AllTags)
             {
-                sproutData[seedTag] = reader.ReadInt32();
+                seedData[seedTag] = reader.ReadInt32();
             }
         }
         public override void OnKill()
@@ -439,7 +468,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, point.X, point.Y, Type);
                 if (TileEntity.TryGet(point.X, point.Y, out SproutEntity entity))
                 {
-                    entity.sproutData = transferData;
+                    entity.seedData = transferData;
                 }
 
                 return -1;
@@ -447,7 +476,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             int result = Place(point.X, point.Y);
             if (TileEntity.TryGet(point.X, point.Y, out SproutEntity tileEntity))
             {
-                tileEntity.sproutData = transferData;
+                tileEntity.seedData = transferData;
             }
             return result;
         }
@@ -669,6 +698,16 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             }
             return normalized;
         }
+
+        public SeedData Clone()
+        {
+            SeedData clone = new SeedData();
+            foreach (var kvp in loves)
+            {
+                clone[kvp.Key] = kvp.Value;
+            }
+            return clone;
+        }
     }
     public static class SeedTags
     {
@@ -688,7 +727,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         ];
         public static int Count => AllTags.Count(); // Total number of tags, used for validation
     }
-    
+
     public static class Depth
     {
         public static DepthZone GetDepthZone(int tileY)

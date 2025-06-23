@@ -67,7 +67,8 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 player.cursorItemIconText = $"Growth: 100, Diff: {tileEntity.seedSurroundingDifference}";
                 foreach (var seedTag in SeedTags.AllTags)
                 {
-                    player.cursorItemIconText += $"\n{seedTag}: {tileEntity.seedData[seedTag]}, S:{tileEntity.surroundingAreaData[seedTag]}";
+                    player.cursorItemIconText += $"\n{seedTag}: {tileEntity.seedData[seedTag]}, S:{tileEntity.surroundingAreaData[seedTag]}, D: " +
+                        $"{tileEntity.seedSurroundingDifferenceDetailed[seedTag]}";
                 }
             }
         }
@@ -76,6 +77,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
     {
         public SeedData seedData = new SeedData();
         public SeedData surroundingAreaData = new SeedData();
+        public SeedData seedSurroundingDifferenceDetailed = new();
         public float seedSurroundingDifference = 0f;
 
         public const int HowOftenUpdate = 30;
@@ -145,7 +147,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         private void CalculateSurroundings()
         {
             surroundingAreaData = new SeedData();
-            int n = 3;
+            int n = 4;
             Tile[] Tiles25p = [Framing.GetTileSafely(Position.X, Position.Y + n),
                                 Framing.GetTileSafely(Position.X + 1, Position.Y + n)];
             Tile[] Tiles125p = [Framing.GetTileSafely(Position.X, Position.Y + n + 1),
@@ -184,7 +186,8 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 
         private void CalculateDifference()
         {
-            var diff = surroundingAreaData - seedData;
+            seedSurroundingDifferenceDetailed = surroundingAreaData - seedData;
+            var diff = seedSurroundingDifferenceDetailed.Clone();
             foreach (var seedTag in SeedTags.AllTags)
             {
                 diff[seedTag] = Math.Abs(diff[seedTag]);

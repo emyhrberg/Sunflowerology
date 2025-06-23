@@ -68,7 +68,8 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 player.cursorItemIconText = $"Growth: {tileEntity.growthAmount}, Diff: {tileEntity.seedSurroundingDifference}";
                 foreach (var seedTag in SeedTags.AllTags)
                 {
-                    player.cursorItemIconText += $"\n{seedTag}: {tileEntity.seedData[seedTag]}, S:{tileEntity.surroundingAreaData[seedTag]}";
+                    player.cursorItemIconText += $"\n{seedTag}: {tileEntity.seedData[seedTag]}, S:{tileEntity.surroundingAreaData[seedTag]}, D: " +
+                        $"{tileEntity.seedSurroundingDifferenceDetailed[seedTag]}";
                 }
             }
         }
@@ -77,6 +78,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
     {
         public SeedData seedData = new SeedData();
         public SeedData surroundingAreaData = new SeedData();
+        public SeedData seedSurroundingDifferenceDetailed = new();
         public float seedSurroundingDifference = 0f;
 
         public int growthAmount
@@ -89,7 +91,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         }
         public const int HowOftenUpdate = 30;
         public int updateCounter = 0;
-        public static List<(int, int, SeedData)> sunflowerPosToGrow = new();
+        public static List<(int, int, SeedData, SeedData)> sunflowerPosToGrow = new();
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];
@@ -142,9 +144,9 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 
         public override void PostGlobalUpdate()
         {
-            foreach (var (i, j, sd) in sunflowerPosToGrow)
+            foreach (var (i, j, sd, esd) in sunflowerPosToGrow)
             {
-                GrowSunflower(i, j, sd);
+                GrowSunflower(i, j, sd, esd);
             }
             sunflowerPosToGrow.Clear();
         }
@@ -160,7 +162,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             CalculateSurroundings();
             CalculateDifference();
 
-            if (Main.rand.NextBool(10) || true)
+            if (Main.rand.NextBool((int)seedSurroundingDifference + 1))
             {
                 growthAmount += 10;
             }
@@ -209,7 +211,8 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 
         private void CalculateDifference()
         {
-            var diff = surroundingAreaData - seedData;
+            seedSurroundingDifferenceDetailed = surroundingAreaData - seedData;
+            var diff = seedSurroundingDifferenceDetailed.Clone();
             foreach (var seedTag in SeedTags.AllTags)
             {
                 diff[seedTag] = Math.Abs(diff[seedTag]);
@@ -221,7 +224,6 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         {
             if (growthAmount >= 100)
             {
-                var seedData1 = seedData;
 
                 int i = Position.X;
                 int j = Position.Y;
@@ -229,11 +231,11 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 WorldGen.KillTile(i, j, false, false, true);
                 // Place the new tile
 
-                sunflowerPosToGrow.Add((i, j, seedData1));
+                sunflowerPosToGrow.Add((i, j, seedData, seedSurroundingDifferenceDetailed));
             }
         }
 
-        private static void GrowSunflower(int i, int j, SeedData sd)
+        private static void GrowSunflower(int i, int j, SeedData sd, SeedData errorSd)
         {
             Random r = new Random();
             int rInt = r.Next(0, 3);
@@ -241,11 +243,34 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             {
                 // Get the ID of the newly placed tile enti ty
                 int id = ModContent.GetInstance<SunflowerWithSeedsEntity>().Place(i, j - 1);
-                if (id != -1 && TileEntity.ByID.TryGetValue(id, out TileEntity entity) && entity is SunflowerWithSeedsEntity saplingEntity)
+                if (id != -1 && TileEntity.ByID.TryGetValue(id, out TileEntity entity) && entity is SunflowerWithSeedsEntity sunflowerEntity)
                 {
-                    saplingEntity.seedData = sd;
+                    RandomizeRedusingError(sd, errorSd, r, sunflowerEntity);
                 }
                 NetMessage.SendObjectPlacement(-1, i, j, ModContent.TileType<SaplingTile>(), 0, 0, -1, -1);
+            }
+        }
+        private static void RandomizeRedusingError(SeedData sd, SeedData errorSd, Random r, SunflowerWithSeedsEntity seedlingEntity)
+        {
+            var originalSproutData = sd;
+            foreach (string seedTag in SeedTags.AllTags)
+            {
+                int rrInt = r.Next(0, 10);
+                if (rrInt == 0)
+                {
+                    seedlingEntity.seedData[seedTag] =
+                        (int)Math.Round(originalSproutData[seedTag] - ((float)errorSd[seedTag] * 2f / 3f));
+                }
+                else if (rrInt > 0 && rrInt < 9)
+                {
+                    seedlingEntity.seedData[seedTag] =
+                        (int)Math.Round(originalSproutData[seedTag] + (float)errorSd[seedTag] / 4f);
+                }
+                else if (rrInt == 9)
+                {
+                    seedlingEntity.seedData[seedTag] =
+                        (int)Math.Round(originalSproutData[seedTag] + (float)errorSd[seedTag] * 3f / 4f);
+                }
             }
         }
 

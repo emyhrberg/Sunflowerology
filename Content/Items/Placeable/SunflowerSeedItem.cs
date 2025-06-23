@@ -12,16 +12,16 @@ namespace ScienceJam.Content.Items.Placeable
     internal class SunflowerSeedItem : ModItem
     {
         public SeedData sproutData = new();
-        public int Dry = 0;//Dry, Water, Wild, Sun, Cave, Hot, Cold, Evil, Good, Honey
-        public int Water = 0;
-        public int Wild = 0;
-        public int Sun = 0;
-        public int Cave = 0;
-        public int Hot = 0;
-        public int Cold = 0;
+        public int Dry = 5;//Dry, Water, Wild, Sun, Cave, Hot, Cold, Evil, Good, Honey
+        public int Water = 30;
+        public int Wild = 10;
+        public int Sun = 50;
+        public int Cave = 10;
+        public int Hot = 5;
+        public int Cold = 5;
         public int Evil = 0;
         public int Good = 0;
-        public int Honey = 0;
+        public int Honey = 1;
         public override void SetDefaults()
         {
             Item.DefaultToPlaceableTile(ModContent.TileType<SproutTile>());
