@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Intrinsics;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -86,9 +88,17 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             }
         }
         public SproutEntity pairedEntity;
-        public int growthAmount = 0;
+        public int growthAmount
+        {
+            get; 
+            set
+            {
+                field = Math.Clamp(value, 0, 100);                
+            }
+        }
         public const int HowOftenUpdate = 30;
         public int updateCounter = 0;
+        public static List<(int, int, int, int)> sproutsPosToGrow = new();
         public bool IsPaired => Pairing != PairingState.None;
         public override bool IsTileValidForEntity(int x, int y)
         {
@@ -197,7 +207,15 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
         }
 
-        //TODO: Slow down the update rate of this entity, so it doesn't check every frame.
+        public override void PostGlobalUpdate()
+        {
+            foreach (var (i, j, growthAmount1, growthAmount2) in sproutsPosToGrow)
+            {
+                GrowSeedling(i, j, growthAmount1, growthAmount2);
+            }
+            sproutsPosToGrow.Clear();
+        }
+
         public override void Update()
         {
             // Update only every HowOftenUpdate frames
@@ -218,12 +236,9 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             {
                 if (Main.rand.NextBool(10) || true)
                 {
-                    pairedEntity.growthAmount++;
-                    growthAmount++;
+                    growthAmount += 10;
                 }
-
                 CheckIfGrowenUp();
-
             }
         }
 
@@ -242,23 +257,27 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 WorldGen.KillTile(pairedEntity.Position.X, pairedEntity.Position.Y, false, false, true);
 
                 // Place the new tile
-                if (WorldGen.PlaceObject(i, j, ModContent.TileType<SeedlingTile>()))
-                {
-
-
-                    // Get the ID of the newly placed tile entity
-                    int id = ModContent.GetInstance<SeedlingEntity>().Place(i, j-1);
-                    if (id != -1 && TileEntity.ByID.TryGetValue(id, out TileEntity entity) && entity is SeedlingEntity seedlingEntity)
-                    {
-                        seedlingEntity.growthAmount1 = growthAmount1;
-                        seedlingEntity.growthAmount2 = growthAmount2;
-                    }
-                    NetMessage.SendObjectPlacement(-1, i, j, ModContent.TileType<SeedlingTile>(), 0, 0, -1, -1);
-                }
+                
+                sproutsPosToGrow.Add((i, j, growthAmount1, growthAmount2));
             }
         }
 
-
+        private static void GrowSeedling(int i, int j, int growthAmount1, int growthAmount2)
+        {
+            Random r = new Random();
+            int rInt = r.Next(0, 3);
+            if (WorldGen.PlaceObject(i, j, ModContent.TileType<SeedlingTile>(), mute: true, random: rInt))
+            {
+                // Get the ID of the newly placed tile entity
+                int id = ModContent.GetInstance<SeedlingEntity>().Place(i, j - 1);
+                if (id != -1 && TileEntity.ByID.TryGetValue(id, out TileEntity entity) && entity is SeedlingEntity seedlingEntity)
+                {
+                    seedlingEntity.growthAmount1 = growthAmount1;
+                    seedlingEntity.growthAmount2 = growthAmount2;
+                }
+                NetMessage.SendObjectPlacement(-1, i, j, ModContent.TileType<SeedlingTile>(), 0, 0, -1, -1);
+            }
+        }
 
         public override void SaveData(TagCompound tag)
         {
@@ -294,4 +313,17 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 
     }
 
+    public struct SproutData
+    {
+        public int DryLove = 0;
+        public int WaterLove = 0;
+        public int SurfaceLove = 0;
+        public int CaveLove = 0;
+        public int HotLove = 0;
+        public int ColdLove = 0;
+
+        public SproutData()
+        {
+        }
+    }
 }
