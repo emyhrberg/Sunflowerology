@@ -97,3 +97,10 @@ Configs: {
 }
 
 NPCs.BigBunny.DisplayName: Big Bunny
+
+Buffs: {
+	DeadSunflowerBuff: {
+		DisplayName: Dead Sunflower
+		Description: Your health suffers, get rid of the dead sunflower!
+	}
+}

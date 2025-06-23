@@ -6,6 +6,12 @@
 			"commandLineArgs": "$(tMLPath)",
 			"workingDirectory": "$(tMLSteamPath)"
 		},
+		"Terraria Fast": {
+			"commandName": "Executable",
+			"executablePath": "$(DotNetName)",
+			"commandLineArgs": "$(tMLPath) -skipselect",
+			"workingDirectory": "$(tMLSteamPath)"
+		},
 		"TerrariaServer": {
 			"commandName": "Executable",
 			"executablePath": "$(DotNetName)",
