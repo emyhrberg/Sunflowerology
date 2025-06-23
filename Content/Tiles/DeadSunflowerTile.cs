@@ -41,6 +41,21 @@ namespace ScienceJam.Content.Tiles
             AddMapEntry(new Color(10, 10, 0));
             glowTexture = ModContent.Request<Texture2D>(Texture + "_Glow");
         }
+        public override void NearbyEffects(int i, int j, bool closer)
+        {
+            if (!closer)
+                return;
+
+            Player player = Main.LocalPlayer;
+
+            const int tileSize = 16;
+            const float rangePixels = 4 * tileSize;
+            Vector2 tileCenter = new((i + 1) * 16f, (j + 1) * 16f);
+
+            bool withinRange = Vector2.Distance(player.Center, tileCenter) <= rangePixels;
+            if (withinRange)
+                player.AddBuff(ModContent.BuffType<DeadSunflowerBuff>(), timeToAdd: 120);
+        }
 
         public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
         {
