@@ -12,6 +12,16 @@ namespace ScienceJam.Content.Items.Placeable
     internal class SunflowerSeedItem : ModItem
     {
         public SeedData sproutData = new();
+        public int Dry = 0;//Dry, Water, Wild, Sun, Cave, Hot, Cold, Evil, Good, Honey
+        public int Water = 0;
+        public int Wild = 0;
+        public int Sun = 0;
+        public int Cave = 0;
+        public int Hot = 0;
+        public int Cold = 0;
+        public int Evil = 0;
+        public int Good = 0;
+        public int Honey = 0;
         public override void SetDefaults()
         {
             Item.DefaultToPlaceableTile(ModContent.TileType<SproutTile>());
@@ -22,15 +32,32 @@ namespace ScienceJam.Content.Items.Placeable
             Item.consumable = true;
         }
 
+        public override bool CanRightClick()
+        {
+            return true;
+        }
+
+        public override void RightClick(Player player)
+        {
+            Random rand = new Random();
+            Dry = rand.Next(0, 100);
+            Water = rand.Next(0, 100);
+            Wild = rand.Next(0, 100);
+            Sun = rand.Next(0, 100);
+            Cave = rand.Next(0, 100);
+            Hot = rand.Next(0, 100);
+            Cold = rand.Next(0, 100);
+            Evil = rand.Next(0, 100);
+            Good = rand.Next(0, 100);
+            Honey = rand.Next(0, 100);
+        }
+
         public override void UpdateInventory(Player player)
         {
-            if (sproutData[SeedTags.Dry] == 0)
+            int[] intl = [Dry, Water, Wild, Sun, Cave, Hot, Cold, Evil, Good, Honey];
+            for (int i = 0; i < 10; i++)
             {
-                Random random = new Random();
-                foreach (var tag in SeedTags.AllTags)
-                {
-                    sproutData[tag] = random.Next(0, 100);
-                }
+                sproutData[SeedTags.AllTags[i]] = intl[i];
             }
             base.UpdateInventory(player);
         }
@@ -74,7 +101,7 @@ namespace ScienceJam.Content.Items.Placeable
                 {
                     sproutData[seedTag] = 0; // If the tag is not found or fails, set it to 0
                 }
-                
+
             }
         }
 

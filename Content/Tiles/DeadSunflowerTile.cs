@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using ScienceJam.Content.Buffs;
 using ScienceJam.Content.Tiles.SunGrass;
 using Terraria;
 using Terraria.DataStructures;

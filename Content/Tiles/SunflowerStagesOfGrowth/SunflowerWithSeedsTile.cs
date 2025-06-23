@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Terraria;
@@ -11,8 +14,9 @@ using Terraria.ObjectData;
 
 namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 {
-    internal class SeedlingTile : ModTile
+    internal class SunflowerWithSeedsTile : ModTile
     {
+        private Asset<Texture2D> glowTexture;
         public override void SetStaticDefaults()
         {
             Main.tileFrameImportant[Type] = true;
@@ -22,31 +26,45 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             DustType = DustID.Grass;
 
             TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
+            TileObjectData.newTile.Height = 4;
             TileObjectData.newTile.DrawYOffset = 2;
             TileObjectData.newTile.RandomStyleRange = 3;
             TileObjectData.newTile.CoordinateWidth = 16;
-            TileObjectData.newTile.CoordinateHeights = [16, 18];
+            TileObjectData.newTile.CoordinateHeights = [16, 16, 16, 18];
             TileObjectData.newTile.StyleHorizontal = true;
-            TileObjectData.newTile.HookPostPlaceMyPlayer = ModContent.GetInstance<SeedlingEntity>().Generic_HookPostPlaceMyPlayer;
+            TileObjectData.newTile.HookPostPlaceMyPlayer = ModContent.GetInstance<SunflowerWithSeedsEntity>().Generic_HookPostPlaceMyPlayer;
             TileObjectData.addTile(Type);
 
             AddMapEntry(new Color(10, 10, 0));
+            glowTexture = ModContent.Request<Texture2D>(Texture + "_Glow");
+        }
+
+        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
+        {
+            Tile tile = Main.tile[i, j];
+            Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
+
+            spriteBatch.Draw(
+                glowTexture.Value,
+                new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero,
+                new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 16),
+                Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            ModContent.GetInstance<SeedlingEntity>().Kill(i, j);
+            ModContent.GetInstance<SunflowerWithSeedsEntity>().Kill(i, j);
         }
 
         public override void MouseOver(int i, int j)
         {
-            if (TileEntity.TryGet(i, j, out SeedlingEntity tileEntity))
+            if (TileEntity.TryGet(i, j, out SunflowerWithSeedsEntity tileEntity))
             {
                 Player player = Main.LocalPlayer;
                 player.noThrow = 2;
                 player.cursorItemIconEnabled = true;
                 player.cursorItemIconID = -1;
-                player.cursorItemIconText = $"Growth: {tileEntity.growthAmount}, Diff: {tileEntity.seedSurroundingDifference}";
+                player.cursorItemIconText = $"Growth: 100, Diff: {tileEntity.seedSurroundingDifference}";
                 foreach (var seedTag in SeedTags.AllTags)
                 {
                     player.cursorItemIconText += $"\n{seedTag}: {tileEntity.seedData[seedTag]}, S:{tileEntity.surroundingAreaData[seedTag]}";
@@ -54,27 +72,18 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             }
         }
     }
-    public class SeedlingEntity : ModTileEntity
+    public class SunflowerWithSeedsEntity : ModTileEntity
     {
         public SeedData seedData = new SeedData();
         public SeedData surroundingAreaData = new SeedData();
         public float seedSurroundingDifference = 0f;
 
-        public int growthAmount
-        {
-            get;
-            set
-            {
-                field = Math.Clamp(value, 0, 100);
-            }
-        }
         public const int HowOftenUpdate = 30;
         public int updateCounter = 0;
-        public static List<(int, int, SeedData)> saplingPosToGrow = new();
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];
-            return tile.HasTile && tile.TileType == ModContent.TileType<SeedlingTile>();
+            return tile.HasTile && tile.TileType == ModContent.TileType<SunflowerWithSeedsTile>();
         }
         public override void SaveData(TagCompound tag)
         {
@@ -120,15 +129,6 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 seedData[seedTag] = reader.ReadInt32();
             }
         }
-
-        public override void PostGlobalUpdate()
-        {
-            foreach (var (i, j, sd) in saplingPosToGrow)
-            {
-                GrowSapling(i, j, sd);
-            }
-            saplingPosToGrow.Clear();
-        }
         public override void Update()
         {
             // Update only every HowOftenUpdate frames
@@ -140,18 +140,12 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             }
             CalculateSurroundings();
             CalculateDifference();
-
-            if (Main.rand.NextBool(10) || true)
-            {
-                growthAmount += 10;
-            }
-            CheckIfGrowenUp();
         }
 
         private void CalculateSurroundings()
         {
             surroundingAreaData = new SeedData();
-            int n = 2;
+            int n = 3;
             Tile[] Tiles25p = [Framing.GetTileSafely(Position.X, Position.Y + n),
                                 Framing.GetTileSafely(Position.X + 1, Position.Y + n)];
             Tile[] Tiles125p = [Framing.GetTileSafely(Position.X, Position.Y + n + 1),
@@ -196,37 +190,6 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 diff[seedTag] = Math.Abs(diff[seedTag]);
             }
             seedSurroundingDifference = diff.AverageLove;
-        }
-
-        private void CheckIfGrowenUp()
-        {
-            if (growthAmount >= 100)
-            {
-
-                int i = Position.X;
-                int j = Position.Y;
-
-                WorldGen.KillTile(i, j, false, false, true);
-                // Place the new tile
-
-                saplingPosToGrow.Add((i, j, seedData));
-            }
-        }
-
-        private static void GrowSapling(int i, int j, SeedData sd)
-        {
-            Random r = new Random();
-            int rInt = r.Next(0, 3);
-            if (WorldGen.PlaceObject(i, j, ModContent.TileType<SaplingTile>(), mute: true, random: rInt))
-            {
-                // Get the ID of the newly placed tile entity
-                int id = ModContent.GetInstance<SaplingEntity>().Place(i, j - 1);
-                if (id != -1 && TileEntity.ByID.TryGetValue(id, out TileEntity entity) && entity is SaplingEntity saplingEntity)
-                {
-                    saplingEntity.seedData = sd;
-                }
-                NetMessage.SendObjectPlacement(-1, i, j, ModContent.TileType<SaplingTile>(), 0, 0, -1, -1);
-            }
         }
 
     }
