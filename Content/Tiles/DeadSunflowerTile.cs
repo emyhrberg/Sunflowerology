@@ -1,4 +1,7 @@
-﻿using ScienceJam.Content.Tiles.SunGrass;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
+using ScienceJam.Content.Tiles.SunGrass;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +17,7 @@ namespace ScienceJam.Content.Tiles
 {
     internal class DeadSunflowerTile : ModTile
     {
+        private Asset<Texture2D> glowTexture;
         public override void SetStaticDefaults()
         {
             Main.tileFrameImportant[Type] = true;
@@ -34,6 +38,19 @@ namespace ScienceJam.Content.Tiles
             TileObjectData.addTile(Type);
 
             AddMapEntry(new Color(10, 10, 0));
+            glowTexture = ModContent.Request<Texture2D>(Texture + "_Glow");
+        }
+
+        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
+        {
+            Tile tile = Main.tile[i, j];
+            Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
+
+            spriteBatch.Draw(
+                glowTexture.Value,
+                new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero,
+                new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 16),
+                Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
     }
 }

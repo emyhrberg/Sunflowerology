@@ -106,7 +106,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             get;
             set
             {
-                field = Math.Clamp(value, 0, 1000);
+                field = Math.Clamp(value, 0, 100);
             }
         }
         public const int HowOftenUpdate = 30;
@@ -389,7 +389,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         }
         private void CheckIfGrowenUp()
         {
-            if (pairedEntity?.growthAmount >= 1000 && growthAmount >= 1000 && Pairing == PairingState.OnRight)
+            if (pairedEntity?.growthAmount >= 100 && growthAmount >= 100 && Pairing == PairingState.OnRight)
             {
                 var sproutData1 = sproutData;
                 var sproutData2 = pairedEntity.sproutData;
@@ -490,7 +490,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 
                 if (Main.rand.NextBool(10) || true)
                 {
-                    growthAmount += 1;
+                    growthAmount += 10;
                 }
                 CheckIfGrowenUp();
             }
