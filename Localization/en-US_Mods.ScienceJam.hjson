@@ -65,6 +65,41 @@ Items: {
 		DisplayName: Beach Sunflower Seed Item
 		Tooltip: ""
 	}
+
+	DeadSunflowerSeedItem: {
+		DisplayName: Dead Sunflower Seed Item
+		Tooltip: ""
+	}
+
+	DrySunflowerSeedItem: {
+		DisplayName: Dry Sunflower Seed Item
+		Tooltip: ""
+	}
+
+	FireSunflowerSeedItem: {
+		DisplayName: Fire Sunflower Seed Item
+		Tooltip: ""
+	}
+
+	IceSunflowerSeedItem: {
+		DisplayName: Ice Sunflower Seed Item
+		Tooltip: ""
+	}
+
+	JungleSunflowerSeedItem: {
+		DisplayName: Jungle Sunflower Seed Item
+		Tooltip: ""
+	}
+
+	ObsidianSunflowerSeedItem: {
+		DisplayName: Obsidian Sunflower Seed Item
+		Tooltip: ""
+	}
+
+	SnowSunflowerSeedItem: {
+		DisplayName: Snow Sunflower Seed Item
+		Tooltip: ""
+	}
 }
 
 Projectiles: {
