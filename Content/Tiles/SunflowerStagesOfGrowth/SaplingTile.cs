@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using ScienceJam.Common.Configs;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -162,9 +163,9 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             CalculateSurroundings();
             CalculateDifference();
 
-            if (Main.rand.NextBool((int)seedSurroundingDifference + 1))
+            if (Main.rand.NextBool(((int)seedSurroundingDifference * (int)seedSurroundingDifference + 1) / 10) || Conf.C.SunflowerGrowFast)
             {
-                growthAmount += 10;
+                growthAmount += Conf.C.SunflowerGrowFast ? 10 : 1;
             }
             CheckIfGrowenUp();
         }

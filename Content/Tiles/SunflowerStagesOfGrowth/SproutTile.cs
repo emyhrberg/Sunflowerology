@@ -1,20 +1,22 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ScienceJam.Common.Configs;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Intrinsics;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
-using Terraria.ModLoader.UI;
 using Terraria.ObjectData;
 
 namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 {
     internal class SproutTile : ModTile
     {
+        public override string Texture => base.Texture;
         public override void SetStaticDefaults()
         {
             Main.tileFrameImportant[Type] = true;
@@ -38,17 +40,42 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             AddMapEntry(new Color(10, 200, 0));
         }
 
-        public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
+        public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             if (TileEntity.TryGet(i, j, out SproutEntity tileEntity))
             {
-                if (tileEntity.Pairing == PairingState.OnRight)
-                    tileFrameY = 20;
-                else if (tileEntity.Pairing == PairingState.OnLeft)
-                    tileFrameY = 40;
-                else
-                    tileFrameY = 0;
+                Tile tile = Main.tile[i, j];
+                Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
+                try
+                {
+                    Texture2D texture = ModContent.Request<Texture2D>(Texture + "_" + tileEntity.typeOfSunflower.ToString()).Value;
+                    if (texture == null || texture.IsDisposed)
+                    {
+                        Main.NewText($"Error: Texture for {tileEntity.typeOfSunflower.ToString()} not found or disposed.", Color.Red);
+                        return true;
+                    }
+                    if (tileEntity.Pairing == PairingState.OnRight)
+                        tile.TileFrameY = 20;
+                    else if (tileEntity.Pairing == PairingState.OnLeft)
+                        tile.TileFrameY = 40;
+                    else
+                        tile.TileFrameY = 0;
+                    spriteBatch.Draw(
+                        texture,
+                        new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero,
+                        new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 18),
+                        Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                    return false;
+                }
+                catch
+                {
+                    Main.NewText($"Error: Texture for {tileEntity.typeOfSunflower.ToString()} not found.", Color.Red);
+                    return true;
+                }
+
+
             }
+            return true;
         }
 
         public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
@@ -78,6 +105,27 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
     public class SproutEntity : ModTileEntity
     {
         //Seed Data
+        public TypesOfSunflowers typeOfSunflower = TypesOfSunflowers.Sunflower;
+
+        public TypesOfSunflowers FindClosestType()
+        {
+            TypesOfSunflowers closestType = default;
+            float minDistance = float.MaxValue;
+
+            foreach (var pair in SunflowersPropertiesData.TypeToData)
+            {
+                float dist = seedData.DistanceTo(pair.Value);
+                if (dist < minDistance)
+                {
+                    minDistance = dist;
+                    closestType = pair.Key;
+                }
+            }
+
+            return closestType;
+        }
+
+
         public SeedData seedData = new SeedData();
         public SeedData surroundingAreaData = new SeedData();
         public static SeedData transferData = new SeedData();
@@ -374,6 +422,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 return;
             }
 
+            typeOfSunflower = FindClosestType();
 
             if (!IsPaired)
             {
@@ -394,9 +443,9 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                     CalculateDifference();
                 }
 
-                if (Main.rand.NextBool((int)seedSurroundingDifference + 1))
+                if (Main.rand.NextBool(((int)seedSurroundingDifference * (int)seedSurroundingDifference + 1) / 10) || Conf.C.SunflowerGrowFast)
                 {
-                    growthAmount += 10;
+                    growthAmount += Conf.C.SunflowerGrowFast ? 10 : 1;
                 }
                 CheckIfGrowenUp();
             }
@@ -708,6 +757,21 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             }
             return clone;
         }
+
+        public float DistanceTo(SeedData other)
+        {
+            float sum = 0f;
+
+            foreach (var tag in SeedTags.AllTags)
+            {
+                float a = this[tag];
+                float b = other[tag];
+                float diff = a - b;
+                sum += diff * diff;
+            }
+
+            return MathF.Sqrt(sum);
+        }
     }
     public static class SeedTags
     {
@@ -746,5 +810,120 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 
     }
 
+    public enum TypesOfSunflowers
+    {
+        Sunflower,
+        Dryflower,
+        Fireflower,
+        Snowflower,
+        Iceflower,
+        Beachflower,
+        Oceanflower,
+        Jungleflower,
+        Deadflower,
+        Obsidianflower,
+    }
+
+    public static class SunflowersPropertiesData
+    {
+        public static Dictionary<TypesOfSunflowers, SeedData> TypeToData = new()
+        {
+            [TypesOfSunflowers.Sunflower] = new SeedData(
+        (SeedTags.Dry, 30),
+        (SeedTags.Water, 30),
+        (SeedTags.Wild, 20),
+        (SeedTags.Sun, 80),
+        (SeedTags.Cave, 10),
+        (SeedTags.Hot, 10),
+        (SeedTags.Cold, 10),
+        (SeedTags.Evil, 0),
+        (SeedTags.Good, 0),
+        (SeedTags.Honey, 0)
+    ),
+
+            [TypesOfSunflowers.Dryflower] = new SeedData(
+        (SeedTags.Dry, 100),
+        (SeedTags.Hot, 80),
+        (SeedTags.Sun, 60),
+        (SeedTags.Cave, 30),
+        (SeedTags.Water, 10),
+        (SeedTags.Cold, 10)
+    ),
+
+            [TypesOfSunflowers.Fireflower] = new SeedData(
+        (SeedTags.Hot, 100),
+        (SeedTags.Sun, 80),
+        (SeedTags.Dry, 50),
+        (SeedTags.Water, 20),
+        (SeedTags.Cold, 10),
+        (SeedTags.Cave, 40)
+    ),
+
+            [TypesOfSunflowers.Snowflower] = new SeedData(
+        (SeedTags.Cold, 100),
+        (SeedTags.Sun, 60),
+        (SeedTags.Water, 40),
+        (SeedTags.Dry, 10),
+        (SeedTags.Hot, 10),
+        (SeedTags.Cave, 30)
+    ),
+
+            [TypesOfSunflowers.Iceflower] = new SeedData(
+        (SeedTags.Cold, 100),
+        (SeedTags.Cave, 50),
+        (SeedTags.Water, 80),
+        (SeedTags.Hot, 10),
+        (SeedTags.Sun, 30),
+        (SeedTags.Good, 20)
+    ),
+
+            [TypesOfSunflowers.Beachflower] = new SeedData(
+        (SeedTags.Water, 100),
+        (SeedTags.Sun, 60),
+        (SeedTags.Wild, 50),
+        (SeedTags.Dry, 30),
+        (SeedTags.Honey, 20),
+        (SeedTags.Cold, 10)
+    ),
+
+            [TypesOfSunflowers.Oceanflower] = new SeedData(
+        (SeedTags.Water, 100),
+        (SeedTags.Sun, 60),
+        (SeedTags.Wild, 50),
+        (SeedTags.Dry, 10),
+        (SeedTags.Good, 20),
+        (SeedTags.Honey, 30)
+    ),
+
+            [TypesOfSunflowers.Jungleflower] = new SeedData(
+        (SeedTags.Wild, 100),
+        (SeedTags.Water, 100),
+        (SeedTags.Sun, 50),
+        (SeedTags.Hot, 30),
+        (SeedTags.Honey, 20),
+        (SeedTags.Cave, 20)
+    ),
+
+            [TypesOfSunflowers.Deadflower] = new SeedData(
+        (SeedTags.Evil, 100),
+        (SeedTags.Sun, 10),
+        (SeedTags.Water, 10),
+        (SeedTags.Good, 0),
+        (SeedTags.Honey, 0),
+        (SeedTags.Wild, 10)
+    ),
+
+            [TypesOfSunflowers.Obsidianflower] = new SeedData(
+        (SeedTags.Hot, 100),
+        (SeedTags.Cold, 100),
+        (SeedTags.Cave, 100),
+        (SeedTags.Water, 40),
+        (SeedTags.Dry, 20),
+        (SeedTags.Evil, 10)
+    ),
+        };
+
+
+    }
 }
 

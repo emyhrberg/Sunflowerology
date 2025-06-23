@@ -25,6 +25,9 @@ namespace ScienceJam.Common.Configs
 
         [DefaultValue(60f)]
         public int HowMuchYouNeedBlocksForDayland = 60;
+
+        [DefaultValue(true)]
+        public bool SunflowerGrowFast = true;
     }
 
 

@@ -12,16 +12,16 @@ namespace ScienceJam.Content.Items.SunflowerSeeds
     internal class SunflowerSeedItem : ModItem
     {
         public SeedData sproutData = new();
-        public int Dry = 5;//Dry, Water, Wild, Sun, Cave, Hot, Cold, Evil, Good, Honey
+        public int Dry = 30;
         public int Water = 30;
-        public int Wild = 10;
-        public int Sun = 50;
+        public int Wild = 20;
+        public int Sun = 80;
         public int Cave = 10;
-        public int Hot = 5;
-        public int Cold = 5;
+        public int Hot = 10;
+        public int Cold = 10;
         public int Evil = 0;
         public int Good = 0;
-        public int Honey = 1;
+        public int Honey = 0;
         public override void SetDefaults()
         {
             Item.DefaultToPlaceableTile(ModContent.TileType<SproutTile>());
@@ -124,7 +124,7 @@ namespace ScienceJam.Content.Items.SunflowerSeeds
 
         public override bool? UseItem(Player player)
         {
-            SproutEntity.transferData = sproutData;
+            SproutEntity.transferData = sproutData.Clone();
             return base.UseItem(player);
         }
     }
