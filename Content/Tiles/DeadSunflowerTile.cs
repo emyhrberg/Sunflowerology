@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ScienceJam.Content.Buffs;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using ScienceJam.Content.Tiles.SunGrass;
 using Terraria;
 using Terraria.DataStructures;
@@ -36,21 +38,19 @@ namespace ScienceJam.Content.Tiles
             TileObjectData.addTile(Type);
 
             AddMapEntry(new Color(10, 10, 0));
+            glowTexture = ModContent.Request<Texture2D>(Texture + "_Glow");
         }
 
-        public override void NearbyEffects(int i, int j, bool closer)
+        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            if (!closer)
-                return;
+            Tile tile = Main.tile[i, j];
+            Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
 
-            Player player = Main.LocalPlayer;
-
-            const int tileSize = 16;
-            const float rangePixels = 4 * tileSize;
-            Vector2 tileCenter = new((i + 1) * 16f, (j + 1) * 16f);
-
-            if (Vector2.Distance(player.Center, tileCenter) <= rangePixels)
-                player.AddBuff(ModContent.BuffType<DeadSunflowerBuff>(), timeToAdd: 120); // 2 ticks keeps it alive
+            spriteBatch.Draw(
+                glowTexture.Value,
+                new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero,
+                new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 16),
+                Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
     }
 }
