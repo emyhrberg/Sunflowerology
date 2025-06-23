@@ -1,7 +1,7 @@
-﻿using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
-using StructureHelper.Content.GUI;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
+using StructureHelper.Content.GUI;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
@@ -25,8 +25,8 @@ namespace ScienceJam.Content.Items.Placeable
         public override void SetDefaults()
         {
             Item.DefaultToPlaceableTile(ModContent.TileType<SproutTile>());
-            Item.width = 30;
-            Item.height = 28;
+            Item.width = 22;
+            Item.height = 18;
             Item.maxStack = 9999;
             Item.value = 1000;
             Item.consumable = true;
@@ -34,11 +34,16 @@ namespace ScienceJam.Content.Items.Placeable
 
         public override bool CanRightClick()
         {
+#if DEBUG
             return true;
+#else
+            return false;
+#endif
         }
 
         public override void RightClick(Player player)
         {
+#if DEBUG
             Random rand = new Random();
             Dry = rand.Next(0, 100);
             Water = rand.Next(0, 100);
@@ -50,6 +55,7 @@ namespace ScienceJam.Content.Items.Placeable
             Evil = rand.Next(0, 100);
             Good = rand.Next(0, 100);
             Honey = rand.Next(0, 100);
+#endif
         }
 
         public override void UpdateInventory(Player player)

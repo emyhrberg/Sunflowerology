@@ -27,5 +27,14 @@
 		<PackageReference Include="Krafs.Publicizer" PrivateAssets="true" Version="2.2.1" />
 		<Publicize Include="tModLoader" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
     </ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Content\Tiles\BeachSunflower\" />
+	  <Folder Include="Content\Tiles\DrySunflower\" />
+	  <Folder Include="Content\Tiles\FireSunflower\" />
+	  <Folder Include="Content\Tiles\IceSunflower\" />
+	  <Folder Include="Content\Tiles\JungleSunflower\" />
+	  <Folder Include="Content\Tiles\SnowSunflower\" />
+	  <Folder Include="Content\Tiles\ObsidianSunflower\" />
+	</ItemGroup>
 
 </Project>
