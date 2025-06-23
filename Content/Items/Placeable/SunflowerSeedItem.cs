@@ -1,4 +1,5 @@
 ﻿using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
+using StructureHelper.Content.GUI;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -10,7 +11,7 @@ namespace ScienceJam.Content.Items.Placeable
 {
     internal class SunflowerSeedItem : ModItem
     {
-        public SproutData sproutData;
+        public SeedData sproutData = new();
         public override void SetDefaults()
         {
             Item.DefaultToPlaceableTile(ModContent.TileType<SproutTile>());
@@ -23,33 +24,75 @@ namespace ScienceJam.Content.Items.Placeable
 
         public override void UpdateInventory(Player player)
         {
-            if (sproutData.DryLove == 0)
+            if (sproutData[SeedTags.Dry] == 0)
             {
                 Random random = new Random();
-                sproutData.DryLove = random.Next(0, 100);
+                foreach (var tag in SeedTags.AllTags)
+                {
+                    sproutData[tag] = random.Next(0, 100);
+                }
             }
             base.UpdateInventory(player);
         }
 
         public override bool CanStack(Item source)
         {
-            return sproutData.DryLove == ((SunflowerSeedItem)source.ModItem).sproutData.DryLove;
+            foreach (var tag in SeedTags.AllTags)
+            {
+                if (sproutData[tag] != ((SunflowerSeedItem)source.ModItem).sproutData[tag])
+                {
+                    return false; // If any tag does not match, do not stack
+                }
+            }
+            return true;
         }
 
         public override void SaveData(TagCompound tag)
         {
-            tag[nameof(sproutData.DryLove)] = sproutData.DryLove;
+            foreach (var seedTag in SeedTags.AllTags)
+            {
+                tag[seedTag] = sproutData[seedTag];
+            }
         }
 
         public override void LoadData(TagCompound tag)
         {
-            sproutData.DryLove = tag.GetInt(nameof(sproutData.DryLove));
+            foreach (var seedTag in SeedTags.AllTags)
+            {
+                try
+                {
+                    if (tag.TryGet(seedTag, out int val))
+                    {
+                        sproutData[seedTag] = val;
+                    }
+                    else
+                    {
+                        sproutData[seedTag] = 0;
+                    }
+                }
+                catch
+                {
+                    sproutData[seedTag] = 0; // If the tag is not found or fails, set it to 0
+                }
+                
+            }
         }
+
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            TooltipLine tooltip = new TooltipLine(Mod, "Info: ", $"{sproutData.DryLove}") { OverrideColor = Color.Red };
-            tooltips.Add(tooltip);
+            foreach (var tag in SeedTags.AllTags)
+            {
+                TooltipLine tooltip = new TooltipLine(Mod, "Info: ", $"{tag}: {sproutData[tag]}") { OverrideColor = Color.Yellow };
+                tooltips.Add(tooltip);
+            }
+
+        }
+
+        public override bool? UseItem(Player player)
+        {
+            SproutEntity.transferData = sproutData;
+            return base.UseItem(player);
         }
     }
 }

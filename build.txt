@@ -4,3 +4,4 @@ version = 0.1
 dllReferences = ModLiquidLib, StructureHelper
 buildIgnore = Assets/Photoshop*, Assets/Workshop*
 side = both
+includeSource = true

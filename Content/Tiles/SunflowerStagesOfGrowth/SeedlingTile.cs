@@ -45,14 +45,17 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 player.noThrow = 2;
                 player.cursorItemIconEnabled = true;
                 player.cursorItemIconID = -1;
-                player.cursorItemIconText = $"{tileEntity.growthAmount1}, {tileEntity.growthAmount2}";
+                player.cursorItemIconText = $"";
+                foreach (var seedTag in SeedTags.AllTags)
+                {
+                    player.cursorItemIconText += $"\n{seedTag}: {tileEntity.sproutData[seedTag]}";
+                }
             }
         }
     }
     public class SeedlingEntity : ModTileEntity
     {
-        public int growthAmount1 = 0;
-        public int growthAmount2 = 0;
+        public SeedData sproutData = new();
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];
@@ -61,27 +64,50 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 
         public override void SaveData(TagCompound tag)
         {
-            tag[nameof(growthAmount1)] = growthAmount1;
-            tag[nameof(growthAmount2)] = growthAmount2;
+            foreach (var seedTag in SeedTags.AllTags)
+            {
+                tag[seedTag] = sproutData[seedTag];
+            }
         }
 
         public override void LoadData(TagCompound tag)
         {
-            growthAmount1 = tag.GetInt(nameof(growthAmount1));
-            growthAmount2 = tag.GetInt(nameof(growthAmount2));
+            foreach (var seedTag in SeedTags.AllTags)
+            {
+                try
+                {
+                    if (tag.TryGet(seedTag, out int val))
+                    {
+                        sproutData[seedTag] = val;
+                    }
+                    else
+                    {
+                        sproutData[seedTag] = 0;
+                    }
+                }
+                catch
+                {
+                    sproutData[seedTag] = 0; // If the tag is not found or fails, set it to 0
+                }
+
+            }
         }
 
         public override void NetSend(BinaryWriter writer)
         {
-            writer.Write(growthAmount1);
-            writer.Write(growthAmount2);
+            foreach (var seedTag in SeedTags.AllTags)
+            {
+                writer.Write(sproutData[seedTag]);
+            }
 
         }
 
         public override void NetReceive(BinaryReader reader)
         {
-            growthAmount1 = reader.ReadInt32();
-            growthAmount2 = reader.ReadInt32();
+            foreach (var seedTag in SeedTags.AllTags)
+            {
+                sproutData[seedTag] = reader.ReadInt32();
+            }
         }
 
     }
