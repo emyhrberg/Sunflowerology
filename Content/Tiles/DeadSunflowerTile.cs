@@ -15,6 +15,7 @@ namespace ScienceJam.Content.Tiles
 {
     internal class DeadSunflowerTile : ModTile
     {
+        private Asset<Texture2D> glowTexture;
         public override void SetStaticDefaults()
         {
             Main.tileFrameImportant[Type] = true;
