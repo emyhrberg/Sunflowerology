@@ -9,6 +9,7 @@ using Terraria.ModLoader;
 
 namespace ScienceJam.Content.Tiles.SunflowerTree
 {
+
     public class SunflowerTree : ModTree
     {
         private static Asset<Texture2D> texture;
@@ -27,16 +28,14 @@ namespace ScienceJam.Content.Tiles.SunflowerTree
         public override void SetStaticDefaults()
         {
             // important!!
-            GrowsOnTileId = [TileID.Grass, ModContent.TileType<SunGrassTile>()];
+            GrowsOnTileId = [ModContent.TileType<SunGrassTile>()];
 
             // textures, also important!!
-            texture = ModContent.Request<Texture2D>("ScienceJam/Content/Tiles/SunflowerTree/Tiles_5");
-            branchesTexture = ModContent.Request<Texture2D>("ScienceJam/Content/Tiles/SunflowerTree/Tree_Branches_1");
-            topsTexture = ModContent.Request<Texture2D>("ScienceJam/Content/Tiles/SunflowerTree/Tree_Tops_1");
-        }
+            texture = ModContent.Request<Texture2D>("ScienceJam/Content/Tiles/SunflowerTree/Tiles_5", AssetRequestMode.AsyncLoad);
+            branchesTexture = ModContent.Request<Texture2D>("ScienceJam/Content/Tiles/SunflowerTree/Tree_Branches_1", AssetRequestMode.AsyncLoad);
+            topsTexture = ModContent.Request<Texture2D>("ScienceJam/Content/Tiles/SunflowerTree/Tree_Tops_1", AssetRequestMode.AsyncLoad);
 
-        // This is the primary texture for the trunk. Branches and foliage use different settings.
-        public override Asset<Texture2D> GetTexture() => texture;
+        }
 
         public override int SaplingGrowthType(ref int style)
         {
@@ -45,16 +44,22 @@ namespace ScienceJam.Content.Tiles.SunflowerTree
             return ModContent.TileType<SunflowerSapling>();
         }
 
-        public override void SetTreeFoliageSettings(Tile tile, ref int xoff, 
-            ref int treeFrame, ref int floorY, ref int topW, ref int topH)
+        public override Asset<Texture2D> GetBranchTextures()
         {
-            topW = 82;   // 246 / 3 columns = 82
-            topH = 82;   // frame height
+            return branchesTexture;
         }
 
-        public override Asset<Texture2D> GetBranchTextures() => branchesTexture;
-        public override Asset<Texture2D> GetTopTextures() => topsTexture;
+        // Token: 0x06000293 RID: 659 RVA: 0x0000EDA4 File Offset: 0x0000CFA4
+        public override Asset<Texture2D> GetTexture()
+        {
+            return texture;
+        }
 
+        // Token: 0x06000294 RID: 660 RVA: 0x0000EDAC File Offset: 0x0000CFAC
+        public override Asset<Texture2D> GetTopTextures()
+        {
+            return topsTexture;
+        }
         public override int DropWood()
         {
             return ModContent.ItemType<SunflowerSeedItem>();
@@ -73,6 +78,10 @@ namespace ScienceJam.Content.Tiles.SunflowerTree
         {
             //return ModContent.GoreType<ExampleTreeLeaf>();
             return 0;
+        }
+
+        public override void SetTreeFoliageSettings(Tile tile, ref int xoffset, ref int treeFrame, ref int floorY, ref int topTextureFrameWidth, ref int topTextureFrameHeight)
+        {
         }
     }
 }
