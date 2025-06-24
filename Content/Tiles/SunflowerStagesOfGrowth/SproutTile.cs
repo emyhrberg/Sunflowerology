@@ -64,7 +64,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                         texture,
                         new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero,
                         new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 18),
-                        Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                        Lighting.GetColor(i, j), 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                     return false;
                 }
                 catch
@@ -443,7 +443,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                     CalculateDifference();
                 }
 
-                if (Main.rand.NextBool(((int)seedSurroundingDifference * (int)seedSurroundingDifference + 1) / 10) || Conf.C.SunflowerGrowFast)
+                if (Main.rand.NextBool((int)Math.Ceiling((seedSurroundingDifference * seedSurroundingDifference) / 10f) + 1) || Conf.C.SunflowerGrowFast)
                 {
                     growthAmount += Conf.C.SunflowerGrowFast ? 10 : 1;
                 }

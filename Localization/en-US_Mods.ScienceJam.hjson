@@ -138,6 +138,11 @@ Configs: {
 			Label: How Much You Need Blocks For Dayland
 			Tooltip: ""
 		}
+
+		SunflowerGrowFast: {
+			Label: Sunflower Grow Fast
+			Tooltip: ""
+		}
 	}
 }
 

@@ -42,17 +42,44 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             glowTexture = ModContent.Request<Texture2D>(Texture + "_Glow");
 
         }
-        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
+        public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            Tile tile = Main.tile[i, j];
-            Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
+            if (TileEntity.TryGet(i, j, out SaplingEntity tileEntity))
+            {
+                Tile tile = Main.tile[i, j];
+                Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
+                try
+                {
+                    Texture2D texture = ModContent.Request<Texture2D>(Texture + "_" + tileEntity.typeOfSunflower.ToString()).Value;
+                    Texture2D glowTexture = ModContent.Request<Texture2D>(Texture + "_Glow_" + tileEntity.typeOfSunflower.ToString()).Value;
+                    if (texture == null || texture.IsDisposed || glowTexture == null)
+                    {
+                        Main.NewText($"Error: Texture for {tileEntity.typeOfSunflower.ToString()} not found or disposed.", Color.Red);
+                        return true;
+                    }
+                    spriteBatch.Draw(
+                        texture,
+                        new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero,
+                        new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, tile.TileFrameY >= 18 * 2 ? 18 : 16),
+                        Lighting.GetColor(i, j), 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                    spriteBatch.Draw(
+                        glowTexture,
+                        new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero,
+                        new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, tile.TileFrameY >= 18 * 2 ? 18 : 16),
+                        Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                    return false;
+                }
+                catch
+                {
+                    Main.NewText($"Error: Texture for {tileEntity.typeOfSunflower.ToString()} not found.", Color.Red);
+                    return true;
+                }
 
-            spriteBatch.Draw(
-                glowTexture.Value,
-                new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero,
-                new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 16),
-                Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+
+            }
+            return true;
         }
+
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
             ModContent.GetInstance<SaplingEntity>().Kill(i, j);
@@ -77,6 +104,24 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
     }
     public class SaplingEntity : ModTileEntity
     {
+        public TypesOfSunflowers typeOfSunflower = TypesOfSunflowers.Sunflower;
+        public TypesOfSunflowers FindClosestType()
+        {
+            TypesOfSunflowers closestType = default;
+            float minDistance = float.MaxValue;
+
+            foreach (var pair in SunflowersPropertiesData.TypeToData)
+            {
+                float dist = seedData.DistanceTo(pair.Value);
+                if (dist < minDistance)
+                {
+                    minDistance = dist;
+                    closestType = pair.Key;
+                }
+            }
+
+            return closestType;
+        }
         public SeedData seedData = new SeedData();
         public SeedData surroundingAreaData = new SeedData();
         public SeedData seedSurroundingDifferenceDetailed = new();
@@ -160,10 +205,11 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             {
                 return;
             }
+            typeOfSunflower = FindClosestType();
             CalculateSurroundings();
             CalculateDifference();
 
-            if (Main.rand.NextBool(((int)seedSurroundingDifference * (int)seedSurroundingDifference + 1) / 10) || Conf.C.SunflowerGrowFast)
+            if (Main.rand.NextBool((int)Math.Ceiling((seedSurroundingDifference * seedSurroundingDifference) / 10f) + 1) || Conf.C.SunflowerGrowFast)
             {
                 growthAmount += Conf.C.SunflowerGrowFast ? 10 : 1;
             }

@@ -1,4 +1,7 @@
-﻿using ScienceJam.Common.Configs;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ModLiquidLib.Utils;
+using ScienceJam.Common.Configs;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -56,9 +59,59 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 }
             }
         }
+
+        public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
+        {
+            if (TileEntity.TryGet(i, j, out SeedlingEntity tileEntity))
+            {
+                Tile tile = Main.tile[i, j];
+                Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
+                try
+                {
+                    Texture2D texture = ModContent.Request<Texture2D>(Texture + "_" + tileEntity.typeOfSunflower.ToString()).Value;
+                    if (texture == null || texture.IsDisposed)
+                    {
+                        Main.NewText($"Error: Texture for {tileEntity.typeOfSunflower.ToString()} not found or disposed.", Color.Red);
+                        return true;
+                    }
+                    spriteBatch.Draw(
+                        texture,
+                        new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero,
+                        new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, tile.TileFrameY >= 18 * 1 ? 18 : 16),
+                        Lighting.GetColor(i, j), 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                    return false;
+                }
+                catch
+                {
+                    Main.NewText($"Error: Texture for {tileEntity.typeOfSunflower.ToString()} not found.", Color.Red);
+                    return true;
+                }
+
+
+            }
+            return true;
+        }
     }
     public class SeedlingEntity : ModTileEntity
     {
+        public TypesOfSunflowers typeOfSunflower = TypesOfSunflowers.Sunflower;
+        public TypesOfSunflowers FindClosestType()
+        {
+            TypesOfSunflowers closestType = default;
+            float minDistance = float.MaxValue;
+
+            foreach (var pair in SunflowersPropertiesData.TypeToData)
+            {
+                float dist = seedData.DistanceTo(pair.Value);
+                if (dist < minDistance)
+                {
+                    minDistance = dist;
+                    closestType = pair.Key;
+                }
+            }
+
+            return closestType;
+        }
         public SeedData seedData = new SeedData();
         public SeedData surroundingAreaData = new SeedData();
         public SeedData seedSurroundingDifferenceDetailed = new();
@@ -142,10 +195,11 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             {
                 return;
             }
+            typeOfSunflower = FindClosestType();
             CalculateSurroundings();
             CalculateDifference();
 
-            if (Main.rand.NextBool(((int)seedSurroundingDifference * (int)seedSurroundingDifference + 1) / 10) || Conf.C.SunflowerGrowFast)
+            if (Main.rand.NextBool((int)Math.Ceiling((seedSurroundingDifference * seedSurroundingDifference) / 10f) + 1) || Conf.C.SunflowerGrowFast)
             {
                 growthAmount += Conf.C.SunflowerGrowFast ? 10 : 1;
             }

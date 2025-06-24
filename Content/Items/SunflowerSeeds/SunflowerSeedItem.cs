@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Graphics;
 using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
 using StructureHelper.Content.GUI;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -111,7 +113,6 @@ namespace ScienceJam.Content.Items.SunflowerSeeds
             }
         }
 
-
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             foreach (var tag in SeedTags.AllTags)
@@ -120,6 +121,12 @@ namespace ScienceJam.Content.Items.SunflowerSeeds
                 tooltips.Add(tooltip);
             }
 
+        }
+
+        public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Microsoft.Xna.Framework.Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+        {
+            spriteBatch.Draw(TextureAssets.Item[Item.type].Value, position, frame, drawColor, 0f, origin, scale, SpriteEffects.None, 0f);
+            return false;
         }
 
         public override bool? UseItem(Player player)
