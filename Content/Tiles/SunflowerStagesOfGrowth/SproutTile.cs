@@ -26,12 +26,17 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         {
             if (TileEntity.TryGet(i, j, out SproutEntity tileEntity))
             {
+                if (!tileEntity.updated)
+                {
+                    tileEntity.Update();
+                }
+                tileFrameY += (short)(20 * 3 * (int)tileEntity.typeOfSunflower);
                 if (tileEntity.Pairing == PairingState.OnRight)
-                    tileFrameY = 20;
+                    tileFrameY += 20;
                 else if (tileEntity.Pairing == PairingState.OnLeft)
-                    tileFrameY = 40;
+                    tileFrameY += 40;
                 else
-                    tileFrameY = 0;
+                    tileFrameY += 0;
             }
         }
         protected override int WidthInTiles => 1;
@@ -111,8 +116,10 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 ModContent.GetModTile(NextTileType);
                 surroundingAreaData = CalculateSurroundings();
                 difference = surroundingAreaData - ((plantData + pairedEntity.plantData) / 2);
+                pairedEntity.difference = difference;
                 averageDifference = CalculateAverageDifference();
-                typeOfSunflower = FindClosestType();
+                pairedEntity.averageDifference = averageDifference;
+                typeOfSunflower = plantData.FindClosestTypeOfSunflower();
                 growthLevel += CalculateGrowth();
 
                 if (IsFullyGrown && pairedEntity.IsFullyGrown)
@@ -120,10 +127,10 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             }
             else if (Pairing == PairingState.OnLeft)
             {
-                averageDifference = CalculateAverageDifference();
-                typeOfSunflower = FindClosestType();
+                typeOfSunflower = plantData.FindClosestTypeOfSunflower();
                 growthLevel += CalculateGrowth();
             }
+            updated = true;
         }
 
         protected override void ReplacePlantWithNewOne()
@@ -239,7 +246,8 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             base.SaveData(tag);
             tag[nameof(Pairing)] = (int)Pairing;
         }
-        public override void LoadData(TagCompound tag) {
+        public override void LoadData(TagCompound tag)
+        {
             base.LoadData(tag);
             if (tag.TryGet(nameof(Pairing), out int pairingState))
             {
@@ -503,6 +511,23 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 
             return MathF.Sqrt(sum);
         }
+
+        public TypeOfSunflower FindClosestTypeOfSunflower()
+        {
+            TypeOfSunflower closestType = default;
+            float minDistance = float.MaxValue;
+
+            foreach (var pair in SunflowersPropertiesData.TypeToData)
+            {
+                float dist = DistanceTo(pair.Value);
+                if (dist < minDistance)
+                {
+                    minDistance = dist;
+                    closestType = pair.Key;
+                }
+            }
+            return closestType;
+        }
     }
     public static class NatureTags
     {
@@ -539,24 +564,24 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 
 
     }
-    public enum TypesOfSunflowers
+    public enum TypeOfSunflower
     {
-        Sunflower,
-        Dryflower,
-        Fireflower,
-        Snowflower,
-        Iceflower,
-        Beachflower,
-        Oceanflower,
-        Jungleflower,
-        Deadflower,
-        Obsidianflower,
+        Sunflower = 0,
+        Dryflower = 1,
+        Fireflower = 2,
+        Snowflower = 3,
+        Iceflower = 4,
+        Beachflower = 5,
+        Oceanflower = 6,
+        Jungleflower = 7,
+        Deadflower = 8,
+        Obsidianflower = 9,
     }
     public static class SunflowersPropertiesData
     {
-        public static Dictionary<TypesOfSunflowers, NatureData> TypeToData = new()
+        public static Dictionary<TypeOfSunflower, NatureData> TypeToData = new()
         {
-            [TypesOfSunflowers.Sunflower] = new NatureData(
+            [TypeOfSunflower.Sunflower] = new NatureData(
         (NatureTags.Dry, 30),
         (NatureTags.Water, 30),
         (NatureTags.Wild, 20),
@@ -569,7 +594,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         (NatureTags.Honey, 0)
     ),
 
-            [TypesOfSunflowers.Dryflower] = new NatureData(
+            [TypeOfSunflower.Dryflower] = new NatureData(
         (NatureTags.Dry, 100),
         (NatureTags.Hot, 80),
         (NatureTags.Sun, 60),
@@ -578,7 +603,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         (NatureTags.Cold, 10)
     ),
 
-            [TypesOfSunflowers.Fireflower] = new NatureData(
+            [TypeOfSunflower.Fireflower] = new NatureData(
         (NatureTags.Hot, 100),
         (NatureTags.Sun, 80),
         (NatureTags.Dry, 50),
@@ -587,7 +612,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         (NatureTags.Cave, 40)
     ),
 
-            [TypesOfSunflowers.Snowflower] = new NatureData(
+            [TypeOfSunflower.Snowflower] = new NatureData(
         (NatureTags.Cold, 100),
         (NatureTags.Sun, 60),
         (NatureTags.Water, 40),
@@ -596,7 +621,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         (NatureTags.Cave, 30)
     ),
 
-            [TypesOfSunflowers.Iceflower] = new NatureData(
+            [TypeOfSunflower.Iceflower] = new NatureData(
         (NatureTags.Cold, 100),
         (NatureTags.Cave, 50),
         (NatureTags.Water, 80),
@@ -605,7 +630,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         (NatureTags.Good, 20)
     ),
 
-            [TypesOfSunflowers.Beachflower] = new NatureData(
+            [TypeOfSunflower.Beachflower] = new NatureData(
         (NatureTags.Water, 100),
         (NatureTags.Sun, 60),
         (NatureTags.Wild, 50),
@@ -614,7 +639,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         (NatureTags.Cold, 10)
     ),
 
-            [TypesOfSunflowers.Oceanflower] = new NatureData(
+            [TypeOfSunflower.Oceanflower] = new NatureData(
         (NatureTags.Water, 100),
         (NatureTags.Sun, 60),
         (NatureTags.Wild, 50),
@@ -623,7 +648,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         (NatureTags.Honey, 30)
     ),
 
-            [TypesOfSunflowers.Jungleflower] = new NatureData(
+            [TypeOfSunflower.Jungleflower] = new NatureData(
         (NatureTags.Wild, 100),
         (NatureTags.Water, 100),
         (NatureTags.Sun, 50),
@@ -632,7 +657,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         (NatureTags.Cave, 20)
     ),
 
-            [TypesOfSunflowers.Deadflower] = new NatureData(
+            [TypeOfSunflower.Deadflower] = new NatureData(
         (NatureTags.Evil, 100),
         (NatureTags.Sun, 10),
         (NatureTags.Water, 10),
@@ -641,7 +666,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         (NatureTags.Wild, 10)
     ),
 
-            [TypesOfSunflowers.Obsidianflower] = new NatureData(
+            [TypeOfSunflower.Obsidianflower] = new NatureData(
         (NatureTags.Hot, 100),
         (NatureTags.Cold, 100),
         (NatureTags.Cave, 100),

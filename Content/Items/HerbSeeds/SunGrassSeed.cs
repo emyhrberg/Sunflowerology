@@ -61,6 +61,5 @@ namespace ScienceJam.Content.Items.HerbSeeds
             return false;
         }
 
-
     }
 }

@@ -100,6 +100,11 @@ Items: {
 		DisplayName: Snow Sunflower Seed Item
 		Tooltip: ""
 	}
+
+	SeedItem: {
+		DisplayName: Seed Item
+		Tooltip: ""
+	}
 }
 
 Projectiles: {
