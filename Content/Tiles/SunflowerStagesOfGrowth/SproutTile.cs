@@ -14,125 +14,40 @@ using Terraria.ObjectData;
 
 namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 {
-    internal class SproutTile : ModTile
+    internal class SproutTile : PlantStageTile<SproutEntity>
     {
-        public override string Texture => base.Texture;
         public override void SetStaticDefaults()
         {
-            Main.tileFrameImportant[Type] = true;
-            Main.tileNoFail[Type] = true;
-            Main.tileObsidianKill[Type] = true;
-
-            DustType = DustID.Grass;
-
-            TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);
-            TileObjectData.newTile.Width = 1;
-            TileObjectData.newTile.Height = 1;
-            TileObjectData.newTile.DrawYOffset = 2;
-            TileObjectData.newTile.RandomStyleRange = 3;
-            TileObjectData.newTile.CoordinateWidth = 16;
-            TileObjectData.newTile.CoordinateHeights = [18];
-            TileObjectData.newTile.StyleHorizontal = true;
-            TileObjectData.newTile.AnchorValidTiles = SeedData.BlocksToSeedsProperties.Keys.ToArray();
-            TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<SproutEntity>().Hook_AfterPlacement, -1, 0, true);
-            TileObjectData.addTile(Type);
-
-            AddMapEntry(new Color(10, 200, 0));
+            base.SetStaticDefaults();
+            var tileData = TileObjectData.GetTileData(Type, 0);
+            tileData.AnchorValidTiles = NatureData.BlocksToSeedsProperties.Keys.ToArray();
         }
-
-        public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
+        public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
         {
             if (TileEntity.TryGet(i, j, out SproutEntity tileEntity))
             {
-                Tile tile = Main.tile[i, j];
-                Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
-                try
-                {
-                    Texture2D texture = ModContent.Request<Texture2D>(Texture + "_" + tileEntity.typeOfSunflower.ToString()).Value;
-                    if (texture == null || texture.IsDisposed)
-                    {
-                        Main.NewText($"Error: Texture for {tileEntity.typeOfSunflower.ToString()} not found or disposed.", Color.Red);
-                        return true;
-                    }
-                    if (tileEntity.Pairing == PairingState.OnRight)
-                        tile.TileFrameY = 20;
-                    else if (tileEntity.Pairing == PairingState.OnLeft)
-                        tile.TileFrameY = 40;
-                    else
-                        tile.TileFrameY = 0;
-                    spriteBatch.Draw(
-                        texture,
-                        new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero,
-                        new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 18),
-                        Lighting.GetColor(i, j), 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                    return false;
-                }
-                catch
-                {
-                    Main.NewText($"Error: Texture for {tileEntity.typeOfSunflower.ToString()} not found.", Color.Red);
-                    return true;
-                }
-
-
-            }
-            return true;
-        }
-
-        public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
-        {
-            ModContent.GetInstance<SproutEntity>().Kill(i, j);
-        }
-
-        public override void MouseOver(int i, int j)
-        {
-            if (TileEntity.TryGet(i, j, out SproutEntity tileEntity))
-            {
-                Player player = Main.LocalPlayer;
-                player.noThrow = 2;
-                player.cursorItemIconEnabled = true;
-                player.cursorItemIconID = -1;
-                player.cursorItemIconText = $"Growth: {tileEntity.growthAmount}, Diff: {tileEntity.seedSurroundingDifference}";
-                foreach (var seedTag in SeedTags.AllTags)
-                {
-                    player.cursorItemIconText += $"\n{seedTag}: {tileEntity.seedData[seedTag]}, S:" +
-                        $"{tileEntity.surroundingAreaData[seedTag]}, D: " +
-                        $"{tileEntity.seedSurroundingDifferenceDetailed[seedTag]}";
-                }
+                if (tileEntity.Pairing == PairingState.OnRight)
+                    tileFrameY = 20;
+                else if (tileEntity.Pairing == PairingState.OnLeft)
+                    tileFrameY = 40;
+                else
+                    tileFrameY = 0;
             }
         }
+        protected override int WidthInTiles => 1;
+        protected override int HeightInTiles => 1;
+
+        protected override bool IsSpecialHook => true;
+
+        protected override bool HaveGlow => false;
+
+        protected override int[] Heights => [18];
     }
 
-    public class SproutEntity : ModTileEntity
+    public class SproutEntity : PlantStageEntity<SeedlingEntity>
     {
-        //Seed Data
-        public TypesOfSunflowers typeOfSunflower = TypesOfSunflowers.Sunflower;
-
-        public TypesOfSunflowers FindClosestType()
-        {
-            TypesOfSunflowers closestType = default;
-            float minDistance = float.MaxValue;
-
-            foreach (var pair in SunflowersPropertiesData.TypeToData)
-            {
-                float dist = seedData.DistanceTo(pair.Value);
-                if (dist < minDistance)
-                {
-                    minDistance = dist;
-                    closestType = pair.Key;
-                }
-            }
-
-            return closestType;
-        }
-
-
-        public SeedData seedData = new SeedData();
-        public SeedData surroundingAreaData = new SeedData();
-        public static SeedData transferData = new SeedData();
-        public SeedData seedSurroundingDifferenceDetailed = new();
-        public float seedSurroundingDifference = 0f;
-
         //Sprout Data
+        public static NatureData transferData = new NatureData();
         public PairingState Pairing
         {
             get
@@ -147,25 +62,12 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             }
         }
         public SproutEntity pairedEntity;
-        public int growthAmount
-        {
-            get;
-            set
-            {
-                field = Math.Clamp(value, 0, 100);
-            }
-        }
-        public const int HowOftenUpdate = 30;
-        public int updateCounter = 0;
-        public static List<(int, int, SeedData, SeedData)> seedlingPosToGrow = new();
-
 
         public bool IsPaired => Pairing != PairingState.None;
-        public override bool IsTileValidForEntity(int x, int y)
-        {
-            Tile tile = Main.tile[x, y];
-            return tile.HasTile && tile.TileType == ModContent.TileType<SproutTile>();
-        }
+
+        protected override int TileType => ModContent.TileType<SproutTile>();
+
+        protected override int NextTileType => ModContent.TileType<SeedlingTile>();
 
         /// <summary>
         /// Checks if the pairing with the paired entity is valid.
@@ -193,12 +95,49 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             return true;
         }
 
+        public override void Update()
+        {
+            if (SkipUpdate()) return;
+            if (!IsPaired)
+            {
+                // Check for unpaired sprouts on both sides
+                if (!CheckAndPairUnpairedSprout(PairingState.OnRight))
+                {
+                    CheckAndPairUnpairedSprout(PairingState.OnLeft);
+                }
+            }
+            else if (Pairing == PairingState.OnRight)
+            {
+                ModContent.GetModTile(NextTileType);
+                surroundingAreaData = CalculateSurroundings();
+                difference = surroundingAreaData - ((plantData + pairedEntity.plantData) / 2);
+                averageDifference = CalculateAverageDifference();
+                typeOfSunflower = FindClosestType();
+                growthLevel += CalculateGrowth();
+
+                if (IsFullyGrown && pairedEntity.IsFullyGrown)
+                    ReplacePlantWithNewOne();
+            }
+            else if (Pairing == PairingState.OnLeft)
+            {
+                averageDifference = CalculateAverageDifference();
+                typeOfSunflower = FindClosestType();
+                growthLevel += CalculateGrowth();
+            }
+        }
+
+        protected override void ReplacePlantWithNewOne()
+        {
+            base.ReplacePlantWithNewOne();
+            WorldGen.KillTile(pairedEntity.Position.X, pairedEntity.Position.Y, false, false, true);
+        }
+
         /// <summary>
         /// Checks if there is an unpaired sprout on the specified side and pairs it with this entity if found.
         /// </summary>
         /// <param name="side"></param>
         /// <returns></returns>
-        private bool CheckUnpairedSprout(PairingState side)
+        private bool CheckAndPairUnpairedSprout(PairingState side)
         {
             // Set the coordinates based on the side
             int i = Position.X + (int)side;
@@ -267,241 +206,6 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             pairedEntity = null;
             NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
         }
-        /*
-        private void GrowSeedling(int i, int j, SproutData sproutData1, SproutData sproutData2)
-        {
-            Random r = new Random();
-            int rInt = r.Next(0, 3);
-            if (WorldGen.PlaceObject(i, j, ModContent.TileType<SeedlingTile>(), mute: true, random: rInt))
-            {
-                int Type = ModContent.TileType<SeedlingTile>();
-                TileObjectData tileData = TileObjectData.GetTileData(Type, 0);
-                Point16 point = TileObjectData.TopLeft(i, j);
-                if (Main.netMode == NetmodeID.MultiplayerClient)
-                {
-                    NetMessage.SendTileSquare(Main.myPlayer, point.X, point.Y, tileData.Width, tileData.Height);
-                    NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, point.X, point.Y, Type);
-                }
-                else
-                {
-                    int id = Place(point.X, point.Y);
-                    if (id != -1 && TileEntity.ByID.TryGetValue(id, out TileEntity entity) && entity is SeedlingEntity seedlingEntity)
-                    {
-                        seedlingEntity.sproutData1 = sproutData1;
-                        seedlingEntity.sproutData2 = sproutData2;
-                    }
-                    NetMessage.SendObjectPlacement(-1, i, j, ModContent.TileType<SeedlingTile>(), 0, 0, -1, -1);
-                }
-                
-
-            }
-        }*/
-
-        private static void GrowSeedling(int i, int j, SeedData sd, SeedData errorSd)
-        {
-            Random r = new Random();
-            int rInt = r.Next(0, 3);
-            if (!WorldGen.PlaceObject(i, j, ModContent.TileType<SeedlingTile>(), mute: true, random: rInt))
-            {
-                return;
-            }
-
-            int id = ModContent.GetInstance<SeedlingEntity>().Place(i, j - 1);
-            if (id != -1 && TileEntity.ByID.TryGetValue(id, out TileEntity entity) && entity is SeedlingEntity seedlingEntity)
-            {
-                RandomizeRedusingError(sd, errorSd, r, seedlingEntity);
-            }
-            NetMessage.SendObjectPlacement(-1, i, j, ModContent.TileType<SeedlingTile>(), 0, 0, -1, -1);
-        }
-
-        private static void RandomizeRedusingError(SeedData sd, SeedData errorSd, Random r, SeedlingEntity seedlingEntity)
-        {
-            var originalSproutData = sd;
-            foreach (string seedTag in SeedTags.AllTags)
-            {
-                int rrInt = r.Next(0, 10);
-                if (rrInt == 0)
-                {
-                    seedlingEntity.seedData[seedTag] =
-                        (int)Math.Round(originalSproutData[seedTag] - ((float)errorSd[seedTag] * 2f / 3f));
-                }
-                else if (rrInt > 0 && rrInt < 9)
-                {
-                    seedlingEntity.seedData[seedTag] =
-                        (int)Math.Round(originalSproutData[seedTag] + (float)errorSd[seedTag] / 4f);
-                }
-                else if (rrInt == 9)
-                {
-                    seedlingEntity.seedData[seedTag] =
-                        (int)Math.Round(originalSproutData[seedTag] + (float)errorSd[seedTag] * 3f / 4f);
-                }
-            }
-        }
-
-        private void CheckIfGrowenUp()
-        {
-            if (pairedEntity?.growthAmount >= 100 && growthAmount >= 100 && Pairing == PairingState.OnRight)
-            {
-                var sd = (seedData + pairedEntity.seedData) / 2;
-
-                int i = Position.X;
-                int j = Position.Y;
-
-                // Kill the current tile and the paired entity's tile
-                WorldGen.KillTile(i, j, false, false, true);
-                WorldGen.KillTile(pairedEntity.Position.X, pairedEntity.Position.Y, false, false, true);
-
-                // Place the new tile
-
-                seedlingPosToGrow.Add((i, j, sd, seedSurroundingDifferenceDetailed));
-            }
-        }
-        private void CalculateSurroundings()
-        {
-            surroundingAreaData = new SeedData();
-            Tile[] Tiles25p = [Framing.GetTileSafely(Position.X, Position.Y + 1),
-                                Framing.GetTileSafely(Position.X + 1, Position.Y + 1)];
-            Tile[] Tiles125p = [Framing.GetTileSafely(Position.X, Position.Y + 2),
-                                Framing.GetTileSafely(Position.X + 1, Position.Y + 2)];
-            Tile[] Tiles625p = [Framing.GetTileSafely(Position.X - 1, Position.Y + 1),
-                                Framing.GetTileSafely(Position.X + 2, Position.Y + 1),
-                                Framing.GetTileSafely(Position.X - 1, Position.Y + 2),
-                                Framing.GetTileSafely(Position.X + 2, Position.Y + 2),];
-            foreach (Tile tile in Tiles25p)
-            {
-                if (tile.HasTile && SeedData.BlocksToSeedsProperties.TryGetValue(tile.TileType, out SeedData seedData))
-                {
-                    surroundingAreaData += seedData * 0.25f;
-                }
-            }
-            foreach (Tile tile in Tiles125p)
-            {
-                if (tile.HasTile && SeedData.BlocksToSeedsProperties.TryGetValue(tile.TileType, out SeedData seedData))
-                {
-                    surroundingAreaData += seedData * 0.125f;
-                }
-            }
-            foreach (Tile tile in Tiles625p)
-            {
-                if (tile.HasTile && SeedData.BlocksToSeedsProperties.TryGetValue(tile.TileType, out SeedData seedData))
-                {
-                    surroundingAreaData += seedData * 0.0625f;
-                }
-            }
-            if (SeedData.DepthZoneToSeedAffinity.TryGetValue(Depth.GetDepthZone(Position.Y), out var i))
-            {
-                surroundingAreaData += i * 0.25f;
-            }
-            surroundingAreaData = surroundingAreaData.Normalize();
-        }
-        private void CalculateDifference()
-        {
-            seedSurroundingDifferenceDetailed = surroundingAreaData - (seedData + pairedEntity.seedData) / 2;
-            var diff = seedSurroundingDifferenceDetailed.Clone();
-            foreach (var seedTag in SeedTags.AllTags)
-            {
-                diff[seedTag] = Math.Abs(diff[seedTag]);
-            }
-            seedSurroundingDifference = diff.AverageLove;
-        }
-        public override void PostGlobalUpdate()
-        {
-            foreach (var (i, j, sd, errorSd) in seedlingPosToGrow)
-            {
-                GrowSeedling(i, j, sd, errorSd);
-            }
-            seedlingPosToGrow.Clear();
-        }
-        public override void Update()
-        {
-            // Update only every HowOftenUpdate frames
-            updateCounter++;
-            updateCounter %= HowOftenUpdate;
-            if (updateCounter != 0)
-            {
-                return;
-            }
-
-            typeOfSunflower = FindClosestType();
-
-            if (!IsPaired)
-            {
-                if (CheckUnpairedSprout(PairingState.OnRight)) return;
-                if (CheckUnpairedSprout(PairingState.OnLeft)) return;
-            }
-            else
-            {
-                if (Pairing == PairingState.OnRight)
-                {
-                    CalculateSurroundings();
-                    pairedEntity.surroundingAreaData = surroundingAreaData;
-                    CalculateDifference();
-
-                }
-                else if (Pairing == PairingState.OnLeft)
-                {
-                    CalculateDifference();
-                }
-
-                if (Main.rand.NextBool((int)Math.Ceiling((seedSurroundingDifference * seedSurroundingDifference) / 10f) + 1) || Conf.C.SunflowerGrowFast)
-                {
-                    growthAmount += Conf.C.SunflowerGrowFast ? 10 : 1;
-                }
-                CheckIfGrowenUp();
-            }
-        }
-        public override void SaveData(TagCompound tag)
-        {
-            tag[nameof(Pairing)] = (int)Pairing;
-            tag[nameof(growthAmount)] = growthAmount;
-            foreach (var seedTag in SeedTags.AllTags)
-            {
-                tag[seedTag] = seedData[seedTag];
-            }
-        }
-        public override void LoadData(TagCompound tag)
-        {
-            SetUpPairedEntity((PairingState)tag.GetInt(nameof(Pairing)));
-            growthAmount = tag.GetInt(nameof(growthAmount));
-            foreach (var seedTag in SeedTags.AllTags)
-            {
-                try
-                {
-                    if (tag.TryGet(seedTag, out int val))
-                    {
-                        seedData[seedTag] = val;
-                    }
-                    else
-                    {
-                        seedData[seedTag] = 0;
-                    }
-                }
-                catch
-                {
-                    seedData[seedTag] = 0; // If the tag is not found or fails, set it to 0
-                }
-
-            }
-        }
-        public override void NetSend(BinaryWriter writer)
-        {
-            writer.Write((int)Pairing);
-            writer.Write(growthAmount);
-            foreach (var seedTag in SeedTags.AllTags)
-            {
-                writer.Write(seedData[seedTag]);
-            }
-
-        }
-        public override void NetReceive(BinaryReader reader)
-        {
-            SetUpPairedEntity((PairingState)reader.ReadInt32());
-            growthAmount = reader.ReadInt32();
-            foreach (var seedTag in SeedTags.AllTags)
-            {
-                seedData[seedTag] = reader.ReadInt32();
-            }
-        }
         public override void OnKill()
         {
             pairedEntity?.RemovePairing();
@@ -517,17 +221,44 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, point.X, point.Y, Type);
                 if (TileEntity.TryGet(point.X, point.Y, out SproutEntity entity))
                 {
-                    entity.seedData = transferData;
+                    entity.plantData = transferData;
+                    transferData = new NatureData(); // Clear the transfer data after placing
                 }
-
                 return -1;
             }
             int result = Place(point.X, point.Y);
             if (TileEntity.TryGet(point.X, point.Y, out SproutEntity tileEntity))
             {
-                tileEntity.seedData = transferData;
+                tileEntity.plantData = transferData;
+                transferData = new NatureData(); // Clear the transfer data after placing
             }
             return result;
+        }
+        override public void SaveData(TagCompound tag)
+        {
+            base.SaveData(tag);
+            tag[nameof(Pairing)] = (int)Pairing;
+        }
+        public override void LoadData(TagCompound tag) {
+            base.LoadData(tag);
+            if (tag.TryGet(nameof(Pairing), out int pairingState))
+            {
+                SetUpPairedEntity((PairingState)pairingState);
+            }
+            else
+            {
+                RemovePairing();
+            }
+        }
+        override public void NetSend(BinaryWriter writer)
+        {
+            base.NetSend(writer);
+            writer.Write((int)Pairing);
+        }
+        override public void NetReceive(BinaryReader reader)
+        {
+            base.NetReceive(reader);
+            SetUpPairedEntity((PairingState)reader.ReadInt32());
         }
 
     }
@@ -545,136 +276,136 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         RockLayer,
         Underworld
     }
-    public class SeedData
+    public class NatureData
     {
-        public static readonly Dictionary<int, SeedData> BlocksToSeedsProperties = new()
+        public static readonly Dictionary<int, NatureData> BlocksToSeedsProperties = new()
         {
             // Overworld blocks and their variations
-            [TileID.Grass] = new SeedData(
-        (SeedTags.Sun, 100), (SeedTags.Water, 40), (SeedTags.Wild, 30), (SeedTags.Dry, 10)),
-            [TileID.Dirt] = new SeedData(
-        (SeedTags.Sun, 70), (SeedTags.Dry, 50), (SeedTags.Water, 20), (SeedTags.Cave, 10)),
+            [TileID.Grass] = new NatureData(
+        (NatureTags.Sun, 100), (NatureTags.Water, 40), (NatureTags.Wild, 30), (NatureTags.Dry, 10)),
+            [TileID.Dirt] = new NatureData(
+        (NatureTags.Sun, 70), (NatureTags.Dry, 50), (NatureTags.Water, 20), (NatureTags.Cave, 10)),
 
             // Stone and moss blocks
-            [TileID.Stone] = new SeedData(
-        (SeedTags.Cave, 100), (SeedTags.Dry, 60), (SeedTags.Cold, 30)),
-            [TileID.GreenMoss] = new SeedData(
-        (SeedTags.Cave, 75), (SeedTags.Water, 65), (SeedTags.Wild, 60)),
-            [TileID.BlueMoss] = new SeedData(
-        (SeedTags.Cave, 70), (SeedTags.Water, 80), (SeedTags.Cold, 40)),
-            [TileID.ArgonMoss] = new SeedData(
-        (SeedTags.Cave, 70), (SeedTags.Water, 80), (SeedTags.Good, 40)),
-            [TileID.BrownMoss] = new SeedData(
-        (SeedTags.Cave, 70), (SeedTags.Water, 80), (SeedTags.Dry, 20)),
-            [TileID.KryptonMoss] = new SeedData(
-        (SeedTags.Cave, 70), (SeedTags.Water, 70), (SeedTags.Wild, 90)),
-            [TileID.PurpleMoss] = new SeedData(
-        (SeedTags.Cave, 70), (SeedTags.Water, 80), (SeedTags.Evil, 50)),
-            [TileID.RainbowMoss] = new SeedData(
-        (SeedTags.Cave, 70), (SeedTags.Water, 80), (SeedTags.Evil, 20), (SeedTags.Good, 20), (SeedTags.Honey, 50)),
-            [TileID.RedMoss] = new SeedData(
-        (SeedTags.Cave, 70), (SeedTags.Water, 80), (SeedTags.Evil, 50)),
-            [TileID.VioletMoss] = new SeedData(
-        (SeedTags.Cave, 70), (SeedTags.Water, 80), (SeedTags.Water, 30)),
-            [TileID.XenonMoss] = new SeedData(
-        (SeedTags.Cave, 70), (SeedTags.Water, 80), (SeedTags.Cold, 30)),
-            [TileID.LavaMoss] = new SeedData(
-        (SeedTags.Cave, 85), (SeedTags.Hot, 70), (SeedTags.Dry, 50)),
+            [TileID.Stone] = new NatureData(
+        (NatureTags.Cave, 100), (NatureTags.Dry, 60), (NatureTags.Cold, 30)),
+            [TileID.GreenMoss] = new NatureData(
+        (NatureTags.Cave, 75), (NatureTags.Water, 65), (NatureTags.Wild, 60)),
+            [TileID.BlueMoss] = new NatureData(
+        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Cold, 40)),
+            [TileID.ArgonMoss] = new NatureData(
+        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Good, 40)),
+            [TileID.BrownMoss] = new NatureData(
+        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Dry, 20)),
+            [TileID.KryptonMoss] = new NatureData(
+        (NatureTags.Cave, 70), (NatureTags.Water, 70), (NatureTags.Wild, 90)),
+            [TileID.PurpleMoss] = new NatureData(
+        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Evil, 50)),
+            [TileID.RainbowMoss] = new NatureData(
+        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Evil, 20), (NatureTags.Good, 20), (NatureTags.Honey, 50)),
+            [TileID.RedMoss] = new NatureData(
+        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Evil, 50)),
+            [TileID.VioletMoss] = new NatureData(
+        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Water, 30)),
+            [TileID.XenonMoss] = new NatureData(
+        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Cold, 30)),
+            [TileID.LavaMoss] = new NatureData(
+        (NatureTags.Cave, 85), (NatureTags.Hot, 70), (NatureTags.Dry, 50)),
 
             // Dry and sandy blocks
-            [TileID.Sand] = new SeedData(
-        (SeedTags.Dry, 100), (SeedTags.Hot, 80), (SeedTags.Sun, 60), (SeedTags.Water, 10)),
-            [TileID.HardenedSand] = new SeedData(
-        (SeedTags.Dry, 90), (SeedTags.Hot, 70), (SeedTags.Cave, 40)),
-            [TileID.Sandstone] = new SeedData(
-        (SeedTags.Dry, 80), (SeedTags.Cave, 60), (SeedTags.Hot, 50)),
+            [TileID.Sand] = new NatureData(
+        (NatureTags.Dry, 100), (NatureTags.Hot, 80), (NatureTags.Sun, 60), (NatureTags.Water, 10)),
+            [TileID.HardenedSand] = new NatureData(
+        (NatureTags.Dry, 90), (NatureTags.Hot, 70), (NatureTags.Cave, 40)),
+            [TileID.Sandstone] = new NatureData(
+        (NatureTags.Dry, 80), (NatureTags.Cave, 60), (NatureTags.Hot, 50)),
 
             // Snow and ice blocks
-            [TileID.SnowBlock] = new SeedData(
-        (SeedTags.Cold, 100), (SeedTags.Sun, 60), (SeedTags.Water, 40)),
-            [TileID.IceBlock] = new SeedData(
-        (SeedTags.Cold, 100), (SeedTags.Cave, 50), (SeedTags.Water, 80)),
+            [TileID.SnowBlock] = new NatureData(
+        (NatureTags.Cold, 100), (NatureTags.Sun, 60), (NatureTags.Water, 40)),
+            [TileID.IceBlock] = new NatureData(
+        (NatureTags.Cold, 100), (NatureTags.Cave, 50), (NatureTags.Water, 80)),
 
             // Jungle blocks and mud
-            [TileID.JungleGrass] = new SeedData(
-        (SeedTags.Wild, 100), (SeedTags.Water, 100), (SeedTags.Sun, 50), (SeedTags.Hot, 30)),
-            [TileID.Mud] = new SeedData(
-        (SeedTags.Wild, 80), (SeedTags.Water, 100), (SeedTags.Sun, 20)),
+            [TileID.JungleGrass] = new NatureData(
+        (NatureTags.Wild, 100), (NatureTags.Water, 100), (NatureTags.Sun, 50), (NatureTags.Hot, 30)),
+            [TileID.Mud] = new NatureData(
+        (NatureTags.Wild, 80), (NatureTags.Water, 100), (NatureTags.Sun, 20)),
 
             // Hallowed blocks and their variations
-            [TileID.HallowedGrass] = new SeedData(
-        (SeedTags.Good, 100), (SeedTags.Sun, 80), (SeedTags.Water, 30), (SeedTags.Wild, 20)),
-            [TileID.Pearlstone] = new SeedData(
-        (SeedTags.Good, 90), (SeedTags.Cave, 70), (SeedTags.Water, 20)),
-            [TileID.Pearlsand] = new SeedData(
-        (SeedTags.Good, 80), (SeedTags.Sun, 60), (SeedTags.Dry, 50)),
-            [TileID.HallowedIce] = new SeedData(
-        (SeedTags.Good, 100), (SeedTags.Cold, 80), (SeedTags.Water, 50)),
+            [TileID.HallowedGrass] = new NatureData(
+        (NatureTags.Good, 100), (NatureTags.Sun, 80), (NatureTags.Water, 30), (NatureTags.Wild, 20)),
+            [TileID.Pearlstone] = new NatureData(
+        (NatureTags.Good, 90), (NatureTags.Cave, 70), (NatureTags.Water, 20)),
+            [TileID.Pearlsand] = new NatureData(
+        (NatureTags.Good, 80), (NatureTags.Sun, 60), (NatureTags.Dry, 50)),
+            [TileID.HallowedIce] = new NatureData(
+        (NatureTags.Good, 100), (NatureTags.Cold, 80), (NatureTags.Water, 50)),
 
             // Evil blocks and their variations
-            [TileID.CorruptGrass] = new SeedData(
-        (SeedTags.Evil, 100), (SeedTags.Sun, 30), (SeedTags.Dry, 40), (SeedTags.Water, 10)),
-            [TileID.Ebonstone] = new SeedData(
-        (SeedTags.Evil, 100), (SeedTags.Cave, 60), (SeedTags.Dry, 40)),
-            [TileID.Crimstone] = new SeedData(
-        (SeedTags.Evil, 100), (SeedTags.Cave, 60), (SeedTags.Dry, 40)),
-            [TileID.CrimsonGrass] = new SeedData(
-        (SeedTags.Evil, 100), (SeedTags.Sun, 30), (SeedTags.Water, 30), (SeedTags.Hot, 20)),
-            [TileID.Crimsand] = new SeedData(
-        (SeedTags.Evil, 90), (SeedTags.Sun, 50), (SeedTags.Dry, 60), (SeedTags.Hot, 20)),
-            [TileID.Ebonsand] = new SeedData(
-        (SeedTags.Evil, 90), (SeedTags.Sun, 50), (SeedTags.Dry, 60), (SeedTags.Hot, 20)),
-            [TileID.FleshIce] = new SeedData(
-        (SeedTags.Evil, 100), (SeedTags.Cold, 80), (SeedTags.Water, 50), (SeedTags.Dry, 20)),
-            [TileID.CorruptIce] = new SeedData(
-        (SeedTags.Evil, 100), (SeedTags.Cold, 80), (SeedTags.Water, 50), (SeedTags.Dry, 20)),
+            [TileID.CorruptGrass] = new NatureData(
+        (NatureTags.Evil, 100), (NatureTags.Sun, 30), (NatureTags.Dry, 40), (NatureTags.Water, 10)),
+            [TileID.Ebonstone] = new NatureData(
+        (NatureTags.Evil, 100), (NatureTags.Cave, 60), (NatureTags.Dry, 40)),
+            [TileID.Crimstone] = new NatureData(
+        (NatureTags.Evil, 100), (NatureTags.Cave, 60), (NatureTags.Dry, 40)),
+            [TileID.CrimsonGrass] = new NatureData(
+        (NatureTags.Evil, 100), (NatureTags.Sun, 30), (NatureTags.Water, 30), (NatureTags.Hot, 20)),
+            [TileID.Crimsand] = new NatureData(
+        (NatureTags.Evil, 90), (NatureTags.Sun, 50), (NatureTags.Dry, 60), (NatureTags.Hot, 20)),
+            [TileID.Ebonsand] = new NatureData(
+        (NatureTags.Evil, 90), (NatureTags.Sun, 50), (NatureTags.Dry, 60), (NatureTags.Hot, 20)),
+            [TileID.FleshIce] = new NatureData(
+        (NatureTags.Evil, 100), (NatureTags.Cold, 80), (NatureTags.Water, 50), (NatureTags.Dry, 20)),
+            [TileID.CorruptIce] = new NatureData(
+        (NatureTags.Evil, 100), (NatureTags.Cold, 80), (NatureTags.Water, 50), (NatureTags.Dry, 20)),
 
             // Hell blocks and their variations
-            [TileID.Ash] = new SeedData(
-        (SeedTags.Hot, 100), (SeedTags.Dry, 100), (SeedTags.Cave, 80), (SeedTags.Evil, 20)),
-            [TileID.Hellstone] = new SeedData(
-        (SeedTags.Hot, 100), (SeedTags.Cave, 90), (SeedTags.Dry, 80), (SeedTags.Evil, 50)),
-            [TileID.AshGrass] = new SeedData(
-        (SeedTags.Hot, 60), (SeedTags.Dry, 50), (SeedTags.Cave, 90), (SeedTags.Evil, 10)),
-            [TileID.Obsidian] = new SeedData(
-                (SeedTags.Hot, 100), (SeedTags.Cave, 80), (SeedTags.Cold, 100)),
+            [TileID.Ash] = new NatureData(
+        (NatureTags.Hot, 100), (NatureTags.Dry, 100), (NatureTags.Cave, 80), (NatureTags.Evil, 20)),
+            [TileID.Hellstone] = new NatureData(
+        (NatureTags.Hot, 100), (NatureTags.Cave, 90), (NatureTags.Dry, 80), (NatureTags.Evil, 50)),
+            [TileID.AshGrass] = new NatureData(
+        (NatureTags.Hot, 60), (NatureTags.Dry, 50), (NatureTags.Cave, 90), (NatureTags.Evil, 10)),
+            [TileID.Obsidian] = new NatureData(
+                (NatureTags.Hot, 100), (NatureTags.Cave, 80), (NatureTags.Cold, 100)),
 
             // Honey blocks and their variations
-            [TileID.HoneyBlock] = new SeedData(
-        (SeedTags.Honey, 100), (SeedTags.Water, 80), (SeedTags.Sun, 40), (SeedTags.Wild, 30)),
-            [TileID.CrispyHoneyBlock] = new SeedData(
-        (SeedTags.Honey, 90), (SeedTags.Dry, 70), (SeedTags.Sun, 50), (SeedTags.Hot, 40)),
-            [TileID.BeeHive] = new SeedData(
-        (SeedTags.Honey, 100), (SeedTags.Sun, 90), (SeedTags.Water, 60)),
+            [TileID.HoneyBlock] = new NatureData(
+        (NatureTags.Honey, 100), (NatureTags.Water, 80), (NatureTags.Sun, 40), (NatureTags.Wild, 30)),
+            [TileID.CrispyHoneyBlock] = new NatureData(
+        (NatureTags.Honey, 90), (NatureTags.Dry, 70), (NatureTags.Sun, 50), (NatureTags.Hot, 40)),
+            [TileID.BeeHive] = new NatureData(
+        (NatureTags.Honey, 100), (NatureTags.Sun, 90), (NatureTags.Water, 60)),
 
             // Clouds and their variations
-            [TileID.Cloud] = new SeedData(
-        (SeedTags.Sun, 100), (SeedTags.Water, 90), (SeedTags.Cold, 30)),
-            [TileID.RainCloud] = new SeedData(
-        (SeedTags.Sun, 100), (SeedTags.Water, 100), (SeedTags.Cold, 40)),
-            [TileID.SnowCloud] = new SeedData(
-        (SeedTags.Sun, 100), (SeedTags.Cold, 100), (SeedTags.Water, 70)),
+            [TileID.Cloud] = new NatureData(
+        (NatureTags.Sun, 100), (NatureTags.Water, 90), (NatureTags.Cold, 30)),
+            [TileID.RainCloud] = new NatureData(
+        (NatureTags.Sun, 100), (NatureTags.Water, 100), (NatureTags.Cold, 40)),
+            [TileID.SnowCloud] = new NatureData(
+        (NatureTags.Sun, 100), (NatureTags.Cold, 100), (NatureTags.Water, 70)),
 
             // Ocean blocks and their variations
-            [TileID.Coralstone] = new SeedData(
-        (SeedTags.Water, 100), (SeedTags.Sun, 60), (SeedTags.Wild, 50)),
-            [TileID.ShellPile] = new SeedData(
-        (SeedTags.Water, 90), (SeedTags.Sun, 30), (SeedTags.Dry, 20)),
+            [TileID.Coralstone] = new NatureData(
+        (NatureTags.Water, 100), (NatureTags.Sun, 60), (NatureTags.Wild, 50)),
+            [TileID.ShellPile] = new NatureData(
+        (NatureTags.Water, 90), (NatureTags.Sun, 30), (NatureTags.Dry, 20)),
         };
-        public static readonly Dictionary<DepthZone, SeedData> DepthZoneToSeedAffinity = new()
+        public static readonly Dictionary<DepthZone, NatureData> DepthZoneToSeedAffinity = new()
         {
-            [DepthZone.Sky] = new SeedData((SeedTags.Sun, 100), (SeedTags.Cave, -100), (SeedTags.Cold, 20)),
-            [DepthZone.Overworld] = new SeedData((SeedTags.Sun, 50), (SeedTags.Cave, -50)),
-            [DepthZone.DirtLayer] = new SeedData((SeedTags.Cave, 20), (SeedTags.Sun, 30)),
-            [DepthZone.RockLayer] = new SeedData((SeedTags.Cave, 80), (SeedTags.Hot, 10), (SeedTags.Sun, -50)),
-            [DepthZone.Underworld] = new SeedData((SeedTags.Hot, 100), (SeedTags.Cave, 60), (SeedTags.Sun, -100)),
+            [DepthZone.Sky] = new NatureData((NatureTags.Sun, 100), (NatureTags.Cave, -100), (NatureTags.Cold, 20)),
+            [DepthZone.Overworld] = new NatureData((NatureTags.Sun, 50), (NatureTags.Cave, -50)),
+            [DepthZone.DirtLayer] = new NatureData((NatureTags.Cave, 20), (NatureTags.Sun, 30)),
+            [DepthZone.RockLayer] = new NatureData((NatureTags.Cave, 80), (NatureTags.Hot, 10), (NatureTags.Sun, -50)),
+            [DepthZone.Underworld] = new NatureData((NatureTags.Hot, 100), (NatureTags.Cave, 60), (NatureTags.Sun, -100)),
         };
 
         private readonly Dictionary<string, int> loves = new();
 
-        public SeedData() { }
+        public NatureData() { }
 
-        public SeedData(params (string key, int value)[] entries)
+        public NatureData(params (string key, int value)[] entries)
         {
             foreach (var (key, value) in entries)
                 loves[key] = value;
@@ -690,33 +421,33 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         public IEnumerable<int> Values => loves.Values;
         public IReadOnlyDictionary<string, int> ValuesMap => loves;
 
-        public static SeedData operator +(SeedData a, SeedData b)
+        public static NatureData operator +(NatureData a, NatureData b)
         {
-            var result = new SeedData();
+            var result = new NatureData();
             foreach (var key in AllKeys(a, b))
                 result[key] = a[key] + b[key];
             return result;
         }
 
-        public static SeedData operator -(SeedData a, SeedData b)
+        public static NatureData operator -(NatureData a, NatureData b)
         {
-            var result = new SeedData();
+            var result = new NatureData();
             foreach (var key in AllKeys(a, b))
                 result[key] = a[key] - b[key];
             return result;
         }
 
-        public static SeedData operator *(SeedData a, float multiplier)
+        public static NatureData operator *(NatureData a, float multiplier)
         {
-            var result = new SeedData();
+            var result = new NatureData();
             foreach (var kvp in a.loves)
                 result[kvp.Key] = (int)Math.Round(kvp.Value * multiplier);
             return result;
         }
 
-        public static SeedData operator /(SeedData a, float divisor)
+        public static NatureData operator /(NatureData a, float divisor)
         {
-            var result = new SeedData();
+            var result = new NatureData();
             foreach (var kvp in a.loves)
                 result[kvp.Key] = (int)Math.Round(kvp.Value / divisor);
             return result;
@@ -724,9 +455,9 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 
         public float TotalLove => loves.Values.Sum();
 
-        public float AverageLove => TotalLove / SeedTags.Count;
+        public float AverageLove => TotalLove / NatureTags.Count;
 
-        private static HashSet<string> AllKeys(SeedData a, SeedData b)
+        private static HashSet<string> AllKeys(NatureData a, NatureData b)
         {
             var keys = new HashSet<string>(a.loves.Keys);
             keys.UnionWith(b.loves.Keys);
@@ -738,9 +469,9 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             return string.Join(", ", loves.Select(kv => $"{kv.Key}: {kv.Value}"));
         }
 
-        public SeedData Normalize()
+        public NatureData Normalize()
         {
-            SeedData normalized = new SeedData();
+            NatureData normalized = new NatureData();
             foreach (var key in loves.Keys.ToList())
             {
                 normalized[key] = Math.Clamp(loves[key], 0, 100); // Ensure values are between 0 and 100
@@ -748,9 +479,9 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             return normalized;
         }
 
-        public SeedData Clone()
+        public NatureData Clone()
         {
-            SeedData clone = new SeedData();
+            NatureData clone = new NatureData();
             foreach (var kvp in loves)
             {
                 clone[kvp.Key] = kvp.Value;
@@ -758,11 +489,11 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             return clone;
         }
 
-        public float DistanceTo(SeedData other)
+        public float DistanceTo(NatureData other)
         {
             float sum = 0f;
 
-            foreach (var tag in SeedTags.AllTags)
+            foreach (var tag in NatureTags.AllTags)
             {
                 float a = this[tag];
                 float b = other[tag];
@@ -773,7 +504,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             return MathF.Sqrt(sum);
         }
     }
-    public static class SeedTags
+    public static class NatureTags
     {
         public const string Dry = "DryLove";
         public const string Water = "WaterLove";
@@ -791,7 +522,6 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         ];
         public static int Count => AllTags.Count(); // Total number of tags, used for validation
     }
-
     public static class Depth
     {
         public static DepthZone GetDepthZone(int tileY)
@@ -809,7 +539,6 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 
 
     }
-
     public enum TypesOfSunflowers
     {
         Sunflower,
@@ -823,103 +552,102 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         Deadflower,
         Obsidianflower,
     }
-
     public static class SunflowersPropertiesData
     {
-        public static Dictionary<TypesOfSunflowers, SeedData> TypeToData = new()
+        public static Dictionary<TypesOfSunflowers, NatureData> TypeToData = new()
         {
-            [TypesOfSunflowers.Sunflower] = new SeedData(
-        (SeedTags.Dry, 30),
-        (SeedTags.Water, 30),
-        (SeedTags.Wild, 20),
-        (SeedTags.Sun, 80),
-        (SeedTags.Cave, 10),
-        (SeedTags.Hot, 10),
-        (SeedTags.Cold, 10),
-        (SeedTags.Evil, 0),
-        (SeedTags.Good, 0),
-        (SeedTags.Honey, 0)
+            [TypesOfSunflowers.Sunflower] = new NatureData(
+        (NatureTags.Dry, 30),
+        (NatureTags.Water, 30),
+        (NatureTags.Wild, 20),
+        (NatureTags.Sun, 80),
+        (NatureTags.Cave, 10),
+        (NatureTags.Hot, 10),
+        (NatureTags.Cold, 10),
+        (NatureTags.Evil, 0),
+        (NatureTags.Good, 0),
+        (NatureTags.Honey, 0)
     ),
 
-            [TypesOfSunflowers.Dryflower] = new SeedData(
-        (SeedTags.Dry, 100),
-        (SeedTags.Hot, 80),
-        (SeedTags.Sun, 60),
-        (SeedTags.Cave, 30),
-        (SeedTags.Water, 10),
-        (SeedTags.Cold, 10)
+            [TypesOfSunflowers.Dryflower] = new NatureData(
+        (NatureTags.Dry, 100),
+        (NatureTags.Hot, 80),
+        (NatureTags.Sun, 60),
+        (NatureTags.Cave, 30),
+        (NatureTags.Water, 10),
+        (NatureTags.Cold, 10)
     ),
 
-            [TypesOfSunflowers.Fireflower] = new SeedData(
-        (SeedTags.Hot, 100),
-        (SeedTags.Sun, 80),
-        (SeedTags.Dry, 50),
-        (SeedTags.Water, 20),
-        (SeedTags.Cold, 10),
-        (SeedTags.Cave, 40)
+            [TypesOfSunflowers.Fireflower] = new NatureData(
+        (NatureTags.Hot, 100),
+        (NatureTags.Sun, 80),
+        (NatureTags.Dry, 50),
+        (NatureTags.Water, 20),
+        (NatureTags.Cold, 10),
+        (NatureTags.Cave, 40)
     ),
 
-            [TypesOfSunflowers.Snowflower] = new SeedData(
-        (SeedTags.Cold, 100),
-        (SeedTags.Sun, 60),
-        (SeedTags.Water, 40),
-        (SeedTags.Dry, 10),
-        (SeedTags.Hot, 10),
-        (SeedTags.Cave, 30)
+            [TypesOfSunflowers.Snowflower] = new NatureData(
+        (NatureTags.Cold, 100),
+        (NatureTags.Sun, 60),
+        (NatureTags.Water, 40),
+        (NatureTags.Dry, 10),
+        (NatureTags.Hot, 10),
+        (NatureTags.Cave, 30)
     ),
 
-            [TypesOfSunflowers.Iceflower] = new SeedData(
-        (SeedTags.Cold, 100),
-        (SeedTags.Cave, 50),
-        (SeedTags.Water, 80),
-        (SeedTags.Hot, 10),
-        (SeedTags.Sun, 30),
-        (SeedTags.Good, 20)
+            [TypesOfSunflowers.Iceflower] = new NatureData(
+        (NatureTags.Cold, 100),
+        (NatureTags.Cave, 50),
+        (NatureTags.Water, 80),
+        (NatureTags.Hot, 10),
+        (NatureTags.Sun, 30),
+        (NatureTags.Good, 20)
     ),
 
-            [TypesOfSunflowers.Beachflower] = new SeedData(
-        (SeedTags.Water, 100),
-        (SeedTags.Sun, 60),
-        (SeedTags.Wild, 50),
-        (SeedTags.Dry, 30),
-        (SeedTags.Honey, 20),
-        (SeedTags.Cold, 10)
+            [TypesOfSunflowers.Beachflower] = new NatureData(
+        (NatureTags.Water, 100),
+        (NatureTags.Sun, 60),
+        (NatureTags.Wild, 50),
+        (NatureTags.Dry, 30),
+        (NatureTags.Honey, 20),
+        (NatureTags.Cold, 10)
     ),
 
-            [TypesOfSunflowers.Oceanflower] = new SeedData(
-        (SeedTags.Water, 100),
-        (SeedTags.Sun, 60),
-        (SeedTags.Wild, 50),
-        (SeedTags.Dry, 10),
-        (SeedTags.Good, 20),
-        (SeedTags.Honey, 30)
+            [TypesOfSunflowers.Oceanflower] = new NatureData(
+        (NatureTags.Water, 100),
+        (NatureTags.Sun, 60),
+        (NatureTags.Wild, 50),
+        (NatureTags.Dry, 10),
+        (NatureTags.Good, 20),
+        (NatureTags.Honey, 30)
     ),
 
-            [TypesOfSunflowers.Jungleflower] = new SeedData(
-        (SeedTags.Wild, 100),
-        (SeedTags.Water, 100),
-        (SeedTags.Sun, 50),
-        (SeedTags.Hot, 30),
-        (SeedTags.Honey, 20),
-        (SeedTags.Cave, 20)
+            [TypesOfSunflowers.Jungleflower] = new NatureData(
+        (NatureTags.Wild, 100),
+        (NatureTags.Water, 100),
+        (NatureTags.Sun, 50),
+        (NatureTags.Hot, 30),
+        (NatureTags.Honey, 20),
+        (NatureTags.Cave, 20)
     ),
 
-            [TypesOfSunflowers.Deadflower] = new SeedData(
-        (SeedTags.Evil, 100),
-        (SeedTags.Sun, 10),
-        (SeedTags.Water, 10),
-        (SeedTags.Good, 0),
-        (SeedTags.Honey, 0),
-        (SeedTags.Wild, 10)
+            [TypesOfSunflowers.Deadflower] = new NatureData(
+        (NatureTags.Evil, 100),
+        (NatureTags.Sun, 10),
+        (NatureTags.Water, 10),
+        (NatureTags.Good, 0),
+        (NatureTags.Honey, 0),
+        (NatureTags.Wild, 10)
     ),
 
-            [TypesOfSunflowers.Obsidianflower] = new SeedData(
-        (SeedTags.Hot, 100),
-        (SeedTags.Cold, 100),
-        (SeedTags.Cave, 100),
-        (SeedTags.Water, 40),
-        (SeedTags.Dry, 20),
-        (SeedTags.Evil, 10)
+            [TypesOfSunflowers.Obsidianflower] = new NatureData(
+        (NatureTags.Hot, 100),
+        (NatureTags.Cold, 100),
+        (NatureTags.Cave, 100),
+        (NatureTags.Water, 40),
+        (NatureTags.Dry, 20),
+        (NatureTags.Evil, 10)
     ),
         };
 

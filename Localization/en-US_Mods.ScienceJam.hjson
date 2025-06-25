@@ -143,6 +143,11 @@ Configs: {
 			Label: Sunflower Grow Fast
 			Tooltip: ""
 		}
+
+		GrowFast: {
+			Label: Grow Fast
+			Tooltip: ""
+		}
 	}
 }
 

@@ -13,7 +13,7 @@ namespace ScienceJam.Content.Items.SunflowerSeeds
 {
     internal class SunflowerSeedItem : ModItem
     {
-        public SeedData sproutData = new();
+        public NatureData sproutData = new();
         public int Dry = 30;
         public int Water = 30;
         public int Wild = 20;
@@ -65,14 +65,14 @@ namespace ScienceJam.Content.Items.SunflowerSeeds
             int[] intl = [Dry, Water, Wild, Sun, Cave, Hot, Cold, Evil, Good, Honey];
             for (int i = 0; i < 10; i++)
             {
-                sproutData[SeedTags.AllTags[i]] = intl[i];
+                sproutData[NatureTags.AllTags[i]] = intl[i];
             }
             base.UpdateInventory(player);
         }
 
         public override bool CanStack(Item source)
         {
-            foreach (var tag in SeedTags.AllTags)
+            foreach (var tag in NatureTags.AllTags)
             {
                 if (sproutData[tag] != ((SunflowerSeedItem)source.ModItem).sproutData[tag])
                 {
@@ -84,7 +84,7 @@ namespace ScienceJam.Content.Items.SunflowerSeeds
 
         public override void SaveData(TagCompound tag)
         {
-            foreach (var seedTag in SeedTags.AllTags)
+            foreach (var seedTag in NatureTags.AllTags)
             {
                 tag[seedTag] = sproutData[seedTag];
             }
@@ -92,7 +92,7 @@ namespace ScienceJam.Content.Items.SunflowerSeeds
 
         public override void LoadData(TagCompound tag)
         {
-            foreach (var seedTag in SeedTags.AllTags)
+            foreach (var seedTag in NatureTags.AllTags)
             {
                 try
                 {
@@ -115,7 +115,7 @@ namespace ScienceJam.Content.Items.SunflowerSeeds
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            foreach (var tag in SeedTags.AllTags)
+            foreach (var tag in NatureTags.AllTags)
             {
                 TooltipLine tooltip = new TooltipLine(Mod, "Info: ", $"{tag}: {sproutData[tag]}") { OverrideColor = Color.Yellow };
                 tooltips.Add(tooltip);
