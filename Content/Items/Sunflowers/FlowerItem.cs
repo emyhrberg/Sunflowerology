@@ -1,14 +1,16 @@
 ﻿using ScienceJam.Content.Tiles.DeadSunflower;
+using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
+using System;
 using Terraria.ModLoader;
 
 namespace ScienceJam.Content.Items.Sunflowers
 {
     internal abstract class FlowerItem : ModItem
     {
-        protected abstract int SunflowerItemId { get; }
+        protected abstract TypeOfSunflower TypeOfSunflower { get; }
         public override void SetDefaults()
         {
-            Item.DefaultToPlaceableTile(SunflowerItemId);
+            Item.DefaultToPlaceableTile(NatureData.TypeOfSunflowerToTileId[TypeOfSunflower]);
             Item.width = 30;
             Item.height = 28;
             Item.maxStack = 9999;
@@ -19,6 +21,7 @@ namespace ScienceJam.Content.Items.Sunflowers
             Item.useTime = 10;
             Item.useStyle = Terraria.ID.ItemUseStyleID.Swing;
             Item.consumable = true;
+            Item.placeStyle = 3 * (int)TypeOfSunflower;
         }
     }
 }

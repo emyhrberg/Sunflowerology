@@ -1,10 +1,11 @@
 ﻿using ScienceJam.Content.Tiles.DeadSunflower;
+using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
 using Terraria.ModLoader;
 
 namespace ScienceJam.Content.Items.Sunflowers
 {
     internal class Snowflower : FlowerItem
     {
-        protected override int SunflowerItemId => ModContent.TileType<SnowflowerTile>();
+        protected override TypeOfSunflower TypeOfSunflower => TypeOfSunflower.Snowflower;
     }
 }

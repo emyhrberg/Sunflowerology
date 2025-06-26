@@ -4,7 +4,9 @@ using ReLogic.Content;
 using ScienceJam.Content.Buffs;
 using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
 using ScienceJam.Content.Tiles.SunGrass;
+using System.Collections.Generic;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
@@ -19,7 +21,6 @@ namespace ScienceJam.Content.Tiles.DeadSunflower
         protected abstract int EffetDuration { get; }
 
         private Asset<Texture2D> glowTexture;
-
         public override string Texture => "ScienceJam/Content/Tiles/SunflowerStagesOfGrowth/SunflowerWithSeedsTile";
         public override void SetStaticDefaults()
         {
@@ -29,11 +30,14 @@ namespace ScienceJam.Content.Tiles.DeadSunflower
 
             DustType = DustID.Asphalt;
 
-            TileObjectData.newTile.CopyFrom(TileObjectData.Style3x2);
+            TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);
             TileObjectData.newTile.Width = 2;
             TileObjectData.newTile.Height = 4;
+            TileObjectData.newTile.FlattenAnchors = true;
+            TileObjectData.newTile.Origin = new(0, 3);
+            TileObjectData.newTile.AnchorBottom = new(Terraria.Enums.AnchorType.SolidTile, TileObjectData.newTile.Width, 0);
             TileObjectData.newTile.DrawYOffset = 2;
-            TileObjectData.newTile.AnchorValidTiles = [TileID.Grass, ModContent.TileType<SunGrassTile>()];
+            TileObjectData.newTile.StyleWrapLimit = 3;
             TileObjectData.newTile.RandomStyleRange = 3;
             TileObjectData.newTile.CoordinateWidth = 16;
             TileObjectData.newTile.CoordinateHeights = new int[] { 16, 16, 16, 18 };
@@ -58,9 +62,9 @@ namespace ScienceJam.Content.Tiles.DeadSunflower
                 player.AddBuff(EffectBuffID, timeToAdd: EffetDuration);
         }
 
-        public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
+        public override IEnumerable<Item> GetItemDrops(int i, int j)
         {
-            tileFrameY += (short)((3 * 18 + 20) * (int)TypeOfSunflower);
+            yield return new Item(NatureData.TypeOfSunflowerToItemId[TypeOfSunflower]);
         }
 
         public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
@@ -74,8 +78,8 @@ namespace ScienceJam.Content.Tiles.DeadSunflower
 
             spriteBatch.Draw(
                 glowTexture.Value,
-                new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y + 1) + zero,
-                new Rectangle(tile.TileFrameX, tile.TileFrameY + frameY, 16, 16),
+                new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y+2) + zero,
+                new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, tile.TileFrameY == 54 ? 18 : 16),
                 Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
 

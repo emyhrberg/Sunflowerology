@@ -17,7 +17,7 @@ namespace ScienceJam.Content.Tiles.DeadSunflower
 
         protected override int EffectBuffID => BuffID.Calm;
 
-        protected override int EffetDuration => 10;
+        protected override int EffetDuration => 30;
         
         protected override TypeOfSunflower TypeOfSunflower => TypeOfSunflower.Dryflower;
     }

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ScienceJam.Common.Configs;
 using ScienceJam.Content.Items.Sunflowers;
 using ScienceJam.Content.Items.SunflowerSeeds;
+using ScienceJam.Content.Tiles.DeadSunflower;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,6 +24,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             base.SetStaticDefaults();
             var tileData = TileObjectData.GetTileData(Type, 0);
             tileData.AnchorValidTiles = NatureData.BlocksToSeedsProperties.Keys.ToArray();
+            tileData.StyleWrapLimit = 3;
         }
         public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
         {
@@ -143,8 +145,9 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 
         protected override void ReplacePlantWithNewOne()
         {
-            base.ReplacePlantWithNewOne();
+            WorldGen.KillTile(Position.X, Position.Y, false, false, true);
             WorldGen.KillTile(pairedEntity.Position.X, pairedEntity.Position.Y, false, false, true);
+            growthQueue.Add((Position.X, Position.Y, (plantData + pairedEntity.plantData)/2, difference.Clone()));
         }
 
         /// <summary>
@@ -537,6 +540,19 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             [TypeOfSunflower.Sporeflower] = ModContent.ItemType<Sporeflower>(),
             [TypeOfSunflower.Deadflower] = ModContent.ItemType<Deadflower>(),
             [TypeOfSunflower.Obsidianflower] = ModContent.ItemType<Obsidianflower>(),
+        };
+        public static readonly Dictionary<TypeOfSunflower, int> TypeOfSunflowerToTileId = new()
+        {
+            [TypeOfSunflower.Sunflower] = TileID.Sunflower,
+            [TypeOfSunflower.Dryflower] = ModContent.TileType<DryflowerTile>(),
+            [TypeOfSunflower.Fireflower] = ModContent.TileType<FireflowerTile>(),
+            [TypeOfSunflower.Snowflower] = ModContent.TileType<SnowflowerTile>(),
+            [TypeOfSunflower.Iceflower] = ModContent.TileType<IceflowerTile>(),
+            [TypeOfSunflower.Beachflower] = ModContent.TileType<BeachflowerTile>(),
+            [TypeOfSunflower.Oceanflower] = ModContent.TileType<OceanflowerTile>(),
+            [TypeOfSunflower.Sporeflower] = ModContent.TileType<SporeflowerTile>(),
+            [TypeOfSunflower.Deadflower] = ModContent.TileType<DeadflowerTile>(),
+            [TypeOfSunflower.Obsidianflower] = ModContent.TileType<ObsidianflowerTile>(),
         };
 
         private readonly Dictionary<string, int> loves = new();

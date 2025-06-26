@@ -26,6 +26,7 @@ namespace ScienceJam.Content.Items.SunflowerSeeds
             Item.width = 20;
             Item.height = 26;
             Item.value = 1000;
+            Item.placeStyle = 9 * (int)typeOfSunflower;
         }
 
         public override bool CanStack(Item source)

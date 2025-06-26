@@ -72,6 +72,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             TileObjectData.newTile.CoordinateHeights = Heights;
             TileObjectData.newTile.DrawYOffset = 2;
             TileObjectData.newTile.RandomStyleRange = 3;
+            TileObjectData.newTile.StyleWrapLimit = 3;
             TileObjectData.newTile.StyleHorizontal = true;
             if (IsSpecialHook)
             {
@@ -346,7 +347,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 // Random style for the new plant
                 int style = random.Next(0, 3);
                 // Place the new tile
-                if (!WorldGen.PlaceObject(i, j-1, NextTileType, mute: true, random: style))
+                if (!WorldGen.PlaceObject(i, j - 1, NextTileType, mute: true, style: 3 * (int)typeOfSunflower))
                 {
                     
                     continue;
