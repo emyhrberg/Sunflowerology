@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ScienceJam.Common.Configs;
+using ScienceJam.Content.Items.Sunflowers;
+using ScienceJam.Content.Items.SunflowerSeeds;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -41,6 +43,12 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         }
         protected override int WidthInTiles => 1;
         protected override int HeightInTiles => 1;
+
+        public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
+        {
+            base.KillTile(i, j, ref fail, ref effectOnly, ref noItem);
+            noItem = true;
+        }
 
         protected override bool IsSpecialHook => true;
 
@@ -408,6 +416,128 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             [DepthZone.RockLayer] = new NatureData((NatureTags.Cave, 80), (NatureTags.Hot, 10), (NatureTags.Sun, -50)),
             [DepthZone.Underworld] = new NatureData((NatureTags.Hot, 100), (NatureTags.Cave, 60), (NatureTags.Sun, -100)),
         };
+        public static readonly Dictionary<TypeOfSunflower, NatureData> TypeOfSunflowerToData = new()
+        {
+            [TypeOfSunflower.Sunflower] = new NatureData(
+        (NatureTags.Dry, 30),
+        (NatureTags.Water, 30),
+        (NatureTags.Wild, 20),
+        (NatureTags.Sun, 80),
+        (NatureTags.Cave, 10),
+        (NatureTags.Hot, 10),
+        (NatureTags.Cold, 10),
+        (NatureTags.Evil, 0),
+        (NatureTags.Good, 0),
+        (NatureTags.Honey, 0)
+    ),
+
+            [TypeOfSunflower.Dryflower] = new NatureData(
+        (NatureTags.Dry, 100),
+        (NatureTags.Hot, 80),
+        (NatureTags.Sun, 60),
+        (NatureTags.Cave, 30),
+        (NatureTags.Water, 10),
+        (NatureTags.Cold, 10)
+    ),
+
+            [TypeOfSunflower.Fireflower] = new NatureData(
+        (NatureTags.Hot, 100),
+        (NatureTags.Sun, 80),
+        (NatureTags.Dry, 50),
+        (NatureTags.Water, 20),
+        (NatureTags.Cold, 10),
+        (NatureTags.Cave, 40)
+    ),
+
+            [TypeOfSunflower.Snowflower] = new NatureData(
+        (NatureTags.Cold, 100),
+        (NatureTags.Sun, 60),
+        (NatureTags.Water, 40),
+        (NatureTags.Dry, 10),
+        (NatureTags.Hot, 10),
+        (NatureTags.Cave, 30)
+    ),
+
+            [TypeOfSunflower.Iceflower] = new NatureData(
+        (NatureTags.Cold, 100),
+        (NatureTags.Cave, 50),
+        (NatureTags.Water, 80),
+        (NatureTags.Hot, 10),
+        (NatureTags.Sun, 30),
+        (NatureTags.Good, 20)
+    ),
+
+            [TypeOfSunflower.Beachflower] = new NatureData(
+        (NatureTags.Water, 100),
+        (NatureTags.Sun, 60),
+        (NatureTags.Wild, 50),
+        (NatureTags.Dry, 30),
+        (NatureTags.Honey, 20),
+        (NatureTags.Cold, 10)
+    ),
+
+            [TypeOfSunflower.Oceanflower] = new NatureData(
+        (NatureTags.Water, 100),
+        (NatureTags.Sun, 60),
+        (NatureTags.Wild, 50),
+        (NatureTags.Dry, 10),
+        (NatureTags.Good, 20),
+        (NatureTags.Honey, 30)
+    ),
+
+            [TypeOfSunflower.Sporeflower] = new NatureData(
+        (NatureTags.Wild, 100),
+        (NatureTags.Water, 100),
+        (NatureTags.Sun, 50),
+        (NatureTags.Hot, 30),
+        (NatureTags.Honey, 20),
+        (NatureTags.Cave, 20)
+    ),
+
+            [TypeOfSunflower.Deadflower] = new NatureData(
+        (NatureTags.Evil, 100),
+        (NatureTags.Sun, 10),
+        (NatureTags.Water, 10),
+        (NatureTags.Good, 0),
+        (NatureTags.Honey, 0),
+        (NatureTags.Wild, 10)
+    ),
+
+            [TypeOfSunflower.Obsidianflower] = new NatureData(
+        (NatureTags.Hot, 100),
+        (NatureTags.Cold, 100),
+        (NatureTags.Cave, 100),
+        (NatureTags.Water, 40),
+        (NatureTags.Dry, 20),
+        (NatureTags.Evil, 10)
+    ),
+        };
+        public static readonly Dictionary<TypeOfSunflower, int> TypeOfSunflowerToSeedItemId = new()
+        {
+            [TypeOfSunflower.Sunflower] = ModContent.ItemType<SunflowerSeed>(),
+            [TypeOfSunflower.Dryflower] = ModContent.ItemType<DryflowerSeed>(),
+            [TypeOfSunflower.Fireflower] = ModContent.ItemType<FireflowerSeed>(),
+            [TypeOfSunflower.Snowflower] = ModContent.ItemType<SnowflowerSeed>(),
+            [TypeOfSunflower.Iceflower] = ModContent.ItemType<IceflowerSeed>(),
+            [TypeOfSunflower.Beachflower] = ModContent.ItemType<BeachflowerSeed>(),
+            [TypeOfSunflower.Oceanflower] = ModContent.ItemType<OceanflowerSeed>(),
+            [TypeOfSunflower.Sporeflower] = ModContent.ItemType<SporeflowerSeed>(),
+            [TypeOfSunflower.Deadflower] = ModContent.ItemType<DeadflowerSeed>(),
+            [TypeOfSunflower.Obsidianflower] = ModContent.ItemType<ObsidianflowerSeed>(),
+        };
+        public static readonly Dictionary<TypeOfSunflower, int> TypeOfSunflowerToItemId = new()
+        {
+            [TypeOfSunflower.Sunflower] = ItemID.Sunflower,
+            [TypeOfSunflower.Dryflower] = ModContent.ItemType<Dryflower>(),
+            [TypeOfSunflower.Fireflower] = ModContent.ItemType<Fireflower>(),
+            [TypeOfSunflower.Snowflower] = ModContent.ItemType<Snowflower>(),
+            [TypeOfSunflower.Iceflower] = ModContent.ItemType<Iceflower>(),
+            [TypeOfSunflower.Beachflower] = ModContent.ItemType<Beachflower>(),
+            [TypeOfSunflower.Oceanflower] = ModContent.ItemType<Oceanflower>(),
+            [TypeOfSunflower.Sporeflower] = ModContent.ItemType<Sporeflower>(),
+            [TypeOfSunflower.Deadflower] = ModContent.ItemType<Deadflower>(),
+            [TypeOfSunflower.Obsidianflower] = ModContent.ItemType<Obsidianflower>(),
+        };
 
         private readonly Dictionary<string, int> loves = new();
 
@@ -517,7 +647,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             TypeOfSunflower closestType = default;
             float minDistance = float.MaxValue;
 
-            foreach (var pair in SunflowersPropertiesData.TypeToData)
+            foreach (var pair in NatureData.TypeOfSunflowerToData)
             {
                 float dist = DistanceTo(pair.Value);
                 if (dist < minDistance)
@@ -573,110 +703,9 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         Iceflower = 4,
         Beachflower = 5,
         Oceanflower = 6,
-        Jungleflower = 7,
+        Sporeflower = 7,
         Deadflower = 8,
         Obsidianflower = 9,
-    }
-    public static class SunflowersPropertiesData
-    {
-        public static Dictionary<TypeOfSunflower, NatureData> TypeToData = new()
-        {
-            [TypeOfSunflower.Sunflower] = new NatureData(
-        (NatureTags.Dry, 30),
-        (NatureTags.Water, 30),
-        (NatureTags.Wild, 20),
-        (NatureTags.Sun, 80),
-        (NatureTags.Cave, 10),
-        (NatureTags.Hot, 10),
-        (NatureTags.Cold, 10),
-        (NatureTags.Evil, 0),
-        (NatureTags.Good, 0),
-        (NatureTags.Honey, 0)
-    ),
-
-            [TypeOfSunflower.Dryflower] = new NatureData(
-        (NatureTags.Dry, 100),
-        (NatureTags.Hot, 80),
-        (NatureTags.Sun, 60),
-        (NatureTags.Cave, 30),
-        (NatureTags.Water, 10),
-        (NatureTags.Cold, 10)
-    ),
-
-            [TypeOfSunflower.Fireflower] = new NatureData(
-        (NatureTags.Hot, 100),
-        (NatureTags.Sun, 80),
-        (NatureTags.Dry, 50),
-        (NatureTags.Water, 20),
-        (NatureTags.Cold, 10),
-        (NatureTags.Cave, 40)
-    ),
-
-            [TypeOfSunflower.Snowflower] = new NatureData(
-        (NatureTags.Cold, 100),
-        (NatureTags.Sun, 60),
-        (NatureTags.Water, 40),
-        (NatureTags.Dry, 10),
-        (NatureTags.Hot, 10),
-        (NatureTags.Cave, 30)
-    ),
-
-            [TypeOfSunflower.Iceflower] = new NatureData(
-        (NatureTags.Cold, 100),
-        (NatureTags.Cave, 50),
-        (NatureTags.Water, 80),
-        (NatureTags.Hot, 10),
-        (NatureTags.Sun, 30),
-        (NatureTags.Good, 20)
-    ),
-
-            [TypeOfSunflower.Beachflower] = new NatureData(
-        (NatureTags.Water, 100),
-        (NatureTags.Sun, 60),
-        (NatureTags.Wild, 50),
-        (NatureTags.Dry, 30),
-        (NatureTags.Honey, 20),
-        (NatureTags.Cold, 10)
-    ),
-
-            [TypeOfSunflower.Oceanflower] = new NatureData(
-        (NatureTags.Water, 100),
-        (NatureTags.Sun, 60),
-        (NatureTags.Wild, 50),
-        (NatureTags.Dry, 10),
-        (NatureTags.Good, 20),
-        (NatureTags.Honey, 30)
-    ),
-
-            [TypeOfSunflower.Jungleflower] = new NatureData(
-        (NatureTags.Wild, 100),
-        (NatureTags.Water, 100),
-        (NatureTags.Sun, 50),
-        (NatureTags.Hot, 30),
-        (NatureTags.Honey, 20),
-        (NatureTags.Cave, 20)
-    ),
-
-            [TypeOfSunflower.Deadflower] = new NatureData(
-        (NatureTags.Evil, 100),
-        (NatureTags.Sun, 10),
-        (NatureTags.Water, 10),
-        (NatureTags.Good, 0),
-        (NatureTags.Honey, 0),
-        (NatureTags.Wild, 10)
-    ),
-
-            [TypeOfSunflower.Obsidianflower] = new NatureData(
-        (NatureTags.Hot, 100),
-        (NatureTags.Cold, 100),
-        (NatureTags.Cave, 100),
-        (NatureTags.Water, 40),
-        (NatureTags.Dry, 20),
-        (NatureTags.Evil, 10)
-    ),
-        };
-
-
     }
 }
 

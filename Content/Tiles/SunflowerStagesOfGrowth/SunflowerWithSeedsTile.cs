@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using ScienceJam.Content.Items.SunflowerSeeds;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,6 +23,31 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         protected override bool HaveGlow => true;
         protected override int[] Heights => [16, 16, 16, 18];
 
+        public override void KillMultiTile(int i, int j, int frameX, int frameY)
+        {
+            int id  = ModContent.GetInstance<SunflowerWithSeedsEntity>().Find(i, j);
+            if (TileEntity.ByID.TryGetValue(id, out TileEntity te) && te is SunflowerWithSeedsEntity ste)
+            {
+                var r = new Random();
+                int seedItemIndex = Item.NewItem(
+                    new EntitySource_TileBreak(i, j),
+                    i * 16, j * 16, 16, 16,
+                    NatureData.TypeOfSunflowerToSeedItemId[ste.typeOfSunflower],
+                    r.Next(5, 11)
+
+                );
+                int flowerItemIndex = Item.NewItem(
+                    new EntitySource_TileBreak(i, j),
+                    i * 16, j * 16, 16, 16,
+                    NatureData.TypeOfSunflowerToItemId[ste.typeOfSunflower],
+                    1
+                );
+
+                (Main.item[seedItemIndex].ModItem as SeedItem).seedData = ste.plantData;
+            }
+
+            base.KillMultiTile(i, j, frameX, frameY);
+        }
         protected override string GetmouseOverPlantText(int i, int j)
         {
             if (TileEntity.TryGet(i, j, out SunflowerWithSeedsEntity tileEntity))
@@ -42,6 +68,8 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
     public class SunflowerWithSeedsEntity : FinalPlantStageEntity
     {
         protected override int TileType => ModContent.TileType<SunflowerWithSeedsTile>();
+
+
     }
 
 }

@@ -12,6 +12,7 @@ using ScienceJam.Common.Configs;
 using System.IO;
 using Terraria.ModLoader.IO;
 using static Terraria.ModLoader.Default.LegacyUnloadedTilesSystem;
+using Stubble.Core.Settings;
 
 namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 {
@@ -61,6 +62,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             Main.tileFrameImportant[Type] = true;
             Main.tileNoFail[Type] = true;
             Main.tileObsidianKill[Type] = true;
+            Main.tileLighted[Type] = true;
 
             DustType = DustID.Grass;
 
@@ -122,7 +124,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         
         public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
         {
-            if (effectOnly)
+            if (effectOnly || fail)
             {
                 return;
             }
@@ -143,6 +145,13 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             player.cursorItemIconEnabled = true;
             player.cursorItemIconID = -1;
             player.cursorItemIconText = GetmouseOverPlantText(i, j);
+        }
+
+        public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
+        {
+            r = 0.1f;
+            g = 0.1f;
+            b = 0.1f;
         }
     }
 

@@ -3,11 +3,12 @@ using Terraria.ModLoader;
 
 namespace ScienceJam.Content.Items.Sunflowers
 {
-    internal class DeadSunflowerItem : ModItem
+    internal abstract class FlowerItem : ModItem
     {
+        protected abstract int SunflowerItemId { get; }
         public override void SetDefaults()
         {
-            Item.DefaultToPlaceableTile(ModContent.TileType<DeadSunflowerTile>());
+            Item.DefaultToPlaceableTile(SunflowerItemId);
             Item.width = 30;
             Item.height = 28;
             Item.maxStack = 9999;

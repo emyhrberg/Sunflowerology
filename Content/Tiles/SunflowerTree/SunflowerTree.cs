@@ -62,7 +62,7 @@ namespace ScienceJam.Content.Tiles.SunflowerTree
         }
         public override int DropWood()
         {
-            return ModContent.ItemType<SunflowerSeedItem>();
+            return ModContent.ItemType<SunflowerSeed>();
         }
 
         public override bool CanDropAcorn() => true;

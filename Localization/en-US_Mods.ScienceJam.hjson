@@ -56,6 +56,11 @@ Items: {
 		Tooltip: ""
 	}
 
+	SunflowerSeed: {
+		DisplayName: Sunflower Seed
+		Tooltip: ""
+	}
+
 	BeachSunflowerItem: {
 		DisplayName: Beach Sunflower Item
 		Tooltip: ""
@@ -68,6 +73,11 @@ Items: {
 
 	DeadSunflowerSeedItem: {
 		DisplayName: Dead Sunflower Seed Item
+		Tooltip: ""
+	}
+
+	DeadSunflower: {
+		DisplayName: Dead Sunflower
 		Tooltip: ""
 	}
 
@@ -103,6 +113,96 @@ Items: {
 
 	SeedItem: {
 		DisplayName: Seed Item
+		Tooltip: ""
+	}
+
+	DryflowerSeed: {
+		DisplayName: Dryflower Seed
+		Tooltip: ""
+	}
+
+	Dryflower: {
+		DisplayName: Dryflower
+		Tooltip: ""
+	}
+
+	BeachflowerSeed: {
+		DisplayName: Beachflower Seed
+		Tooltip: ""
+	}
+
+	Beachflower: {
+		DisplayName: Beachflower
+		Tooltip: ""
+	}
+
+	DeadflowerSeed: {
+		DisplayName: Deadflower Seed
+		Tooltip: ""
+	}
+
+	Deadflower: {
+		DisplayName: Deadflower
+		Tooltip: ""
+	}
+
+	FireflowerSeed: {
+		DisplayName: Fireflower Seed
+		Tooltip: ""
+	}
+
+	Fireflower: {
+		DisplayName: Fireflower
+		Tooltip: ""
+	}
+
+	IceflowerSeed: {
+		DisplayName: Iceflower Seed
+		Tooltip: ""
+	}
+
+	Iceflower: {
+		DisplayName: Iceflower
+		Tooltip: ""
+	}
+
+	ObsidianflowerSeed: {
+		DisplayName: Obsidianflower Seed
+		Tooltip: ""
+	}
+
+	Obsidianflower: {
+		DisplayName: Obsidianflower
+		Tooltip: ""
+	}
+
+	OceanflowerSeed: {
+		DisplayName: Oceanflower Seed
+		Tooltip: ""
+	}
+
+	Oceanflower: {
+		DisplayName: Oceanflower
+		Tooltip: ""
+	}
+
+	SnowflowerSeed: {
+		DisplayName: Snowflower Seed
+		Tooltip: ""
+	}
+
+	Snowflower: {
+		DisplayName: Snowflower
+		Tooltip: ""
+	}
+
+	SporeflowerSeed: {
+		DisplayName: Sporeflower Seed
+		Tooltip: ""
+	}
+
+	Sporeflower: {
+		DisplayName: Sporeflower
 		Tooltip: ""
 	}
 }
