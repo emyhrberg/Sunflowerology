@@ -463,9 +463,6 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             }
             return diff.AverageLove;
         }
-
-
     }
-
-
 }
+

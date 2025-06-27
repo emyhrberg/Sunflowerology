@@ -71,11 +71,7 @@ namespace ScienceJam.Content.Tiles.DeadSunflower
         {
             Tile tile = Main.tile[i, j];
             Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
-
-            int frameY = 0;
-
-            frameY = (short)((3 * 18 + 20) * (int)TypeOfSunflower);
-
+            int frameY = (short)((3 * 18 + 20) * (int)TypeOfSunflower);
             spriteBatch.Draw(
                 glowTexture.Value,
                 new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y+2) + zero,
