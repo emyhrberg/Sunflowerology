@@ -1,8 +1,8 @@
-﻿using Terraria;
+﻿using Sunflowerology.Content.Tiles.SunflowerTree;
+using Terraria;
 using Terraria.ModLoader;
-using ScienceJam.Content.Tiles.SunflowerTree;
 
-namespace ScienceJam.Common.Systems
+namespace Sunflowerology.Common.Systems
 {
     public class SpawnSunflowerTree : ModSystem
     {

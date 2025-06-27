@@ -43,4 +43,4 @@ jobs:
           EOF
 
       - name: Lint
-        run: dotnet format style ScienceJam.sln --verify-no-changes
+        run: dotnet format style Sunflowerology.sln --verify-no-changes

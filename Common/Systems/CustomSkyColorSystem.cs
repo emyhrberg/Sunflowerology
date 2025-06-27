@@ -1,9 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Common.Systems
+namespace Sunflowerology.Common.Systems
 {
     internal class CustomSkyColorSystem : ModSystem
     {

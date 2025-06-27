@@ -1,9 +1,9 @@
-﻿using ScienceJam.Content.Tiles.DeadSunflower;
-using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
-using System;
+﻿using System;
+using Sunflowerology.Content.Tiles.DeadSunflower;
+using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Content.Items.Sunflowers
+namespace Sunflowerology.Content.Items.Sunflowers
 {
     internal abstract class FlowerItem : ModItem
     {

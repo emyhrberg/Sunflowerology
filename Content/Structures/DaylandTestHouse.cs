@@ -7,7 +7,7 @@
 //using Terraria.ModLoader;
 //using Terraria.WorldBuilding;
 
-//namespace ScienceJam.Content.Structures
+//namespace Sunflowerology.Content.Structures
 //{
 //    public sealed class DaylandTestHouseSystem : ModSystem
 //    {
@@ -16,7 +16,7 @@
 //            int skyIslandIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Floating Island Houses"));
 
 //            if (skyIslandIndex != -1)
-//                tasks.Insert(skyIslandIndex + 1, new DaylandTestHousePass("ScienceJam: Dayland Test House", 100f));
+//                tasks.Insert(skyIslandIndex + 1, new DaylandTestHousePass("Sunflowerology: Dayland Test House", 100f));
 //        }
 
 //        public override void ClearWorld()
@@ -25,7 +25,7 @@
 //            StructureHelper.API.Generator.GenerateStructure(
 //                    path: "Content/Structures/DaylandTestHouse",
 //                    pos: new Point16(100, 100),
-//                    mod: ModContent.GetInstance<ScienceJam>()
+//                    mod: ModContent.GetInstance<Sunflowerology>()
 //            );
 //        }
 
@@ -43,7 +43,7 @@
 //                StructureHelper.API.Generator.GenerateStructure(
 //                                    path: "Content/Structures/DaylandTestHouse",
 //                                    pos: new Point16(100, 100),
-//                                    mod: ModContent.GetInstance<ScienceJam>()
+//                                    mod: ModContent.GetInstance<Sunflowerology>()
 //                            );
 //            }
 //        }

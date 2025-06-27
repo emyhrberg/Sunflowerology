@@ -1,7 +1,7 @@
 using Terraria;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Content.Dusts
+namespace Sunflowerology.Content.Dusts
 {
     public class SunGrassSparkle : ModDust
     {

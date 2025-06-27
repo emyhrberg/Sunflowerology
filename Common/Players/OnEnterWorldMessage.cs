@@ -1,8 +1,8 @@
-﻿using ScienceJam.Common.Configs;
+﻿using Sunflowerology.Common.Configs;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Common.Players
+namespace Sunflowerology.Common.Players
 {
     internal class OnEnterWorldMessage : ModPlayer
     {

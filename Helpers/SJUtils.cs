@@ -1,15 +1,15 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ScienceJam.Content.Tiles.SunGrass;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Threading;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Sunflowerology.Content.Tiles.SunGrass;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Helper
+namespace Sunflowerology.Helpers
 {
     public static class SJUtils
     {

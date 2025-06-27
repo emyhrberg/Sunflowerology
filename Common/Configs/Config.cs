@@ -3,7 +3,7 @@ using System.ComponentModel;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 
-namespace ScienceJam.Common.Configs
+namespace Sunflowerology.Common.Configs
 {
     public class Config : ModConfig
     {

@@ -1,13 +1,13 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using ScienceJam.Content.Items.SunflowerSeeds;
-using ScienceJam.Content.Tiles.SunGrass;
+using Sunflowerology.Content.Items.SunflowerSeeds;
+using Sunflowerology.Content.Tiles.SunGrass;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Content.Tiles.SunflowerTree
+namespace Sunflowerology.Content.Tiles.SunflowerTree
 {
 
     public class SunflowerTree : ModTree
@@ -31,9 +31,9 @@ namespace ScienceJam.Content.Tiles.SunflowerTree
             GrowsOnTileId = [ModContent.TileType<SunGrassTile>()];
 
             // textures, also important!!
-            texture = ModContent.Request<Texture2D>("ScienceJam/Content/Tiles/SunflowerTree/Tiles_5", AssetRequestMode.AsyncLoad);
-            branchesTexture = ModContent.Request<Texture2D>("ScienceJam/Content/Tiles/SunflowerTree/Tree_Branches_1", AssetRequestMode.AsyncLoad);
-            topsTexture = ModContent.Request<Texture2D>("ScienceJam/Content/Tiles/SunflowerTree/Tree_Tops_1", AssetRequestMode.AsyncLoad);
+            texture = ModContent.Request<Texture2D>("Sunflowerology/Content/Tiles/SunflowerTree/Tiles_5", AssetRequestMode.AsyncLoad);
+            branchesTexture = ModContent.Request<Texture2D>("Sunflowerology/Content/Tiles/SunflowerTree/Tree_Branches_1", AssetRequestMode.AsyncLoad);
+            topsTexture = ModContent.Request<Texture2D>("Sunflowerology/Content/Tiles/SunflowerTree/Tree_Tops_1", AssetRequestMode.AsyncLoad);
 
         }
 

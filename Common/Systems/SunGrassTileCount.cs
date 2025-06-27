@@ -1,12 +1,12 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using ScienceJam.Common.Configs;
-using ScienceJam.Content.Tiles;
-using ScienceJam.Content.Tiles.SunGrass;
+using Sunflowerology.Common.Configs;
+using Sunflowerology.Content.Tiles;
+using Sunflowerology.Content.Tiles.SunGrass;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Common.Systems
+namespace Sunflowerology.Common.Systems
 {
     public class SunGrassTileCount : ModSystem
     {

@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Helper
+namespace Sunflowerology.Helpers
 {
     public static class Log
     {
@@ -68,7 +68,7 @@ namespace ScienceJam.Helper
             {
                 try
                 {
-                    return ModLoader.GetMod("ScienceJam");
+                    return ModLoader.GetMod("Sunflowerology");
                 }
                 catch (Exception ex)
                 {

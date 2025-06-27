@@ -1,17 +1,17 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using ScienceJam.Content.Buffs;
-using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
-using ScienceJam.Content.Tiles.SunGrass;
-using System.Collections.Generic;
+using Sunflowerology.Content.Buffs;
+using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
+using Sunflowerology.Content.Tiles.SunGrass;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
-namespace ScienceJam.Content.Tiles.DeadSunflower
+namespace Sunflowerology.Content.Tiles.DeadSunflower
 {
     internal abstract class FlowerTile : ModTile
     {
@@ -21,7 +21,7 @@ namespace ScienceJam.Content.Tiles.DeadSunflower
         protected abstract int EffetDuration { get; }
 
         private Asset<Texture2D> glowTexture;
-        public override string Texture => "ScienceJam/Content/Tiles/SunflowerStagesOfGrowth/SunflowerWithSeedsTile";
+        public override string Texture => "Sunflowerology/Content/Tiles/SunflowerStagesOfGrowth/SunflowerWithSeedsTile";
         public override void SetStaticDefaults()
         {
             Main.tileFrameImportant[Type] = true;
@@ -74,7 +74,7 @@ namespace ScienceJam.Content.Tiles.DeadSunflower
             int frameY = (short)((3 * 18 + 20) * (int)TypeOfSunflower);
             spriteBatch.Draw(
                 glowTexture.Value,
-                new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y+2) + zero,
+                new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y + 2) + zero,
                 new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, tile.TileFrameY == 54 ? 18 : 16),
                 Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }

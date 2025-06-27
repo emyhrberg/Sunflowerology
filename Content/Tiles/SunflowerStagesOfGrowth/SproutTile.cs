@@ -1,13 +1,13 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ScienceJam.Common.Configs;
-using ScienceJam.Content.Items.Sunflowers;
-using ScienceJam.Content.Items.SunflowerSeeds;
-using ScienceJam.Content.Tiles.DeadSunflower;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Sunflowerology.Common.Configs;
+using Sunflowerology.Content.Items.Sunflowers;
+using Sunflowerology.Content.Items.SunflowerSeeds;
+using Sunflowerology.Content.Tiles.DeadSunflower;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -15,7 +15,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 
-namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
+namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 {
     internal class SproutTile : PlantStageTile<SproutEntity>
     {
@@ -147,7 +147,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         {
             WorldGen.KillTile(Position.X, Position.Y, false, false, true);
             WorldGen.KillTile(pairedEntity.Position.X, pairedEntity.Position.Y, false, false, true);
-            growthQueue.Add((Position.X, Position.Y, (plantData + pairedEntity.plantData)/2, difference.Clone()));
+            growthQueue.Add((Position.X, Position.Y, (plantData + pairedEntity.plantData) / 2, difference.Clone()));
         }
 
         /// <summary>

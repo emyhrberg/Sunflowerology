@@ -1,10 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using ScienceJam.Common.Configs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
+using Sunflowerology.Common.Configs;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -13,7 +13,7 @@ using Terraria.ModLoader.IO;
 using Terraria.ModLoader.UI;
 using Terraria.ObjectData;
 
-namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
+namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 {
     internal class SaplingTile : PlantStageTile<SaplingEntity>
     {

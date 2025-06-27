@@ -6,7 +6,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
-namespace ScienceJam.Content.Tiles.SunGrass
+namespace Sunflowerology.Content.Tiles.SunGrass
 {
     internal class SunGrassLargeFoliage : ModTile
     {

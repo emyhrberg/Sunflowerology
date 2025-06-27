@@ -1,10 +1,10 @@
 ﻿using System;
-using ScienceJam.Content.Tiles.SunflowerTree;
+using Sunflowerology.Content.Tiles.SunflowerTree;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Common.Systems
+namespace Sunflowerology.Common.Systems
 {
     public class SunflowerWorld : ModSystem
     {

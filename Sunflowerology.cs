@@ -2,7 +2,7 @@ using Terraria.ModLoader;
 
 namespace Sunflowerology
 {
-    public class ScienceJam : Mod
+    public class Sunflowerology : Mod
     {
         // You probably shouldnt add code here
         // If you can add the code to another class, you should do that instead

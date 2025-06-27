@@ -1,5 +1,5 @@
-﻿using ScienceJam.Content.Tiles.SunGrass;
-using System.Linq;
+﻿using System.Linq;
+using Sunflowerology.Content.Tiles.SunGrass;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;

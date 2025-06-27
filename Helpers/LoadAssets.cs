@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Helper
+namespace Sunflowerology.Helpers
 {
     /// <summary>
     /// Static class to hold all assets used in the mod.
@@ -22,7 +22,7 @@ namespace ScienceJam.Helper
             {
                 if (field.FieldType == typeof(Asset<Texture2D>))
                 {
-                    string modName = "ScienceJam";
+                    string modName = "Sunflowerology";
                     string path = field.Name;
                     var asset = ModContent.Request<Texture2D>($"{modName}/Assets/{path}", AssetRequestMode.AsyncLoad);
                     field.SetValue(null, asset);

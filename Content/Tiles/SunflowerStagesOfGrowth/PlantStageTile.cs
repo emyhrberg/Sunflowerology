@@ -1,20 +1,20 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using System;
+using Stubble.Core.Settings;
+using Sunflowerology.Common.Configs;
+using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ObjectData;
-using Terraria;
-using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using ScienceJam.Common.Configs;
-using System.IO;
 using Terraria.ModLoader.IO;
+using Terraria.ObjectData;
 using static Terraria.ModLoader.Default.LegacyUnloadedTilesSystem;
-using Stubble.Core.Settings;
 
-namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
+namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 {
     public abstract class PlantStageTile<T> : ModTile where T : FinalPlantStageEntity
     {
@@ -30,11 +30,11 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         {
             if (TileEntity.TryGet(i, j, out T tileEntity))
             {
-                if(!tileEntity.updated)
+                if (!tileEntity.updated)
                 {
                     tileEntity.Update();
                 }
-                tileFrameY += (short)(((HeightInTiles-1) * 18 + 20)*(int)tileEntity.typeOfSunflower);
+                tileFrameY += (short)(((HeightInTiles - 1) * 18 + 20) * (int)tileEntity.typeOfSunflower);
             }
         }
 
@@ -122,7 +122,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             }
             ModContent.GetInstance<T>().Kill(i, j);
         }
-        
+
         public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
         {
             if (effectOnly || fail)
@@ -242,14 +242,14 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         public override void Update()
         {
             if (SkipUpdate()) return;
-            if(!updated)
+            if (!updated)
             {
                 typeOfSunflower = plantData.FindClosestTypeOfSunflower();
                 updated = true;
             }
         }
 
-        
+
 
         protected bool SkipUpdate()
         {
@@ -349,7 +349,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 // Place the new tile
                 if (!WorldGen.PlaceObject(i, j - 1, NextTileType, mute: true, style: 3 * (int)typeOfSunflower))
                 {
-                    
+
                     continue;
                 }
                 var newEntity = GetEntityOn(i, j - 1);
@@ -372,7 +372,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                     else if (randomInt == 9)
                     {
                         // Make the plant grow with even lesser error
-                        change = (float)errorPD[seedTag] * 3 / 4 ;
+                        change = (float)errorPD[seedTag] * 3 / 4;
                     }
 
                     change = Math.Clamp(change, -10, 10);

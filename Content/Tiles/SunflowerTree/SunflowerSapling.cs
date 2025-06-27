@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using ScienceJam.Content.Dusts;
+using Sunflowerology.Content.Dusts;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
@@ -9,7 +9,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
-namespace ScienceJam.Content.Tiles.SunflowerTree
+namespace Sunflowerology.Content.Tiles.SunflowerTree
 {
     public class SunflowerSapling : ModTile
     {

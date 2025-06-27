@@ -1,10 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using ScienceJam.Content.Items.SunflowerSeeds;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
+using Sunflowerology.Content.Items.SunflowerSeeds;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -13,7 +13,7 @@ using Terraria.ModLoader.IO;
 using Terraria.ModLoader.UI;
 using Terraria.ObjectData;
 
-namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
+namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 {
     internal class SunflowerWithSeedsTile : PlantStageTile<SunflowerWithSeedsEntity>
     {
@@ -25,7 +25,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            int id  = ModContent.GetInstance<SunflowerWithSeedsEntity>().Find(i, j);
+            int id = ModContent.GetInstance<SunflowerWithSeedsEntity>().Find(i, j);
             if (TileEntity.ByID.TryGetValue(id, out TileEntity te) && te is SunflowerWithSeedsEntity ste)
             {
                 var r = new Random();

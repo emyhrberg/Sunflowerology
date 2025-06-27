@@ -4,15 +4,15 @@ using System.Collections.ObjectModel;
 using AssGen;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
 using StructureHelper.Content.GUI;
+using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
-namespace ScienceJam.Content.Items.SunflowerSeeds
+namespace Sunflowerology.Content.Items.SunflowerSeeds
 {
     internal abstract class SeedItem : ModItem
     {

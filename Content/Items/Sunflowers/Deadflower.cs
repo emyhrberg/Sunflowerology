@@ -1,8 +1,8 @@
-﻿using ScienceJam.Content.Tiles.DeadSunflower;
-using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
+﻿using Sunflowerology.Content.Tiles.DeadSunflower;
+using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Content.Items.Sunflowers
+namespace Sunflowerology.Content.Items.Sunflowers
 {
     internal class Deadflower : FlowerItem
     {

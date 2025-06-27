@@ -6,7 +6,7 @@ using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Common.Systems
+namespace Sunflowerology.Common.Systems
 {
     internal class SmartCursorSystem : ModSystem
     {
@@ -64,7 +64,7 @@ namespace ScienceJam.Common.Systems
                                 break;
                         }
 
-                        foreach(var relationship in GrassTileRelationship)
+                        foreach (var relationship in GrassTileRelationship)
                         {
                             if (relationship.Item1 == type && relationship.Item2 == tile.type)
                             {

@@ -1,7 +1,7 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
 
-namespace ScienceJam.Content.Buffs
+namespace Sunflowerology.Content.Buffs
 {
     internal class DeadSunflowerBuff : ModBuff
     {

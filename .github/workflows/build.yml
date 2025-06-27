@@ -38,15 +38,15 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore packages
-        run: dotnet restore ScienceJam.sln
+        run: dotnet restore Sunflowerology.sln
 
       - name: Build solution
-        run: dotnet build ScienceJam.sln --configuration Release
+        run: dotnet build Sunflowerology.sln --configuration Release
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ScienceJam-Binaries
+          name: Sunflowerology-Binaries
           path: |
             ./bin/**/Release/net8.0/*.dll
             ./bin/**/Release/net8.0/*.tmod
