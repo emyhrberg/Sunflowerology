@@ -1,12 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using ScienceJam.Content.Buffs;
 using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
-using ScienceJam.Content.Tiles.SunGrass;
 using System.Collections.Generic;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
@@ -74,7 +71,7 @@ namespace ScienceJam.Content.Tiles.DeadSunflower
             int frameY = (short)((3 * 18 + 20) * (int)TypeOfSunflower);
             spriteBatch.Draw(
                 glowTexture.Value,
-                new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y+2) + zero,
+                new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y + 2) + zero,
                 new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, tile.TileFrameY == 54 ? 18 : 16),
                 Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }

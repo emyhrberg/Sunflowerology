@@ -1,13 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using ScienceJam.Content.Buffs;
+﻿using ScienceJam.Content.Buffs;
 using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
-using ScienceJam.Content.Tiles.SunGrass;
-using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ObjectData;
 
 namespace ScienceJam.Content.Tiles.DeadSunflower
 {
@@ -18,7 +11,7 @@ namespace ScienceJam.Content.Tiles.DeadSunflower
         protected override int EffectBuffID => ModContent.BuffType<DeadSunflowerBuff>();
 
         protected override int EffetDuration => 120;
-        
+
         protected override TypeOfSunflower TypeOfSunflower => TypeOfSunflower.Deadflower;
     }
 }

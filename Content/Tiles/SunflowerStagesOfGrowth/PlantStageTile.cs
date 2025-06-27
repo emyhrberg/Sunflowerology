@@ -11,8 +11,7 @@ using System.Collections.Generic;
 using ScienceJam.Common.Configs;
 using System.IO;
 using Terraria.ModLoader.IO;
-using static Terraria.ModLoader.Default.LegacyUnloadedTilesSystem;
-using Stubble.Core.Settings;
+using ScienceJam.Content.Items.SunflowerSeeds;
 
 namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 {
@@ -25,18 +24,6 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         protected abstract int[] Heights { get; }
 
         protected Asset<Texture2D> glowTexture = null;
-
-        public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
-        {
-            if (TileEntity.TryGet(i, j, out T tileEntity))
-            {
-                if(!tileEntity.updated)
-                {
-                    tileEntity.Update();
-                }
-                tileFrameY += (short)(((HeightInTiles-1) * 18 + 20)*(int)tileEntity.typeOfSunflower);
-            }
-        }
 
         protected virtual string GetmouseOverPlantText(int i, int j)
         {
@@ -100,16 +87,10 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             Tile tile = Main.tile[i, j];
             Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
 
-            int frameY = 0;
-            if (TileEntity.TryGet(i, j, out T tileEntity))
-            {
-                frameY = (short)(((HeightInTiles - 1) * 18 + 20) * (int)tileEntity.typeOfSunflower);
-            }
-
             spriteBatch.Draw(
                 glowTexture.Value,
                 new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero,
-                new Rectangle(tile.TileFrameX, tile.TileFrameY + frameY, 16, 16),
+                new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 16),
                 Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
 
@@ -121,8 +102,9 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 return;
             }
             ModContent.GetInstance<T>().Kill(i, j);
+            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, i, j);
         }
-        
+
         public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
         {
             if (effectOnly || fail)
@@ -135,6 +117,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 return;
             }
             ModContent.GetInstance<T>().Kill(i, j);
+            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, i, j);
 
         }
 
@@ -154,6 +137,32 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             g = 0.1f;
             b = 0.1f;
         }
+
+        public override void PlaceInWorld(int i, int j, Item item)
+        {
+            TileObjectData tileData = TileObjectData.GetTileData(Type, 0);
+            var topLeft = TileObjectData.TopLeft(i, j);
+            int id = ModContent.GetInstance<T>().Find(i, j);
+            if (TileEntity.ByID.TryGetValue(id, out TileEntity entity) && entity is T te)
+            {
+                te.SetUpData(((SeedItem)item.ModItem).seedData);
+            }
+            else
+            {
+                id = ModContent.GetInstance<T>().Place(i, j);
+                if (TileEntity.ByID.TryGetValue(id, out TileEntity entity2) && entity2 is T te2)
+                {
+                    te2.SetUpData(((SeedItem)item.ModItem).seedData);
+                }
+                else
+                {
+                    Main.NewText($"Failed to place tile entity at {i}, {j}. ID: {id}");
+                    return;
+                }
+                Main.NewText("Placed tile entity: " + id);
+            }
+            base.PlaceInWorld(i, j, item);
+        }
     }
 
     public abstract class FinalPlantStageEntity : ModTileEntity
@@ -171,7 +180,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         public NatureData surroundingAreaData = new NatureData();
         public NatureData difference = new();
         public float averageDifference = 0f;
-        public TypeOfSunflower typeOfSunflower = TypeOfSunflower.Sunflower;
+        public TypeOfSunflower typeOfSunflower = TypeOfSunflower.None;
         public bool updated = false;
 
         // Data of the plant itself (not changing)
@@ -229,10 +238,12 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             {
                 writer.Write(plantData[seedTag]);
             }
+            Log.Info($"Sending plant data: {string.Join(", ", plantData.Values)}");
 
         }
         public override void NetReceive(BinaryReader reader)
         {
+            Main.NewText($"Receiving plant data!!!");
             foreach (var seedTag in NatureTags.AllTags)
             {
                 plantData[seedTag] = reader.ReadInt32();
@@ -241,15 +252,23 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
 
         public override void Update()
         {
-            if (SkipUpdate()) return;
-            if(!updated)
+            if (typeOfSunflower == TypeOfSunflower.None)
             {
                 typeOfSunflower = plantData.FindClosestTypeOfSunflower();
+            }
+            if (SkipUpdate()) return;
+            if (!updated)
+            {
                 updated = true;
             }
         }
 
-        
+        public override void OnKill()
+        {
+            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
+        }
+
+
 
         protected bool SkipUpdate()
         {
@@ -315,6 +334,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                 typeOfSunflower = plantData.FindClosestTypeOfSunflower();
                 updated = true;
             }
+            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
         }
 
         public override void PostGlobalUpdate()
@@ -344,16 +364,7 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
             // Going through all the plants that need to be grown
             foreach (var (i, j, plantD, errorPD) in growthQueue)
             {
-                // Random style for the new plant
-                int style = random.Next(0, 3);
-                // Place the new tile
-                if (!WorldGen.PlaceObject(i, j - 1, NextTileType, mute: true, style: 3 * (int)typeOfSunflower))
-                {
-                    
-                    continue;
-                }
-                var newEntity = GetEntityOn(i, j - 1);
-
+                var newPlantData = new NatureData();
                 foreach (string seedTag in NatureTags.AllTags)
                 {
                     int randomInt = random.Next(0, 10);
@@ -372,15 +383,30 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
                     else if (randomInt == 9)
                     {
                         // Make the plant grow with even lesser error
-                        change = (float)errorPD[seedTag] * 3 / 4 ;
+                        change = (float)errorPD[seedTag] * 3 / 4;
                     }
 
                     change = Math.Clamp(change, -10, 10);
 
-                    newEntity.plantData[seedTag] = (int)Math.Round(plantD[seedTag] + change);
+                    newPlantData[seedTag] = (int)Math.Round(plantD[seedTag] + change);
                 }
-                newEntity.plantData = newEntity.plantData.Normalize();
+                newPlantData = newPlantData.Normalize();
+                var newTypeOfSunflower = (int)newPlantData.FindClosestTypeOfSunflower();
+                // Random style for the new plant
+                int style = random.Next(0, 3);
+                // Place the new tile
+                if (!WorldGen.PlaceObject(i, j, NextTileType, mute: true, style: 3 * newTypeOfSunflower))
+                {
+                    continue;
+                }
+                var tod = TileObjectData.GetTileData(NextTileType, 3 * newTypeOfSunflower);
+                var point = TileObjectData.TopLeft(i, j);
+                var newEntity = GetEntityOn(point.X, point.Y);
+                
+                newEntity.plantData = newPlantData;
                 NetMessage.SendObjectPlacement(-1, i, j, NextTileType, 0, 0, -1, -1);
+                NetMessage.SendTileSquare(-1, point.X, point.Y, tod.Width, tod.Height, TileChangeType.None);
+                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, point.X, point.Y, newEntity.Type);
             }
             growthQueue.Clear();
         }
@@ -388,7 +414,12 @@ namespace ScienceJam.Content.Tiles.SunflowerStagesOfGrowth
         protected virtual void ReplacePlantWithNewOne()
         {
             WorldGen.KillTile(Position.X, Position.Y, false, false, true);
-            growthQueue.Add((Position.X, Position.Y, plantData.Clone(), difference.Clone()));
+            Kill(Position.X, Position.Y);
+
+            growthQueue.Add((Position.X, Position.Y - 1, plantData.Clone(), difference.Clone()));
+
+            NetMessage.SendTileSquare(-1, Position.X, Position.Y, 2, 4, TileChangeType.None);
+            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
         }
 
         protected float CalculateGrowth()

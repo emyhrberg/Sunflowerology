@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -64,7 +63,7 @@ namespace ScienceJam.Common.Systems
                                 break;
                         }
 
-                        foreach(var relationship in GrassTileRelationship)
+                        foreach (var relationship in GrassTileRelationship)
                         {
                             if (relationship.Item1 == type && relationship.Item2 == tile.type)
                             {
