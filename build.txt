@@ -1,5 +1,5 @@
-displayName = Sunflowers!
-author = Erky &amp; Cotlim
+displayName = Sunflowerology
+author = Erky & Cotlim
 version = 0.1
 dllReferences = ModLiquidLib, StructureHelper
 buildIgnore = Assets/Photoshop*, Assets/Workshop*

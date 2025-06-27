@@ -1,6 +1,6 @@
 using Terraria.ModLoader;
 
-namespace ScienceJam
+namespace Sunflowerology
 {
     public class ScienceJam : Mod
     {

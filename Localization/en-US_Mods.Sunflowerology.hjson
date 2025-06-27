@@ -1,0 +1,145 @@
+Buffs: {
+	DeadSunflowerBuff: {
+		DisplayName: Dead Sunflower Buff
+		Description: Mods.Sunflowerology.Buffs.DeadSunflowerBuff.Description
+	}
+}
+
+Items: {
+	SunGrassSeed: {
+		DisplayName: Sun Grass Seed
+		Tooltip: ""
+	}
+
+	Beachflower: {
+		DisplayName: Beachflower
+		Tooltip: ""
+	}
+
+	Deadflower: {
+		DisplayName: Deadflower
+		Tooltip: ""
+	}
+
+	Dryflower: {
+		DisplayName: Dryflower
+		Tooltip: ""
+	}
+
+	Fireflower: {
+		DisplayName: Fireflower
+		Tooltip: ""
+	}
+
+	Iceflower: {
+		DisplayName: Iceflower
+		Tooltip: ""
+	}
+
+	Obsidianflower: {
+		DisplayName: Obsidianflower
+		Tooltip: ""
+	}
+
+	Oceanflower: {
+		DisplayName: Oceanflower
+		Tooltip: ""
+	}
+
+	Snowflower: {
+		DisplayName: Snowflower
+		Tooltip: ""
+	}
+
+	Sporeflower: {
+		DisplayName: Sporeflower
+		Tooltip: ""
+	}
+
+	BeachflowerSeed: {
+		DisplayName: Beachflower Seed
+		Tooltip: ""
+	}
+
+	DeadflowerSeed: {
+		DisplayName: Deadflower Seed
+		Tooltip: ""
+	}
+
+	DryflowerSeed: {
+		DisplayName: Dryflower Seed
+		Tooltip: ""
+	}
+
+	FireflowerSeed: {
+		DisplayName: Fireflower Seed
+		Tooltip: ""
+	}
+
+	IceflowerSeed: {
+		DisplayName: Iceflower Seed
+		Tooltip: ""
+	}
+
+	ObsidianflowerSeed: {
+		DisplayName: Obsidianflower Seed
+		Tooltip: ""
+	}
+
+	OceanflowerSeed: {
+		DisplayName: Oceanflower Seed
+		Tooltip: ""
+	}
+
+	SnowflowerSeed: {
+		DisplayName: Snowflower Seed
+		Tooltip: ""
+	}
+
+	SporeflowerSeed: {
+		DisplayName: Sporeflower Seed
+		Tooltip: ""
+	}
+
+	SunflowerSeed: {
+		DisplayName: Sunflower Seed
+		Tooltip: ""
+	}
+}
+
+Configs: {
+	Config: {
+		DisplayName: Config
+		Headers.JamOfBiomology: Jam Of Biomology Header
+
+		ShowMessageWhenEnteringWorld: {
+			Label: Show Message When Entering World
+			Tooltip: ""
+		}
+
+		DestabilizeTiles: {
+			Label: Destabilize Tiles
+			Tooltip: ""
+		}
+
+		RadiusOfSunflower: {
+			Label: Radius Of Sunflower
+			Tooltip: ""
+		}
+
+		HowFastSunGrassDecays: {
+			Label: How Fast Sun Grass Decays
+			Tooltip: ""
+		}
+
+		HowMuchYouNeedBlocksForDayland: {
+			Label: How Much You Need Blocks For Dayland
+			Tooltip: ""
+		}
+
+		GrowFast: {
+			Label: Grow Fast
+			Tooltip: ""
+		}
+	}
+}
