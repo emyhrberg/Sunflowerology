@@ -1,22 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
-using StructureHelper.Content.GUI;
-using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
-using Terraria;
-using Terraria.DataStructures;
-using Terraria.GameContent;
-using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
+﻿using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
 
 namespace Sunflowerology.Content.Items.SunflowerSeeds
 {
     internal class SunflowerSeed : SeedItem
     {
-        public override void SetDefaults()
-        {
-            base.SetDefaults();
-            seedData = NatureData.TypeOfSunflowerToData[TypeOfSunflower.Sunflower];
-        }
+        protected override TypeOfSunflower TypeOfSunflower => TypeOfSunflower.Sunflower;
     }
 }

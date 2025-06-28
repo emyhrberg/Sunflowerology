@@ -1,6 +1,4 @@
-﻿using Sunflowerology.Content.Tiles.DeadSunflower;
-using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
-using Terraria.ModLoader;
+﻿using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
 
 namespace Sunflowerology.Content.Items.Sunflowers
 {

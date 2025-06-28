@@ -1,17 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using Sunflowerology.Common.Configs;
-using Terraria;
-using Terraria.DataStructures;
-using Terraria.ID;
-using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
-using Terraria.ModLoader.UI;
-using Terraria.ObjectData;
+﻿using Terraria.ModLoader;
 
 namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 {

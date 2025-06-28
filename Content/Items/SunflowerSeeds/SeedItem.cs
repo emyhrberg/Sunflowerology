@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using AssGen;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using StructureHelper.Content.GUI;
-using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
+﻿using System.Collections.Generic;
+using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
 using Terraria;
-using Terraria.DataStructures;
-using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -16,8 +8,8 @@ namespace Sunflowerology.Content.Items.SunflowerSeeds
 {
     internal abstract class SeedItem : ModItem
     {
-        public NatureData seedData;
-        public TypeOfSunflower typeOfSunflower = TypeOfSunflower.Sunflower;
+        public NatureData seedData = new();
+        protected abstract TypeOfSunflower TypeOfSunflower { get; }
         bool updated = false;
 
         public override void SetDefaults()
@@ -26,7 +18,7 @@ namespace Sunflowerology.Content.Items.SunflowerSeeds
             Item.width = 20;
             Item.height = 26;
             Item.value = 1000;
-            Item.placeStyle = 9 * (int)typeOfSunflower;
+            Item.placeStyle = 9 * (int)TypeOfSunflower;
         }
 
         public override bool CanStack(Item source)
@@ -80,12 +72,6 @@ namespace Sunflowerology.Content.Items.SunflowerSeeds
                 tooltips.Add(tooltip);
             }
 
-        }
-
-        public override bool? UseItem(Player player)
-        {
-            SproutEntity.transferData = seedData.Clone();
-            return base.UseItem(player);
         }
     }
 }

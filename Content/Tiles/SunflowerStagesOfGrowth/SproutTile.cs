@@ -1,4 +1,7 @@
-﻿using System;
+﻿using ScienceJam.Content.Items.Sunflowers;
+using ScienceJam.Content.Items.SunflowerSeeds;
+using ScienceJam.Content.Tiles.DeadSunflower;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,7 +37,6 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 {
                     tileEntity.Update();
                 }
-                tileFrameY += (short)(20 * 3 * (int)tileEntity.typeOfSunflower);
                 if (tileEntity.Pairing == PairingState.OnRight)
                     tileFrameY += 20;
                 else if (tileEntity.Pairing == PairingState.OnLeft)
@@ -52,7 +54,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             noItem = true;
         }
 
-        protected override bool IsSpecialHook => true;
+        protected override bool IsSpecialHook => false;
 
         protected override bool HaveGlow => false;
 
@@ -61,8 +63,6 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
     public class SproutEntity : PlantStageEntity<SeedlingEntity>
     {
-        //Sprout Data
-        public static NatureData transferData = new NatureData();
         public PairingState Pairing
         {
             get
@@ -112,6 +112,10 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
         public override void Update()
         {
+            if (typeOfSunflower == TypeOfSunflower.None)
+            {
+                typeOfSunflower = plantData.FindClosestTypeOfSunflower();
+            }
             if (SkipUpdate()) return;
             if (!IsPaired)
             {
@@ -141,13 +145,20 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 growthLevel += CalculateGrowth();
             }
             updated = true;
+            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type);
         }
 
         protected override void ReplacePlantWithNewOne()
         {
             WorldGen.KillTile(Position.X, Position.Y, false, false, true);
             WorldGen.KillTile(pairedEntity.Position.X, pairedEntity.Position.Y, false, false, true);
-            growthQueue.Add((Position.X, Position.Y, (plantData + pairedEntity.plantData) / 2, difference.Clone()));
+            pairedEntity.Kill(pairedEntity.Position.X, pairedEntity.Position.Y);
+            Kill(Position.X, Position.Y);
+            
+            growthQueue.Add((Position.X, Position.Y - 1, (plantData + pairedEntity.plantData) / 2, difference.Clone()));
+            NetMessage.SendTileSquare(-1, Position.X, Position.Y, 2, 2, TileChangeType.None);
+            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
+            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, pairedEntity.Position.X, pairedEntity.Position.Y);
         }
 
         /// <summary>
@@ -191,7 +202,6 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             // If the pairing state is None, remove the pairing.
             if (pairing == PairingState.None)
             {
-                RemovePairing();
                 return;
             }
 
@@ -228,29 +238,6 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         {
             pairedEntity?.RemovePairing();
             NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
-        }
-        public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
-        {
-            TileObjectData tileData = TileObjectData.GetTileData(type, style, alternate);
-            Point16 point = TileObjectData.TopLeft(i, j);
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-            {
-                NetMessage.SendTileSquare(Main.myPlayer, point.X, point.Y, tileData.Width, tileData.Height);
-                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, point.X, point.Y, Type);
-                if (TileEntity.TryGet(point.X, point.Y, out SproutEntity entity))
-                {
-                    entity.plantData = transferData;
-                    transferData = new NatureData(); // Clear the transfer data after placing
-                }
-                return -1;
-            }
-            int result = Place(point.X, point.Y);
-            if (TileEntity.TryGet(point.X, point.Y, out SproutEntity tileEntity))
-            {
-                tileEntity.plantData = transferData;
-                transferData = new NatureData(); // Clear the transfer data after placing
-            }
-            return result;
         }
         override public void SaveData(TagCompound tag)
         {
@@ -567,7 +554,18 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
         public int this[string key]
         {
-            get => loves.TryGetValue(key, out var v) ? v : 0;
+            get
+            {
+                if (loves.TryGetValue(key, out var v))
+                {
+                    return v;
+                }
+                else
+                {
+                    loves[key] = 0;
+                    return 0;
+                }
+            }
             set => loves[key] = value;
         }
 
@@ -712,6 +710,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
     }
     public enum TypeOfSunflower
     {
+        None = -1,
         Sunflower = 0,
         Dryflower = 1,
         Fireflower = 2,

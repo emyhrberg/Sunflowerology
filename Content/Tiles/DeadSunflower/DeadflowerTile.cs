@@ -1,13 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using Sunflowerology.Content.Buffs;
-using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
-using Sunflowerology.Content.Tiles.SunGrass;
-using Terraria;
-using Terraria.ID;
+﻿using ScienceJam.Content.Buffs;
+using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
 using Terraria.ModLoader;
-using Terraria.ObjectData;
 
 namespace Sunflowerology.Content.Tiles.DeadSunflower
 {
