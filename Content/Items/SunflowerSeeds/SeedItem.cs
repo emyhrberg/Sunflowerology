@@ -19,6 +19,7 @@ namespace Sunflowerology.Content.Items.SunflowerSeeds
             Item.height = 26;
             Item.value = 1000;
             Item.placeStyle = 9 * (int)TypeOfSunflower;
+            seedData = NatureData.TypeOfSunflowerToData[TypeOfSunflower];
         }
 
         public override bool CanStack(Item source)
