@@ -1,4 +1,4 @@
-﻿using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
+﻿using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
 using Terraria.ID;
 
 namespace Sunflowerology.Content.Tiles.DeadSunflower

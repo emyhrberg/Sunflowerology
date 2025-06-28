@@ -63,10 +63,10 @@ namespace Sunflowerology.Content.Tiles.SunflowerTree
         public override void RandomUpdate(int i, int j)
         {
             // A random chance to slow down growth
-            if (!WorldGen.genRand.NextBool(20))
-            {
-                return;
-            }
+            //if (!WorldGen.genRand.NextBool(20))
+            //{
+            //    return;
+            //}
 
             Tile tile = Framing.GetTileSafely(i, j); // Safely get the tile at the given coordinates
             bool growSuccess; // A bool to see if the tree growing was successful.

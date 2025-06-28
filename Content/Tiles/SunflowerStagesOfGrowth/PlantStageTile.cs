@@ -6,12 +6,13 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Stubble.Core.Settings;
 using Sunflowerology.Common.Configs;
+using Sunflowerology.Content.Items.SunflowerSeeds;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
-using ScienceJam.Content.Items.SunflowerSeeds;
+using Terraria.ObjectData;
 
 namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 {
@@ -402,7 +403,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 var tod = TileObjectData.GetTileData(NextTileType, 3 * newTypeOfSunflower);
                 var point = TileObjectData.TopLeft(i, j);
                 var newEntity = GetEntityOn(point.X, point.Y);
-                
+
                 newEntity.plantData = newPlantData;
                 NetMessage.SendObjectPlacement(-1, i, j, NextTileType, 0, 0, -1, -1);
                 NetMessage.SendTileSquare(-1, point.X, point.Y, tod.Width, tod.Height, TileChangeType.None);

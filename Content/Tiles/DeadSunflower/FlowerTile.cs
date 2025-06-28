@@ -2,8 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
-using System.Collections.Generic;
+using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;

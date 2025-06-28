@@ -1,13 +1,7 @@
-﻿using ScienceJam.Content.Items.Sunflowers;
-using ScienceJam.Content.Items.SunflowerSeeds;
-using ScienceJam.Content.Tiles.DeadSunflower;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Sunflowerology.Common.Configs;
 using Sunflowerology.Content.Items.Sunflowers;
 using Sunflowerology.Content.Items.SunflowerSeeds;
 using Sunflowerology.Content.Tiles.DeadSunflower;
@@ -154,7 +148,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             WorldGen.KillTile(pairedEntity.Position.X, pairedEntity.Position.Y, false, false, true);
             pairedEntity.Kill(pairedEntity.Position.X, pairedEntity.Position.Y);
             Kill(Position.X, Position.Y);
-            
+
             growthQueue.Add((Position.X, Position.Y - 1, (plantData + pairedEntity.plantData) / 2, difference.Clone()));
             NetMessage.SendTileSquare(-1, Position.X, Position.Y, 2, 2, TileChangeType.None);
             NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);

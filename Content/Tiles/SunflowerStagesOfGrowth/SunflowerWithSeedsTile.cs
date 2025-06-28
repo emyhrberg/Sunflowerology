@@ -1,5 +1,5 @@
-﻿using ScienceJam.Content.Items.SunflowerSeeds;
-using System;
+﻿using System;
+using Sunflowerology.Content.Items.SunflowerSeeds;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ScienceJam.Content.Tiles.SunflowerStagesOfGrowth;
+using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
