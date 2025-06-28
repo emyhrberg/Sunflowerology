@@ -1,6 +1,6 @@
 displayName = Sunflowerology
 author = Erky & Cotlim
-version = 0.1
+version = 0.2
 dllReferences = ModLiquidLib, StructureHelper
 buildIgnore = Assets/Photoshop*, Assets/Workshop*
 side = both
