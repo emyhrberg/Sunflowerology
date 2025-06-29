@@ -1,7 +1,7 @@
 Buffs: {
 	DeadSunflowerBuff: {
-		DisplayName: Dead Sunflower Buff
-		Description: Mods.Sunflowerology.Buffs.DeadSunflowerBuff.Description
+		DisplayName: Dead Sunflower!
+		Description: The dead flower is hurting your life, remove it!
 	}
 }
 
@@ -103,6 +103,11 @@ Items: {
 
 	SunflowerSeed: {
 		DisplayName: Sunflower Seed
+		Tooltip: ""
+	}
+
+	SunflowerAcornItem: {
+		DisplayName: Sunflower Acorn
 		Tooltip: ""
 	}
 }

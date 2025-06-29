@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Sunflowerology.Content.Items.SunflowerSeeds;
 using Sunflowerology.Content.Tiles.SunGrass;
@@ -41,7 +43,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerTree
         {
             style = 0;
             //return ModContent.TileType<Plants.ExampleSapling>();
-            return ModContent.TileType<SunflowerSapling>();
+            return ModContent.TileType<SunflowerSaplingTile>();
         }
 
         public override Asset<Texture2D> GetBranchTextures()
@@ -62,10 +64,24 @@ namespace Sunflowerology.Content.Tiles.SunflowerTree
         }
         public override int DropWood()
         {
-            return ModContent.ItemType<SunflowerSeed>();
+            // Drop a random seed
+            Random random = new();
+            List<int> seeds = [];
+            seeds.Add(ModContent.ItemType<BeachflowerSeed>());
+            seeds.Add(ModContent.ItemType<DeadflowerSeed>());
+            seeds.Add(ModContent.ItemType<DryflowerSeed>());
+            seeds.Add(ModContent.ItemType<FireflowerSeed>());
+            seeds.Add(ModContent.ItemType<IceflowerSeed>());
+            seeds.Add(ModContent.ItemType<ObsidianflowerSeed>());
+            seeds.Add(ModContent.ItemType<OceanflowerSeed>());
+            seeds.Add(ModContent.ItemType<SnowflowerSeed>());
+            seeds.Add(ModContent.ItemType<SporeflowerSeed>());
+            int choice = random.Next(seeds.Count);
+
+            return seeds[choice];
         }
 
-        public override bool CanDropAcorn() => true;
+        public override bool CanDropAcorn() => false;
         public override int CreateDust() => 7; // default dust for when tree is destroyed
 
         public override bool Shake(int x, int y, ref bool createLeaves)

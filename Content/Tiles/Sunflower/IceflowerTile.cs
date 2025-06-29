@@ -1,7 +1,7 @@
 ﻿using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
 using Terraria.ID;
 
-namespace Sunflowerology.Content.Tiles.DeadSunflower
+namespace Sunflowerology.Content.Tiles.Sunflower
 {
     internal class IceflowerTile : FlowerTile
     {

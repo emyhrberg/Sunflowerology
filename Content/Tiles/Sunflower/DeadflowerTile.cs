@@ -2,7 +2,7 @@
 using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
 using Terraria.ModLoader;
 
-namespace Sunflowerology.Content.Tiles.DeadSunflower
+namespace Sunflowerology.Content.Tiles.Sunflower
 {
     internal class DeadflowerTile : FlowerTile
     {

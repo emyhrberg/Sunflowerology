@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Sunflowerology.Content.Items.Sunflowers;
 using Sunflowerology.Content.Items.SunflowerSeeds;
-using Sunflowerology.Content.Tiles.DeadSunflower;
+using Sunflowerology.Content.Tiles.Sunflower;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;

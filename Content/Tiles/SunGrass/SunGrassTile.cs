@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Sunflowerology.Common.Configs;
@@ -146,12 +147,19 @@ namespace Sunflowerology.Content.Tiles.SunGrass
             {
                 Kill(Position.X, Position.Y);
             }
+            //float a = Main.GameZoomTarget;
+            //float b = Main.ForcedMinimumZoom;
+            //Main.NewText(a + ", " + b);
 
             if (!WorldGen.InWorld(Position.X, Position.Y, 10))
             {
                 return;
             }
+        }
 
+        [Obsolete("This method is not needed anymore, Cotlim had some idea about only keeping the seed but making it fade when no sunflower is on it, but I don't think it is needed anymore, so I removed it. If you want to use this method, please contact me on Discord")]
+        private void CheckForSunflower()
+        {
             counter++;
             counter %= Conf.C.HowFastSunGrassDecays;
             if (!needCheckForSunflower || !Main.rand.NextBool(10))

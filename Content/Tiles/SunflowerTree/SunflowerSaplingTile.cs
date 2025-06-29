@@ -11,7 +11,7 @@ using Terraria.ObjectData;
 
 namespace Sunflowerology.Content.Tiles.SunflowerTree
 {
-    public class SunflowerSapling : ModTile
+    public class SunflowerSaplingTile : ModTile
     {
         public override void SetStaticDefaults()
         {
