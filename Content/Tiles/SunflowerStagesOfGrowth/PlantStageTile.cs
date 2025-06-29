@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Stubble.Core.Settings;
 using Sunflowerology.Common.Configs;
+using Sunflowerology.Common.PacketHandlers;
 using Sunflowerology.Content.Items.SunflowerSeeds;
 using Terraria;
 using Terraria.DataStructures;
@@ -64,7 +65,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             TileObjectData.newTile.StyleHorizontal = true;
             if (IsSpecialHook)
             {
-                TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<T>().Hook_AfterPlacement, -1, 0, true);
+                //TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<T>().Hook_AfterPlacement, -1, 0, true);
             }
             else
             {
@@ -102,8 +103,21 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             {
                 return;
             }
-            ModContent.GetInstance<T>().Kill(i, j);
-            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, i, j);
+
+            int id = ModContent.GetInstance<T>().Find(i, j);
+
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+            {
+
+                ModContent.GetInstance<T>().Kill(i, j);
+                NetMessage.SendData(MessageID.TileEntitySharing, number: id);
+                Log.Info($"Killed TE at {i}, {j}");
+            }
+            else
+            {
+                NetMessage.SendData(MessageID.TileEntitySharing, number: id);
+                Log.Info($"Can't kill TE at {i}, {j}");
+            }
         }
 
         public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
@@ -117,8 +131,21 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             {
                 return;
             }
-            ModContent.GetInstance<T>().Kill(i, j);
-            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, i, j);
+
+            int id = ModContent.GetInstance<T>().Find(i, j);
+
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+            {
+                
+                ModContent.GetInstance<T>().Kill(i, j);
+                NetMessage.SendData(MessageID.TileEntitySharing, number: id);
+                Log.Info($"Killed TE at {i}, {j}");
+            }
+            else
+            {
+                NetMessage.SendData(MessageID.TileEntitySharing, number: id);
+                Log.Info($"Can't kill TE at {i}, {j}");
+            }
 
         }
 
@@ -139,31 +166,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             b = 0.1f;
         }
 
-        public override void PlaceInWorld(int i, int j, Item item)
-        {
-            TileObjectData tileData = TileObjectData.GetTileData(Type, 0);
-            var topLeft = TileObjectData.TopLeft(i, j);
-            int id = ModContent.GetInstance<T>().Find(i, j);
-            if (TileEntity.ByID.TryGetValue(id, out TileEntity entity) && entity is T te)
-            {
-                te.SetUpData(((SeedItem)item.ModItem).seedData);
-            }
-            else
-            {
-                id = ModContent.GetInstance<T>().Place(i, j);
-                if (TileEntity.ByID.TryGetValue(id, out TileEntity entity2) && entity2 is T te2)
-                {
-                    te2.SetUpData(((SeedItem)item.ModItem).seedData);
-                }
-                else
-                {
-                    Main.NewText($"Failed to place tile entity at {i}, {j}. ID: {id}");
-                    return;
-                }
-                Main.NewText("Placed tile entity: " + id);
-            }
-            base.PlaceInWorld(i, j, item);
-        }
+
     }
 
     public abstract class FinalPlantStageEntity : ModTileEntity
@@ -182,7 +185,6 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         public NatureData difference = new();
         public float averageDifference = 0f;
         public TypeOfSunflower typeOfSunflower = TypeOfSunflower.None;
-        public bool updated = false;
 
         // Data of the plant itself (not changing)
         public NatureData plantData = new NatureData();
@@ -191,7 +193,6 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         // Technical variables
         protected int updateCounter = 0;
         protected int PlantUpdateInterval => Conf.C.PlantUpdateInterval;
-
         protected bool SkippedUpdate => updateCounter != 1;
 
         public void SetUpData(NatureData nt)
@@ -210,27 +211,38 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             {
                 tag[seedTag] = plantData[seedTag];
             }
+            tag[nameof(typeOfSunflower)] = (int)typeOfSunflower;
         }
         public override void LoadData(TagCompound tag)
         {
+            var newPlantData = new NatureData();
             foreach (var seedTag in NatureTags.AllTags)
             {
                 try
                 {
                     if (tag.TryGet(seedTag, out int val))
                     {
-                        plantData[seedTag] = val;
+                        newPlantData[seedTag] = val;
                     }
                     else
                     {
-                        plantData[seedTag] = 0;
+                        newPlantData[seedTag] = 0;
                     }
                 }
                 catch
                 {
-                    plantData[seedTag] = 0;
+                    newPlantData[seedTag] = 0;
                 }
+            }
+            plantData = newPlantData;
 
+            if (tag.TryGet(nameof(typeOfSunflower), out int type))
+            {
+                typeOfSunflower = (TypeOfSunflower)type;
+            }
+            else
+            {
+                typeOfSunflower = TypeOfSunflower.None;
             }
         }
         public override void NetSend(BinaryWriter writer)
@@ -239,16 +251,18 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             {
                 writer.Write(plantData[seedTag]);
             }
-            Log.Info($"Sending plant data: {string.Join(", ", plantData.Values)}");
-
+            writer.Write((int)typeOfSunflower);
         }
         public override void NetReceive(BinaryReader reader)
         {
-            Main.NewText($"Receiving plant data!!!");
+            var newPlantData = new NatureData();
             foreach (var seedTag in NatureTags.AllTags)
             {
-                plantData[seedTag] = reader.ReadInt32();
+                newPlantData[seedTag] = reader.ReadInt32();
             }
+            plantData = newPlantData;
+            typeOfSunflower = (TypeOfSunflower)reader.ReadInt32();
+
         }
 
         public override void Update()
@@ -258,15 +272,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 typeOfSunflower = plantData.FindClosestTypeOfSunflower();
             }
             if (SkipUpdate()) return;
-            if (!updated)
-            {
-                updated = true;
-            }
-        }
-
-        public override void OnKill()
-        {
-            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
+            NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
         }
 
 
@@ -321,6 +327,10 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
         public override void Update()
         {
+            if (typeOfSunflower == TypeOfSunflower.None)
+            {
+                typeOfSunflower = plantData.FindClosestTypeOfSunflower();
+            }
             if (SkipUpdate()) return;
 
             surroundingAreaData = CalculateSurroundings();
@@ -330,12 +340,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
             if (IsFullyGrown)
                 ReplacePlantWithNewOne();
-            if (!updated)
-            {
-                typeOfSunflower = plantData.FindClosestTypeOfSunflower();
-                updated = true;
-            }
-            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
+            NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
         }
 
         public override void PostGlobalUpdate()
@@ -394,20 +399,20 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 newPlantData = newPlantData.Normalize();
                 var newTypeOfSunflower = (int)newPlantData.FindClosestTypeOfSunflower();
                 // Random style for the new plant
-                int style = random.Next(0, 3);
+                int randomStyle = random.Next(0, 3);
+                int style = 3 * newTypeOfSunflower;
                 // Place the new tile
-                if (!WorldGen.PlaceObject(i, j, NextTileType, mute: true, style: 3 * newTypeOfSunflower))
+                if (!WorldGen.PlaceObject(i, j, NextTileType, mute: true, style: style, random: randomStyle))
                 {
                     continue;
                 }
-                var tod = TileObjectData.GetTileData(NextTileType, 3 * newTypeOfSunflower);
+                var tod = TileObjectData.GetTileData(NextTileType, style);
                 var point = TileObjectData.TopLeft(i, j);
                 var newEntity = GetEntityOn(point.X, point.Y);
 
                 newEntity.plantData = newPlantData;
-                NetMessage.SendObjectPlacement(-1, i, j, NextTileType, 0, 0, -1, -1);
-                NetMessage.SendTileSquare(-1, point.X, point.Y, tod.Width, tod.Height, TileChangeType.None);
-                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, point.X, point.Y, newEntity.Type);
+                NetMessage.SendObjectPlacement(-1, i, j, NextTileType, style, 0, randomStyle, -1);
+                NetMessage.SendData(MessageID.TileEntityPlacement, number: newEntity.ID);
             }
             growthQueue.Clear();
         }
@@ -419,8 +424,8 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
             growthQueue.Add((Position.X, Position.Y - 1, plantData.Clone(), difference.Clone()));
 
-            NetMessage.SendTileSquare(-1, Position.X, Position.Y, 2, 4, TileChangeType.None);
-            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
+            NetMessage.SendTileSquare(-1, Position.X, Position.Y, 2, 4);
+            NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
         }
 
         protected float CalculateGrowth()

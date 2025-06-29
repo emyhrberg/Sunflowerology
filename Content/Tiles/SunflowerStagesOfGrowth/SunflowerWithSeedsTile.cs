@@ -1,8 +1,11 @@
 ﻿using System;
+using Mono.Cecil;
 using Sunflowerology.Content.Items.SunflowerSeeds;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.ID;
 using Terraria.ModLoader;
+using static AssGen.Assets;
 
 namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 {
@@ -20,23 +23,37 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             if (TileEntity.ByID.TryGetValue(id, out TileEntity te) && te is SunflowerWithSeedsEntity ste)
             {
                 var r = new Random();
-                int seedItemIndex = Item.NewItem(
-                    new EntitySource_TileBreak(i, j),
-                    i * 16, j * 16, 16, 16,
-                    NatureData.TypeOfSunflowerToSeedItemId[ste.typeOfSunflower],
-                    r.Next(5, 11)
+                ste.typeOfSunflower = ste.plantData.FindClosestTypeOfSunflower();
 
-                );
-                int flowerItemIndex = Item.NewItem(
-                    new EntitySource_TileBreak(i, j),
-                    i * 16, j * 16, 16, 16,
-                    NatureData.TypeOfSunflowerToItemId[ste.typeOfSunflower],
-                    1
-                );
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
 
-                (Main.item[seedItemIndex].ModItem as SeedItem).seedData = ste.plantData;
+                    int seedItemIndex = Item.NewItem(
+                        new EntitySource_TileBreak(i, j),
+                        i * 16, j * 16, 16, 16,
+                        NatureData.TypeOfSunflowerToSeedItemId[ste.typeOfSunflower],
+                        r.Next(5, 11),
+                        noBroadcast: true
+                    );
+                    int flowerItemIndex = Item.NewItem(
+                        new EntitySource_TileBreak(i, j),
+                        i * 16, j * 16, 16, 16,
+                        NatureData.TypeOfSunflowerToItemId[ste.typeOfSunflower],
+                        1
+                    );
+                    (Main.item[seedItemIndex].ModItem as SeedItem).seedData = ste.plantData.Clone();
+                    NetMessage.SendData(
+                        MessageID.SyncItem,
+                        number: seedItemIndex
+                    );
+                    
+                }
+
             }
-
+            else
+            {
+                Log.Warn($"TileEntity not found at {i}, {j} with ID: {id}, clientMode: {Main.netMode}");
+            }
             base.KillMultiTile(i, j, frameX, frameY);
         }
         protected override string GetmouseOverPlantText(int i, int j)
