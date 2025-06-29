@@ -1,1 +1,26 @@
-This description will show up on the steam page, check out https://steamcommunity.com/comment/Guide/formattinghelp.
+[h1] Sunflowerology [/h1]
+This mod allows you to grow more sunflowers. There are new sunflower seeds and trees. There are mechanics in place for you to figure out how to grow all the sunflower types. Can you grow all sunflowers and craft the mighty [i] Zenithflower [/i]?!
+
+[h1]Features[/h1]
+[list]
+[*] [b]Sunflower Trees[/b]: Discover towering sunflower trees growing on sungrass seeds. These unique trees spawn near the world's starting area in newly generated worlds. Chop them down to collect a variety of sunflower seeds.
+[*] [b]Seed Pairing[/b]: Plant two sunflower seeds side by side and experiment to see how they grow together!
+[*] [b]Sunflower Buffs[/b]: Each type of sunflower grants a distinct buff within a certain radius, consider a strategic placement in your arena for boss fights or base defense!
+[*] [b]Zenithflower[/b]: Gather every type of sunflower to craft the powerful Zenithflower.
+[*] [b]Deadflowers[/b]: If sunflower seeds are mishandled, they may grow into Deadflowers, which inflict a harmful debuff within range.
+[/list]
+
+[h1] Sunflower Buffs [/h1]
+
+[table]
+[tr][th]Flower[/th][th]Biome[/th][th]Effect[/th][/tr]
+[tr][td]Beachflower[/td][td]Any[/td][td]Faster movement on sand[/td][/tr]
+[tr][td]Deadflower[/td][td]Any[/td][td]Reduced life + Slower speed[/td][/tr]
+[tr][td]Dryflower[/td][td]Any[/td][td]Calming or spike-related effect[/td][/tr]
+[tr][td]Fireflower[/td][td]Hell[/td][td]Inflicts On Fire on enemies[/td][/tr]
+[tr][td]Iceflower[/td][td]Snow[/td][td]Inflicts Freeze on enemies[/td][/tr]
+[tr][td]Obsidianflower[/td][td]Evil[/td][td]Combines Fire and Ice effects[/td][/tr]
+[tr][td]Oceanflower[/td][td]Ocean[/td][td]Underwater breathing and mobility[/td][/tr]
+[tr][td]Sporeflower[/td][td]Jungle[/td][td]Spawns spores like Sporebag[/td][/tr]
+[tr][td]Zenith Flower[/td][td]Any[/td][td]All flower effects combined[/td][/tr]
+[/table]
