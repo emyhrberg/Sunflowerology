@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Sunflowerology.Common.PacketHandlers;
 using Sunflowerology.Content.Items.Sunflowers;
 using Sunflowerology.Content.Items.SunflowerSeeds;
 using Sunflowerology.Content.Tiles.Sunflower;
@@ -27,10 +28,6 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         {
             if (TileEntity.TryGet(i, j, out SproutEntity tileEntity))
             {
-                if (!tileEntity.updated)
-                {
-                    tileEntity.Update();
-                }
                 if (tileEntity.Pairing == PairingState.OnRight)
                     tileFrameY += 20;
                 else if (tileEntity.Pairing == PairingState.OnLeft)
@@ -48,11 +45,34 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             noItem = true;
         }
 
-        protected override bool IsSpecialHook => false;
+        protected override bool IsSpecialHook => true;
 
         protected override bool HaveGlow => false;
 
         protected override int[] Heights => [18];
+
+        public override void PlaceInWorld(int i, int j, Item item)
+        {
+            TileObjectData tileData = TileObjectData.GetTileData(Type, 0);
+            var topLeft = TileObjectData.TopLeft(i, j);
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+            {
+                ModNetHandler.plantTEHandler.SendPlacingTE(-1, -1, topLeft.X, topLeft.Y, (SeedItem)item.ModItem);
+                return;
+            }
+            else if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                int id = ModContent.GetInstance<SproutEntity>().Place(i, j);
+                if (id != -1 && TileEntity.ByID.TryGetValue(id, out var te) && te is SproutEntity sproutTE)
+                {
+                    sproutTE.plantData = ((SeedItem)item.ModItem).seedData.Clone();
+                }
+                else
+                {
+                    Log.Warn($"Failed to place SproutEntity at {i}, {j}");
+                }
+            }
+        }
     }
 
     public class SproutEntity : PlantStageEntity<SeedlingEntity>
@@ -138,8 +158,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 typeOfSunflower = plantData.FindClosestTypeOfSunflower();
                 growthLevel += CalculateGrowth();
             }
-            updated = true;
-            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type);
+            NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
         }
 
         protected override void ReplacePlantWithNewOne()
@@ -151,8 +170,8 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
             growthQueue.Add((Position.X, Position.Y - 1, (plantData + pairedEntity.plantData) / 2, difference.Clone()));
             NetMessage.SendTileSquare(-1, Position.X, Position.Y, 2, 2, TileChangeType.None);
-            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
-            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, pairedEntity.Position.X, pairedEntity.Position.Y);
+            NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
+            NetMessage.SendData(MessageID.TileEntitySharing, number: pairedEntity.ID);
         }
 
         /// <summary>
@@ -178,8 +197,8 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 pairedEntity = other;
 
                 // Send the pairing information to the network
-                NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
-                NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, i, j);
+                NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
+                NetMessage.SendData(MessageID.TileEntitySharing, number: pairedEntity.ID);
                 return true;
             }
 
@@ -215,8 +234,11 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 other.pairedEntity = this;
 
                 // Send the pairing information to the network
-                NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
-                NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, i, j);
+                if(Main.netMode == NetmodeID.Server)
+                {
+                    NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
+                    NetMessage.SendData(MessageID.TileEntitySharing, number: pairedEntity.ID);
+                }
             }
         }
 
@@ -226,12 +248,11 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         public void RemovePairing()
         {
             pairedEntity = null;
-            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
+            NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
         }
         public override void OnKill()
         {
             pairedEntity?.RemovePairing();
-            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, Type, Position.X, Position.Y);
         }
         override public void SaveData(TagCompound tag)
         {

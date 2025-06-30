@@ -68,12 +68,16 @@ namespace Sunflowerology.Content.Tiles.Sunflower
         {
             Tile tile = Main.tile[i, j];
             Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
-            int frameY = (short)((3 * 18 + 20) * (int)TypeOfSunflower);
             spriteBatch.Draw(
                 glowTexture.Value,
                 new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y + 2) + zero,
                 new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, tile.TileFrameY == 54 ? 18 : 16),
                 Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        }
+
+        public override void KillMultiTile(int i, int j, int frameX, int frameY)
+        {
+            base.KillMultiTile(i, j, frameX, frameY);
         }
 
 

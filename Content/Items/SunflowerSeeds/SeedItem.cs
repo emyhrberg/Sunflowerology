@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
 using Terraria;
 using Terraria.ModLoader;
@@ -10,7 +11,6 @@ namespace Sunflowerology.Content.Items.SunflowerSeeds
     {
         public NatureData seedData = new();
         protected abstract TypeOfSunflower TypeOfSunflower { get; }
-        bool updated = false;
 
         public override void SetDefaults()
         {
@@ -44,25 +44,26 @@ namespace Sunflowerology.Content.Items.SunflowerSeeds
 
         public override void LoadData(TagCompound tag)
         {
+            var newSeedData = new NatureData();
             foreach (var seedTag in NatureTags.AllTags)
             {
                 try
                 {
                     if (tag.TryGet(seedTag, out int val))
                     {
-                        seedData[seedTag] = val;
+                        newSeedData[seedTag] = val;
                     }
                     else
                     {
-                        seedData[seedTag] = 0;
+                        newSeedData[seedTag] = 0;
                     }
                 }
                 catch
                 {
-                    seedData[seedTag] = 0; // If the tag is not found or fails, set it to 0
+                    newSeedData[seedTag] = 0; // If the tag is not found or fails, set it to 0
                 }
-
             }
+            seedData = newSeedData;
         }
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
@@ -73,6 +74,24 @@ namespace Sunflowerology.Content.Items.SunflowerSeeds
                 tooltips.Add(tooltip);
             }
 
+        }
+
+        public override void NetSend(BinaryWriter writer)
+        {
+            foreach (var seedTag in NatureTags.AllTags)
+            {
+                writer.Write(seedData[seedTag]);
+            }
+        }
+
+        public override void NetReceive(BinaryReader reader)
+        {
+            var newSeedData = new NatureData();
+            foreach (var seedTag in NatureTags.AllTags)
+            {
+                newSeedData[seedTag] = reader.ReadInt32();
+            }
+            seedData = newSeedData;
         }
     }
 }
