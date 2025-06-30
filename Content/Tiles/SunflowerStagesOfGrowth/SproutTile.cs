@@ -59,7 +59,8 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             {
                 ModNetHandler.plantTEHandler.SendPlacingTE(-1, -1, topLeft.X, topLeft.Y, (SeedItem)item.ModItem);
                 return;
-            }else if (Main.netMode == NetmodeID.SinglePlayer)
+            }
+            else if (Main.netMode == NetmodeID.SinglePlayer)
             {
                 int id = ModContent.GetInstance<SproutEntity>().Place(i, j);
                 if (id != -1 && TileEntity.ByID.TryGetValue(id, out var te) && te is SproutEntity sproutTE)
@@ -233,8 +234,11 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 other.pairedEntity = this;
 
                 // Send the pairing information to the network
-                NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
-                NetMessage.SendData(MessageID.TileEntitySharing, number: pairedEntity.ID);
+                if(Main.netMode == NetmodeID.Server)
+                {
+                    NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
+                    NetMessage.SendData(MessageID.TileEntitySharing, number: pairedEntity.ID);
+                }
             }
         }
 

@@ -111,12 +111,10 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
                 ModContent.GetInstance<T>().Kill(i, j);
                 NetMessage.SendData(MessageID.TileEntitySharing, number: id);
-                Log.Info($"Killed TE at {i}, {j}");
             }
             else
             {
                 NetMessage.SendData(MessageID.TileEntitySharing, number: id);
-                Log.Info($"Can't kill TE at {i}, {j}");
             }
         }
 
@@ -139,12 +137,10 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 
                 ModContent.GetInstance<T>().Kill(i, j);
                 NetMessage.SendData(MessageID.TileEntitySharing, number: id);
-                Log.Info($"Killed TE at {i}, {j}");
             }
             else
             {
                 NetMessage.SendData(MessageID.TileEntitySharing, number: id);
-                Log.Info($"Can't kill TE at {i}, {j}");
             }
 
         }

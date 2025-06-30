@@ -13,12 +13,7 @@ namespace Sunflowerology.Common.PacketHandlers
     internal class PlantTEPackerHandler : BasePacketHandler
     {
         public const byte PlacingTE = 1;
-        public const byte KillingTE = 2;
         public PlantTEPackerHandler(byte handlerType) : base(handlerType) { }
-
-        // Only for server:
-        private byte majorClient = 0;
-        private bool shouldServerBeSaved = false;
 
         //Gets packets
         public override void HandlePacket(BinaryReader reader, int fromWho)
@@ -27,9 +22,6 @@ namespace Sunflowerology.Common.PacketHandlers
             {
                 case PlacingTE:
                     ReceivePlacingTE(reader, fromWho);
-                    break;
-                case KillingTE:
-                    ReceiveKillingTE(reader, fromWho);
                     break;
             }
         }
@@ -53,8 +45,6 @@ namespace Sunflowerology.Common.PacketHandlers
         //Server:
         public void ReceivePlacingTE(BinaryReader reader, int fromWho)
         {
-            Log.Info($"Receiving PlacingTE to {Main.myPlayer} from {fromWho}");
-
             if (Main.netMode == NetmodeID.Server)
             {
                 int i = reader.ReadInt32();
@@ -64,7 +54,6 @@ namespace Sunflowerology.Common.PacketHandlers
                 {
                     natureData[seedTag] = reader.ReadInt32();
                 }
-                Log.Info($"Placing TE at {i}, {j} with data: {natureData}");
                 int id = ModContent.GetInstance<SproutEntity>().Place(i, j);
                 if (id != -1 && TileEntity.ByID.TryGetValue(id, out var te) && te is SproutEntity sproutTE)
                 {
@@ -77,39 +66,6 @@ namespace Sunflowerology.Common.PacketHandlers
                     Log.Warn($"Failed to place SproutEntity at {i}, {j}");
                 }
 
-            }
-        }
-
-        //MP client:
-        public void SendKillingTE(int toWho, int ignoreWho, int id)
-        {
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-            {
-                ModPacket packet = GetPacket(KillingTE);
-                packet.Write(id);
-                packet.Send(toWho, ignoreWho);
-            }
-        }
-
-        //Server:
-        public void ReceiveKillingTE(BinaryReader reader, int fromWho)
-        {
-            Log.Info($"Receiving KillingTE from {fromWho}");
-            if (Main.netMode == NetmodeID.Server)
-            {
-                int id = reader.ReadInt32();
-                Log.Info($"Killing TE with ID: {id}");
-                if (TileEntity.ByID.TryGetValue(id, out TileEntity te))
-                {
-                    ((ModTileEntity)te).OnKill();
-                    TileEntity.ByID.Remove(te.ID);
-                    TileEntity.ByPosition.Remove(te.Position);
-                    NetMessage.SendData(MessageID.TileEntitySharing, number: id);
-                }
-                else
-                {
-                    Log.Warn($"TileEntity with ID {id} not found.");
-                }
             }
         }
     }
