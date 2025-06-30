@@ -65,20 +65,22 @@ namespace Sunflowerology.Content.Tiles.SunflowerTree
         public override int DropWood()
         {
             // Drop a random seed
-            Random random = new();
-            List<int> seeds = [];
-            seeds.Add(ModContent.ItemType<BeachflowerSeed>());
-            seeds.Add(ModContent.ItemType<DeadflowerSeed>());
-            seeds.Add(ModContent.ItemType<DryflowerSeed>());
-            seeds.Add(ModContent.ItemType<FireflowerSeed>());
-            seeds.Add(ModContent.ItemType<IceflowerSeed>());
-            seeds.Add(ModContent.ItemType<ObsidianflowerSeed>());
-            seeds.Add(ModContent.ItemType<OceanflowerSeed>());
-            seeds.Add(ModContent.ItemType<SnowflowerSeed>());
-            seeds.Add(ModContent.ItemType<SporeflowerSeed>());
-            int choice = random.Next(seeds.Count);
+            //Random random = new();
+            //List<int> seeds = [];
+            //seeds.Add(ModContent.ItemType<BeachflowerSeed>());
+            //seeds.Add(ModContent.ItemType<DeadflowerSeed>());
+            //seeds.Add(ModContent.ItemType<DryflowerSeed>());
+            //seeds.Add(ModContent.ItemType<FireflowerSeed>());
+            //seeds.Add(ModContent.ItemType<IceflowerSeed>());
+            //seeds.Add(ModContent.ItemType<ObsidianflowerSeed>());
+            //seeds.Add(ModContent.ItemType<OceanflowerSeed>());
+            //seeds.Add(ModContent.ItemType<SnowflowerSeed>());
+            //seeds.Add(ModContent.ItemType<SporeflowerSeed>());
+            //int choice = random.Next(seeds.Count);
 
-            return seeds[choice];
+            //return seeds[choice];
+
+            return ModContent.ItemType<SunflowerSeed>();
         }
 
         public override bool CanDropAcorn() => false;
