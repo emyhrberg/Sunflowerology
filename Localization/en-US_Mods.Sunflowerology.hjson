@@ -110,6 +110,11 @@ Items: {
 		DisplayName: Sunflower Acorn
 		Tooltip: ""
 	}
+
+	ZenithflowerItem: {
+		DisplayName: Zenithflower Item
+		Tooltip: ""
+	}
 }
 
 Configs: {

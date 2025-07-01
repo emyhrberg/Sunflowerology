@@ -6,39 +6,39 @@ using Terraria.IO;
 using Terraria.ModLoader;
 using Terraria.WorldBuilding;
 
-namespace Sunflowerology.Content.WorldGen
+namespace Sunflowerology.Content.WorldGeneration
 {
-    public sealed class ManySunflowers : ModSystem
+    public sealed class TwoSunflowerTrees : ModSystem
     {
         public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight)
         {
             int skyIslandIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Final Cleanup"));
 
             if (skyIslandIndex != -1)
-                tasks.Insert(skyIslandIndex + 1, new DaylandTestHousePass("Sunflowerology: Many Trees", loadWeight: 100f));
+                tasks.Insert(skyIslandIndex + 1, new DaylandTestHousePass("Sunflowerology: Two Sunflower Trees", loadWeight: 100f));
         }
 
         private sealed class DaylandTestHousePass(string name, float loadWeight) : GenPass(name, loadWeight)
         {
             protected override void ApplyPass(GenerationProgress progress, GameConfiguration configuration)
             {
-                progress.Message = "Generating more sunflower trees...";
+                progress.Message = "Generating sunflower trees...";
                 PlaceTwoSunflowerTrees();
             }
 
             private static void PlaceTwoSunflowerTrees()
             {
                 var mod = ModContent.GetInstance<Sunflowerology>();
-                string structurePath = "Content/Structures/ManySunflowers";
+                string structurePath = "Content/Structures/TwoSunflowerTrees";
 
                 // Get structure dimensions
                 Point16 size = StructureHelper.API.Generator.GetStructureDimensions(path: structurePath, mod: mod);
 
-                // Get spawn tile and offset 30 tiles to the right
-                int startX = Main.spawnTileX + 30;
+                // Get spawn tile and offset 10 tiles to the right
+                int startX = Main.spawnTileX + 10;
                 int y = Main.spawnTileY;
 
-                // Search downward for a grasstile
+                // Search downward for a grasstile, starting at the spawn tile
                 while (y < Main.maxTilesY - 10)
                 {
                     if (Main.tile[startX, y].HasTile && Main.tile[startX, y].TileType == TileID.Grass)
