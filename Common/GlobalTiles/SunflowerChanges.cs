@@ -4,7 +4,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
-namespace SienceJam.Common.GlobalTiles
+namespace Sunflowerology.Common.GlobalTiles
 {
     public class SunflowerChanges : GlobalTile
     {
