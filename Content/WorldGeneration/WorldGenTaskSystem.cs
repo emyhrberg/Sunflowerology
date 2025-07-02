@@ -34,7 +34,7 @@ namespace Sunflowerology.Content.WorldGeneration
         {
             // Get file path and mod instance
             var mod = ModContent.GetInstance<Sunflowerology>();
-            string structurePath = "Content/Structures/TwoSunflowerTrees";
+            string structurePath = "Content/WorldGeneration/TwoSunflowerTrees";
 
             // Get the starting position for placing the structure 
             // Offset 30 tiles to the right of the spawn tile
@@ -67,7 +67,7 @@ namespace Sunflowerology.Content.WorldGeneration
         {
             // Get file path and mod instance
             var mod = ModContent.GetInstance<Sunflowerology>();
-            string structurePath = "Content/Structures/TwoSunflowerTrees";
+            string structurePath = "Content/WorldGeneration/TwoSunflowerTrees";
 
             // Get the starting position for placing the structure 
             // Offset 10 tiles to the right of the spawn tile
