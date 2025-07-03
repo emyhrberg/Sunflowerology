@@ -8,7 +8,7 @@ namespace Sunflowerology.Content.Buffs
         public override void SetStaticDefaults()
         {
             Main.buffNoTimeDisplay[Type] = true;  // hide the ticking timer
-            Main.debuff[Type] = false;            // it’s a boon, not a bane
+            Main.debuff[Type] = false;
         }
 
         public override void Update(Player player, ref int buffIndex)

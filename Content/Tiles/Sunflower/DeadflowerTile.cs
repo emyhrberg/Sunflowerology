@@ -6,11 +6,11 @@ namespace Sunflowerology.Content.Tiles.Sunflower
 {
     internal class DeadflowerTile : FlowerTile
     {
-        protected override int RangeOfEffectInTiles => 4;
+        public override int RangeOfEffectInTiles => 4;
 
-        protected override int EffectBuffID => ModContent.BuffType<DeadSunflowerBuff>();
+        public override int EffectBuffID => ModContent.BuffType<DeadSunflowerBuff>();
 
-        protected override int EffetDuration => 120;
+        public override int EffectDuration => 120;
 
         protected override TypeOfSunflower TypeOfSunflower => TypeOfSunflower.Deadflower;
     }

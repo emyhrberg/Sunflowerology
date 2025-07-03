@@ -14,7 +14,7 @@ namespace Sunflowerology.Content.WorldGeneration
             WorldGenHelper.InsertWorldGenPass(
                 mod: Mod,
                 tasks,
-                placeAfterPass: "Final Cleanup",
+                placeAfterPass: "Water Plants",
                 taskName: "Two Sunflower Trees",
                 message: "Planting two sunflower trees...",
                 action: PlaceTwoSunflowerTrees
@@ -23,7 +23,7 @@ namespace Sunflowerology.Content.WorldGeneration
             WorldGenHelper.InsertWorldGenPass(
                 mod: Mod,
                 tasks,
-                placeAfterPass: "Final Cleanup",
+                placeAfterPass: "Water Plants",
                 taskName: "Many Sunflower Trees",
                 message: "Planting many sunflower trees...",
                 action: PlaceManySunflowerTrees
@@ -34,7 +34,7 @@ namespace Sunflowerology.Content.WorldGeneration
         {
             // Get file path and mod instance
             var mod = ModContent.GetInstance<Sunflowerology>();
-            string structurePath = "Content/WorldGeneration/TwoSunflowerTrees";
+            string structurePath = "Content/WorldGeneration/ManySunflowers";
 
             // Get the starting position for placing the structure 
             // Offset 30 tiles to the right of the spawn tile
@@ -54,12 +54,14 @@ namespace Sunflowerology.Content.WorldGeneration
             // Align the structure so it sits on top of the found grass tile
             Point16 size = StructureHelper.API.Generator.GetStructureDimensions(structurePath, mod);
             int placeX = startX;
-            int placeY = y - size.Y;
+            int placeY = y - size.Y + 3; // Move the structure down by 3 tiles
+
+            Log.Info($"Placing ManySunflowers at: ({placeX}, {placeY}) with size: {size.X}x{size.Y}");
 
             StructureHelper.API.Generator.GenerateStructure(
-                path: structurePath,
-                pos: new Point16(placeX, placeY),
-                mod: mod
+            path: structurePath,
+            pos: new Point16(placeX, placeY),
+            mod: mod
             );
         }
 
@@ -88,6 +90,8 @@ namespace Sunflowerology.Content.WorldGeneration
             Point16 size = StructureHelper.API.Generator.GetStructureDimensions(structurePath, mod);
             int placeX = startX;
             int placeY = y - size.Y;
+
+            Log.Info($"Placing TwoSunflowerTrees at: ({placeX}, {placeY}) with size: {size.X}x{size.Y}");
 
             StructureHelper.API.Generator.GenerateStructure(
                 path: structurePath,

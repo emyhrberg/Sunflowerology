@@ -1,9 +1,5 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using Sunflowerology.Content.Items;
-using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -13,7 +9,6 @@ namespace Sunflowerology.Content.Tiles
 {
     internal class ZenithflowerTile : ModTile
     {
-
         public override void SetStaticDefaults()
         {
             Main.tileFrameImportant[Type] = true;
@@ -37,6 +32,32 @@ namespace Sunflowerology.Content.Tiles
             TileObjectData.addTile(Type);
 
             AddMapEntry(new Color(10, 10, 0));
+        }
+
+        public override void NearbyEffects(int i, int j, bool closer)
+        {
+            if (!closer)
+                return;
+
+            Player player = Main.LocalPlayer;
+
+            float rangePixels = 20 * 16;
+            Vector2 tileCenter = new((i + 1) * 16f, (j + 1) * 16f);
+
+            bool withinRange = Vector2.Distance(player.Center, tileCenter) <= rangePixels;
+            if (withinRange)
+            {
+                int dur = 30; // Duration of the buffs in frames (1 second = 60 frames)
+                player.AddBuff(BuffID.Flipper, dur);
+                player.AddBuff(BuffID.Calm, dur);
+                player.AddBuff(BuffID.Inferno, dur);
+                //player.AddBuff(BuffID.IceBarrier, dur);
+                player.AddBuff(BuffID.ObsidianSkin, dur);
+                player.AddBuff(BuffID.Gills, dur);
+                player.AddBuff(BuffID.Warmth, dur);
+                player.AddBuff(BuffID.TikiSpirit, dur);
+                // player.AddBuff(BuffID.Happy, duration);
+            }
         }
 
         public override IEnumerable<Item> GetItemDrops(int i, int j)

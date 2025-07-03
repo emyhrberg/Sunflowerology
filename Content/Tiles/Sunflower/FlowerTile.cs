@@ -13,9 +13,9 @@ namespace Sunflowerology.Content.Tiles.Sunflower
     internal abstract class FlowerTile : ModTile
     {
         protected abstract TypeOfSunflower TypeOfSunflower { get; }
-        protected abstract int RangeOfEffectInTiles { get; }
-        protected abstract int EffectBuffID { get; }
-        protected abstract int EffetDuration { get; }
+        public abstract int RangeOfEffectInTiles { get; }
+        public abstract int EffectBuffID { get; }
+        public abstract int EffectDuration { get; }
 
         private Asset<Texture2D> glowTexture;
         public override string Texture => "Sunflowerology/Content/Tiles/SunflowerStagesOfGrowth/SunflowerWithSeedsTile";
@@ -56,7 +56,7 @@ namespace Sunflowerology.Content.Tiles.Sunflower
 
             bool withinRange = Vector2.Distance(player.Center, tileCenter) <= rangePixels;
             if (withinRange)
-                player.AddBuff(EffectBuffID, timeToAdd: EffetDuration);
+                player.AddBuff(EffectBuffID, timeToAdd: EffectDuration);
         }
 
         public override IEnumerable<Item> GetItemDrops(int i, int j)

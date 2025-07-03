@@ -5,11 +5,11 @@ namespace Sunflowerology.Content.Tiles.Sunflower
 {
     internal class DryflowerTile : FlowerTile
     {
-        protected override int RangeOfEffectInTiles => 20;
+        public override int RangeOfEffectInTiles => 20;
 
-        protected override int EffectBuffID => BuffID.Calm;
+        public override int EffectBuffID => BuffID.Calm;
 
-        protected override int EffetDuration => 30;
+        public override int EffectDuration => 30;
 
         protected override TypeOfSunflower TypeOfSunflower => TypeOfSunflower.Dryflower;
     }

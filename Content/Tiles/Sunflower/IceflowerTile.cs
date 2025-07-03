@@ -5,11 +5,11 @@ namespace Sunflowerology.Content.Tiles.Sunflower
 {
     internal class IceflowerTile : FlowerTile
     {
-        protected override int RangeOfEffectInTiles => 20;
+        public override int RangeOfEffectInTiles => 20;
 
-        protected override int EffectBuffID => BuffID.IceBarrier;
+        public override int EffectBuffID => BuffID.IceBarrier;
 
-        protected override int EffetDuration => 120;
+        public override int EffectDuration => 120;
 
         protected override TypeOfSunflower TypeOfSunflower => TypeOfSunflower.Iceflower;
     }

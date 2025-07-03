@@ -1,4 +1,5 @@
-﻿using Sunflowerology.Content.Items.SunflowerSeeds;
+﻿using Sunflowerology.Content.Items.HerbSeeds;
+using Sunflowerology.Content.Items.SunflowerSeeds;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -61,7 +62,8 @@ namespace Sunflowerology.Content.NPCs.TownNPCs
         public override void AddShops()
         {
             var npcShop = new NPCShop(Type, "Shop")
-                .Add(new Item(ModContent.ItemType<SunflowerSeed>()) { shopCustomPrice = Item.buyPrice(silver: 75) });
+                .Add(new Item(ModContent.ItemType<SunflowerSeed>()) { shopCustomPrice = Item.buyPrice(silver: 75) })
+                .Add(new Item(ModContent.ItemType<SunGrassSeed>()) { shopCustomPrice = Item.buyPrice(silver: 25) });
 
             npcShop.Register();
         }
