@@ -21,7 +21,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         {
             base.SetStaticDefaults();
             var tileData = TileObjectData.GetTileData(Type, 0);
-            tileData.AnchorValidTiles = NatureData.BlocksToSeedsProperties.Keys.ToArray();
+            tileData.AnchorValidTiles = NatureData.TilesToData.Keys.ToArray();
             tileData.StyleWrapLimit = 3;
         }
         public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
@@ -126,13 +126,21 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
         public override void Update()
         {
+            // If the type of sunflower is not set, find the closest type based on the plant data
             if (typeOfSunflower == TypeOfSunflower.None)
             {
                 typeOfSunflower = plantData.FindClosestTypeOfSunflower();
             }
+
+            // Skip the update (to not update every frame)
             if (SkipUpdate()) return;
+
+            // Updating the entity based on the pairing state
             if (!IsPaired)
             {
+                // Reset growth level if not paired
+                growthLevel = 0;
+
                 // Check for unpaired sprouts on both sides
                 if (!CheckAndPairUnpairedSprout(PairingState.OnRight))
                 {
@@ -142,22 +150,32 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             else if (Pairing == PairingState.OnRight)
             {
                 ModContent.GetModTile(NextTileType);
+                // Calculate the surroundings area data
                 surroundingAreaData = CalculateSurroundings();
+                pairedEntity.surroundingAreaData = surroundingAreaData;
+
+                // Calculate the difference
                 difference = surroundingAreaData - ((plantData + pairedEntity.plantData) / 2);
                 pairedEntity.difference = difference;
+
+                // Calculate the average difference
                 averageDifference = CalculateAverageDifference();
                 pairedEntity.averageDifference = averageDifference;
-                typeOfSunflower = plantData.FindClosestTypeOfSunflower();
-                growthLevel += CalculateGrowth();
 
+                // Calculate the growth level
+                float growthAdd = CalculateGrowth();
+                growthLevel += growthAdd;
+                pairedEntity.growthLevel = growthLevel;
+
+                // Check if both sprouts are fully grown
                 if (IsFullyGrown && pairedEntity.IsFullyGrown)
                     ReplacePlantWithNewOne();
             }
             else if (Pairing == PairingState.OnLeft)
             {
-                typeOfSunflower = plantData.FindClosestTypeOfSunflower();
-                growthLevel += CalculateGrowth();
             }
+
+            // Send the updated data to the server
             NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
         }
 
@@ -234,7 +252,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 other.pairedEntity = this;
 
                 // Send the pairing information to the network
-                if(Main.netMode == NetmodeID.Server)
+                if (Main.netMode == NetmodeID.Server)
                 {
                     NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
                     NetMessage.SendData(MessageID.TileEntitySharing, number: pairedEntity.ID);
@@ -299,222 +317,178 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
     }
     public class NatureData
     {
-        public static readonly Dictionary<int, NatureData> BlocksToSeedsProperties = new()
+        public static readonly Dictionary<int, NatureData> TilesToData = new()
         {
-            // Overworld blocks and their variations
-            [TileID.Grass] = new NatureData(
-        (NatureTags.Sun, 100), (NatureTags.Water, 40), (NatureTags.Wild, 30), (NatureTags.Dry, 10)),
-            [TileID.Dirt] = new NatureData(
-        (NatureTags.Sun, 70), (NatureTags.Dry, 50), (NatureTags.Water, 20), (NatureTags.Cave, 10)),
+            // Overworld: Sunflower-friendly
+            [TileID.Grass] = new NatureData((NatureTags.Temp, 30),
+        (NatureTags.Height, 50), (NatureTags.Moist, 40), (NatureTags.Good, 50)),
 
-            // Stone and moss blocks
-            [TileID.Stone] = new NatureData(
-        (NatureTags.Cave, 100), (NatureTags.Dry, 60), (NatureTags.Cold, 30)),
-            [TileID.GreenMoss] = new NatureData(
-        (NatureTags.Cave, 75), (NatureTags.Water, 65), (NatureTags.Wild, 60)),
-            [TileID.BlueMoss] = new NatureData(
-        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Cold, 40)),
-            [TileID.ArgonMoss] = new NatureData(
-        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Good, 40)),
-            [TileID.BrownMoss] = new NatureData(
-        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Dry, 20)),
-            [TileID.KryptonMoss] = new NatureData(
-        (NatureTags.Cave, 70), (NatureTags.Water, 70), (NatureTags.Wild, 90)),
-            [TileID.PurpleMoss] = new NatureData(
-        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Evil, 50)),
-            [TileID.RainbowMoss] = new NatureData(
-        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Evil, 20), (NatureTags.Good, 20), (NatureTags.Honey, 50)),
-            [TileID.RedMoss] = new NatureData(
-        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Evil, 50)),
-            [TileID.VioletMoss] = new NatureData(
-        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Water, 30)),
-            [TileID.XenonMoss] = new NatureData(
-        (NatureTags.Cave, 70), (NatureTags.Water, 80), (NatureTags.Cold, 30)),
-            [TileID.LavaMoss] = new NatureData(
-        (NatureTags.Cave, 85), (NatureTags.Hot, 70), (NatureTags.Dry, 50)),
+            [TileID.Dirt] = new NatureData((NatureTags.Temp, 25),
+        (NatureTags.Height, 45), (NatureTags.Moist, 35), (NatureTags.Good, 40)),
 
-            // Dry and sandy blocks
-            [TileID.Sand] = new NatureData(
-        (NatureTags.Dry, 100), (NatureTags.Hot, 80), (NatureTags.Sun, 60), (NatureTags.Water, 10)),
-            [TileID.HardenedSand] = new NatureData(
-        (NatureTags.Dry, 90), (NatureTags.Hot, 70), (NatureTags.Cave, 40)),
-            [TileID.Sandstone] = new NatureData(
-        (NatureTags.Dry, 80), (NatureTags.Cave, 60), (NatureTags.Hot, 50)),
+            // Stone → ближче до Deadflower/Obsidianflower (холодно, низька якість)
+            [TileID.Stone] = new NatureData((NatureTags.Temp, -20),
+        (NatureTags.Height, -20), (NatureTags.Moist, 20), (NatureTags.Good, -20)),
 
-            // Snow and ice blocks
-            [TileID.SnowBlock] = new NatureData(
-        (NatureTags.Cold, 100), (NatureTags.Sun, 60), (NatureTags.Water, 40)),
-            [TileID.IceBlock] = new NatureData(
-        (NatureTags.Cold, 100), (NatureTags.Cave, 50), (NatureTags.Water, 80)),
+            // Moss → вологіший камінь, трохи тепліший, але все ще бідний
+            [TileID.GreenMoss] = new NatureData((NatureTags.Temp, -10),
+        (NatureTags.Height, -30), (NatureTags.Moist, 45), (NatureTags.Good, -10)),
+            [TileID.BlueMoss] = new NatureData((NatureTags.Temp, -20),
+        (NatureTags.Height, -30), (NatureTags.Moist, 55), (NatureTags.Good, -10)),
+            [TileID.ArgonMoss] = new NatureData((NatureTags.Temp, -5),
+        (NatureTags.Height, -30), (NatureTags.Moist, 50), (NatureTags.Good, -5)),
+            [TileID.BrownMoss] = new NatureData((NatureTags.Temp, -5),
+        (NatureTags.Height, -30), (NatureTags.Moist, 45), (NatureTags.Good, -5)),
+            [TileID.KryptonMoss] = new NatureData((NatureTags.Temp, -5),
+        (NatureTags.Height, -30), (NatureTags.Moist, 50), (NatureTags.Good, -5)),
+            [TileID.PurpleMoss] = new NatureData((NatureTags.Temp, -10),
+        (NatureTags.Height, -30), (NatureTags.Moist, 50), (NatureTags.Good, -10)),
+            [TileID.RainbowMoss] = new NatureData((NatureTags.Temp, 0),
+        (NatureTags.Height, -30), (NatureTags.Moist, 50), (NatureTags.Good, -5)),
+            [TileID.RedMoss] = new NatureData((NatureTags.Temp, 5),
+        (NatureTags.Height, -30), (NatureTags.Moist, 45), (NatureTags.Good, -5)),
+            [TileID.VioletMoss] = new NatureData((NatureTags.Temp, -5),
+        (NatureTags.Height, -30), (NatureTags.Moist, 50), (NatureTags.Good, -10)),
+            [TileID.XenonMoss] = new NatureData((NatureTags.Temp, -10),
+        (NatureTags.Height, -30), (NatureTags.Moist, 50), (NatureTags.Good, -10)),
 
-            // Jungle blocks and mud
-            [TileID.JungleGrass] = new NatureData(
-        (NatureTags.Wild, 100), (NatureTags.Water, 100), (NatureTags.Sun, 50), (NatureTags.Hot, 30)),
-            [TileID.Mud] = new NatureData(
-        (NatureTags.Wild, 80), (NatureTags.Water, 100), (NatureTags.Sun, 20)),
+            // LavaMoss → ближче до Fireflower (гарячий, сухуватий, але на камені)
+            [TileID.LavaMoss] = new NatureData((NatureTags.Temp, 70),
+        (NatureTags.Height, -40), (NatureTags.Moist, 20), (NatureTags.Good, -5)),
 
-            // Hallowed blocks and their variations
-            [TileID.HallowedGrass] = new NatureData(
-        (NatureTags.Good, 100), (NatureTags.Sun, 80), (NatureTags.Water, 30), (NatureTags.Wild, 20)),
-            [TileID.Pearlstone] = new NatureData(
-        (NatureTags.Good, 90), (NatureTags.Cave, 70), (NatureTags.Water, 20)),
-            [TileID.Pearlsand] = new NatureData(
-        (NatureTags.Good, 80), (NatureTags.Sun, 60), (NatureTags.Dry, 50)),
-            [TileID.HallowedIce] = new NatureData(
-        (NatureTags.Good, 100), (NatureTags.Cold, 80), (NatureTags.Water, 50)),
+            // Desert: Dryflower-friendly
+            [TileID.Sand] = new NatureData((NatureTags.Temp, 65),
+        (NatureTags.Height, -10), (NatureTags.Moist, -30), (NatureTags.Good, 10)),
+            [TileID.HardenedSand] = new NatureData((NatureTags.Temp, 70),
+        (NatureTags.Height, -20), (NatureTags.Moist, -40), (NatureTags.Good, 0)),
+            [TileID.Sandstone] = new NatureData((NatureTags.Temp, 75),
+        (NatureTags.Height, -30), (NatureTags.Moist, -50), (NatureTags.Good, -10)),
 
-            // Evil blocks and their variations
-            [TileID.CorruptGrass] = new NatureData(
-        (NatureTags.Evil, 100), (NatureTags.Sun, 30), (NatureTags.Dry, 40), (NatureTags.Water, 10)),
-            [TileID.Ebonstone] = new NatureData(
-        (NatureTags.Evil, 100), (NatureTags.Cave, 60), (NatureTags.Dry, 40)),
-            [TileID.Crimstone] = new NatureData(
-        (NatureTags.Evil, 100), (NatureTags.Cave, 60), (NatureTags.Dry, 40)),
-            [TileID.CrimsonGrass] = new NatureData(
-        (NatureTags.Evil, 100), (NatureTags.Sun, 30), (NatureTags.Water, 30), (NatureTags.Hot, 20)),
-            [TileID.Crimsand] = new NatureData(
-        (NatureTags.Evil, 90), (NatureTags.Sun, 50), (NatureTags.Dry, 60), (NatureTags.Hot, 20)),
-            [TileID.Ebonsand] = new NatureData(
-        (NatureTags.Evil, 90), (NatureTags.Sun, 50), (NatureTags.Dry, 60), (NatureTags.Hot, 20)),
-            [TileID.FleshIce] = new NatureData(
-        (NatureTags.Evil, 100), (NatureTags.Cold, 80), (NatureTags.Water, 50), (NatureTags.Dry, 20)),
-            [TileID.CorruptIce] = new NatureData(
-        (NatureTags.Evil, 100), (NatureTags.Cold, 80), (NatureTags.Water, 50), (NatureTags.Dry, 20)),
+            // Snow/Ice: Snowflower & Iceflower-friendly
+            [TileID.SnowBlock] = new NatureData((NatureTags.Temp, -40),
+        (NatureTags.Height, 60), (NatureTags.Moist, 50), (NatureTags.Good, 40)),
+            [TileID.IceBlock] = new NatureData((NatureTags.Temp, -80),
+        (NatureTags.Height, -60), (NatureTags.Moist, 60), (NatureTags.Good, 20)),
 
-            // Hell blocks and their variations
-            [TileID.Ash] = new NatureData(
-        (NatureTags.Hot, 100), (NatureTags.Dry, 100), (NatureTags.Cave, 80), (NatureTags.Evil, 20)),
-            [TileID.Hellstone] = new NatureData(
-        (NatureTags.Hot, 100), (NatureTags.Cave, 90), (NatureTags.Dry, 80), (NatureTags.Evil, 50)),
-            [TileID.AshGrass] = new NatureData(
-        (NatureTags.Hot, 60), (NatureTags.Dry, 50), (NatureTags.Cave, 90), (NatureTags.Evil, 10)),
-            [TileID.Obsidian] = new NatureData(
-                (NatureTags.Hot, 100), (NatureTags.Cave, 80), (NatureTags.Cold, 100)),
+            // Jungle: Sporeflower-friendly
+            [TileID.JungleGrass] = new NatureData((NatureTags.Temp, 60),
+        (NatureTags.Height, 45), (NatureTags.Moist, 70), (NatureTags.Good, 20)),
+            [TileID.Mud] = new NatureData((NatureTags.Temp, 50),
+        (NatureTags.Height, 35), (NatureTags.Moist, 65), (NatureTags.Good, 10)),
 
-            // Honey blocks and their variations
-            [TileID.HoneyBlock] = new NatureData(
-        (NatureTags.Honey, 100), (NatureTags.Water, 80), (NatureTags.Sun, 40), (NatureTags.Wild, 30)),
-            [TileID.CrispyHoneyBlock] = new NatureData(
-        (NatureTags.Honey, 90), (NatureTags.Dry, 70), (NatureTags.Sun, 50), (NatureTags.Hot, 40)),
-            [TileID.BeeHive] = new NatureData(
-        (NatureTags.Honey, 100), (NatureTags.Sun, 90), (NatureTags.Water, 60)),
+            // Underworld: Fireflower-friendly
+            [TileID.Ash] = new NatureData((NatureTags.Temp, 90),
+        (NatureTags.Height, -70), (NatureTags.Moist, -60), (NatureTags.Good, -10)),
+            [TileID.Hellstone] = new NatureData((NatureTags.Temp, 100),
+        (NatureTags.Height, -90), (NatureTags.Moist, -70), (NatureTags.Good, -20)),
+            [TileID.AshGrass] = new NatureData((NatureTags.Temp, 95),
+        (NatureTags.Height, -80), (NatureTags.Moist, -65), (NatureTags.Good, -15)),
 
-            // Clouds and their variations
-            [TileID.Cloud] = new NatureData(
-        (NatureTags.Sun, 100), (NatureTags.Water, 90), (NatureTags.Cold, 30)),
-            [TileID.RainCloud] = new NatureData(
-        (NatureTags.Sun, 100), (NatureTags.Water, 100), (NatureTags.Cold, 40)),
-            [TileID.SnowCloud] = new NatureData(
-        (NatureTags.Sun, 100), (NatureTags.Cold, 100), (NatureTags.Water, 70)),
+            // Deadflower / Obsidianflower
+            [TileID.Obsidian] = new NatureData((NatureTags.Temp, -60),
+        (NatureTags.Height, -70), (NatureTags.Moist, -50), (NatureTags.Good, -40)),
 
-            // Ocean blocks and their variations
-            [TileID.Coralstone] = new NatureData(
-        (NatureTags.Water, 100), (NatureTags.Sun, 60), (NatureTags.Wild, 50)),
-            [TileID.ShellPile] = new NatureData(
-        (NatureTags.Water, 90), (NatureTags.Sun, 30), (NatureTags.Dry, 20)),
+            // Clouds (високо, холодно, мало користі)
+            [TileID.Cloud] = new NatureData((NatureTags.Temp, -10),
+        (NatureTags.Height, 100), (NatureTags.Moist, -20), (NatureTags.Good, 10)),
+            [TileID.RainCloud] = new NatureData((NatureTags.Temp, 0),
+        (NatureTags.Height, 100), (NatureTags.Moist, 70), (NatureTags.Good, 20)),
+            [TileID.SnowCloud] = new NatureData((NatureTags.Temp, -40),
+        (NatureTags.Height, 100), (NatureTags.Moist, 60), (NatureTags.Good, 15)),
+
+            // Ocean: Beachflower & Oceanflower-friendly
+            [TileID.Coralstone] = new NatureData((NatureTags.Temp, 25),
+        (NatureTags.Height, 0), (NatureTags.Moist, 90), (NatureTags.Good, 40)),
+            [TileID.ShellPile] = new NatureData((NatureTags.Temp, 35),
+        (NatureTags.Height, 5), (NatureTags.Moist, 50), (NatureTags.Good, 30)),
         };
-        public static readonly Dictionary<DepthZone, NatureData> DepthZoneToSeedAffinity = new()
+        public static readonly Dictionary<DepthZone, NatureData> DepthZoneToData = new()
         {
-            [DepthZone.Sky] = new NatureData((NatureTags.Sun, 100), (NatureTags.Cave, -100), (NatureTags.Cold, 20)),
-            [DepthZone.Overworld] = new NatureData((NatureTags.Sun, 50), (NatureTags.Cave, -50)),
-            [DepthZone.DirtLayer] = new NatureData((NatureTags.Cave, 20), (NatureTags.Sun, 30)),
-            [DepthZone.RockLayer] = new NatureData((NatureTags.Cave, 80), (NatureTags.Hot, 10), (NatureTags.Sun, -50)),
-            [DepthZone.Underworld] = new NatureData((NatureTags.Hot, 100), (NatureTags.Cave, 60), (NatureTags.Sun, -100)),
+            [DepthZone.Sky] = new NatureData((NatureTags.Temp, -20),
+                (NatureTags.Height, 100), (NatureTags.Moist, -20), (NatureTags.Good, 0)),
+
+            [DepthZone.Overworld] = new NatureData((NatureTags.Temp, 30),
+                (NatureTags.Height, 50), (NatureTags.Moist, 40), (NatureTags.Good, 50)),
+
+            [DepthZone.DirtLayer] = new NatureData((NatureTags.Temp, 15),
+                (NatureTags.Height, 30), (NatureTags.Moist, 50), (NatureTags.Good, 30)),
+
+            [DepthZone.RockLayer] = new NatureData((NatureTags.Temp, 0),
+                (NatureTags.Height, -20), (NatureTags.Moist, 40), (NatureTags.Good, 10)),
+
+            [DepthZone.Underworld] = new NatureData((NatureTags.Temp, 100),
+                (NatureTags.Height, -100), (NatureTags.Moist, -70), (NatureTags.Good, -20)),
         };
         public static readonly Dictionary<TypeOfSunflower, NatureData> TypeOfSunflowerToData = new()
         {
             [TypeOfSunflower.Sunflower] = new NatureData(
-        (NatureTags.Dry, 30),
-        (NatureTags.Water, 30),
-        (NatureTags.Wild, 20),
-        (NatureTags.Sun, 80),
-        (NatureTags.Cave, 10),
-        (NatureTags.Hot, 10),
-        (NatureTags.Cold, 10),
-        (NatureTags.Evil, 0),
-        (NatureTags.Good, 0),
-        (NatureTags.Honey, 0)
+        (NatureTags.Moist, 40),
+        (NatureTags.Height, 50),
+        (NatureTags.Temp, 30),
+        (NatureTags.Good, 50)
     ),
 
             [TypeOfSunflower.Dryflower] = new NatureData(
-        (NatureTags.Dry, 100),
-        (NatureTags.Hot, 80),
-        (NatureTags.Sun, 60),
-        (NatureTags.Cave, 30),
-        (NatureTags.Water, 10),
-        (NatureTags.Cold, 10)
+        (NatureTags.Temp, 60),
+        (NatureTags.Height, -30),
+        (NatureTags.Moist, -40),
+        (NatureTags.Good, 0)
     ),
 
             [TypeOfSunflower.Fireflower] = new NatureData(
-        (NatureTags.Hot, 100),
-        (NatureTags.Sun, 80),
-        (NatureTags.Dry, 50),
-        (NatureTags.Water, 20),
-        (NatureTags.Cold, 10),
-        (NatureTags.Cave, 40)
+        (NatureTags.Temp, 100),
+        (NatureTags.Height, -100),
+        (NatureTags.Moist, -70),
+        (NatureTags.Good, -30)
     ),
 
             [TypeOfSunflower.Snowflower] = new NatureData(
-        (NatureTags.Cold, 100),
-        (NatureTags.Sun, 60),
-        (NatureTags.Water, 40),
-        (NatureTags.Dry, 10),
-        (NatureTags.Hot, 10),
-        (NatureTags.Cave, 30)
+        (NatureTags.Temp, -50),
+        (NatureTags.Height, 70),
+        (NatureTags.Moist, 40),
+        (NatureTags.Good, 50)
     ),
 
             [TypeOfSunflower.Iceflower] = new NatureData(
-        (NatureTags.Cold, 100),
-        (NatureTags.Cave, 50),
-        (NatureTags.Water, 80),
-        (NatureTags.Hot, 10),
-        (NatureTags.Sun, 30),
-        (NatureTags.Good, 20)
+        (NatureTags.Temp, -100),
+        (NatureTags.Moist, 70),
+        (NatureTags.Height, -100),
+        (NatureTags.Good, 60)
     ),
 
             [TypeOfSunflower.Beachflower] = new NatureData(
-        (NatureTags.Water, 100),
-        (NatureTags.Sun, 60),
-        (NatureTags.Wild, 50),
-        (NatureTags.Dry, 30),
-        (NatureTags.Honey, 20),
-        (NatureTags.Cold, 10)
+        (NatureTags.Temp, 30),
+        (NatureTags.Moist, 70),
+        (NatureTags.Height, 40),
+        (NatureTags.Good, 30)
     ),
 
             [TypeOfSunflower.Oceanflower] = new NatureData(
-        (NatureTags.Water, 100),
-        (NatureTags.Sun, 60),
-        (NatureTags.Wild, 50),
-        (NatureTags.Dry, 10),
-        (NatureTags.Good, 20),
-        (NatureTags.Honey, 30)
+        (NatureTags.Temp, 10),
+        (NatureTags.Moist, 100),
+        (NatureTags.Height, 0),
+        (NatureTags.Good, 30)
     ),
 
             [TypeOfSunflower.Sporeflower] = new NatureData(
-        (NatureTags.Wild, 100),
-        (NatureTags.Water, 100),
-        (NatureTags.Sun, 50),
-        (NatureTags.Hot, 30),
-        (NatureTags.Honey, 20),
-        (NatureTags.Cave, 20)
+        (NatureTags.Temp, 70),
+        (NatureTags.Moist, 70),
+        (NatureTags.Height, 50),
+        (NatureTags.Good, -20)
     ),
 
             [TypeOfSunflower.Deadflower] = new NatureData(
-        (NatureTags.Evil, 100),
-        (NatureTags.Sun, 10),
-        (NatureTags.Water, 10),
-        (NatureTags.Good, 0),
-        (NatureTags.Honey, 0),
-        (NatureTags.Wild, 10)
+        (NatureTags.Temp, -30),
+        (NatureTags.Moist, -20),
+        (NatureTags.Height, -30),
+        (NatureTags.Good, -100)
     ),
 
             [TypeOfSunflower.Obsidianflower] = new NatureData(
-        (NatureTags.Hot, 100),
-        (NatureTags.Cold, 100),
-        (NatureTags.Cave, 100),
-        (NatureTags.Water, 40),
-        (NatureTags.Dry, 20),
-        (NatureTags.Evil, 10)
+        (NatureTags.Temp, -70),
+        (NatureTags.Moist, -70),
+        (NatureTags.Height, -80),
+        (NatureTags.Good, -50)
     ),
         };
         public static readonly Dictionary<TypeOfSunflower, int> TypeOfSunflowerToSeedItemId = new()
@@ -641,9 +615,19 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             NatureData normalized = new NatureData();
             foreach (var key in loves.Keys.ToList())
             {
-                normalized[key] = Math.Clamp(loves[key], 0, 100); // Ensure values are between 0 and 100
+                normalized[key] = Math.Clamp(loves[key], -100, 100); // Ensure values are between 0 and 100
             }
             return normalized;
+        }
+
+        public NatureData Abs()
+        {
+            NatureData absolute = new NatureData();
+            foreach (var key in loves.Keys.ToList())
+            {
+                absolute[key] = Math.Abs(loves[key]);
+            }
+            return absolute;
         }
 
         public NatureData Clone()
@@ -690,19 +674,13 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
     }
     public static class NatureTags
     {
-        public const string Dry = "DryLove";
-        public const string Water = "WaterLove";
-        public const string Wild = "WildLove";
-        public const string Sun = "SunLove";
-        public const string Cave = "CaveLove";
-        public const string Hot = "HotLove";
-        public const string Cold = "ColdLove";
-        public const string Evil = "EvilLove";
+        public const string Moist = "WaterLove";
+        public const string Height = "SunLove";
+        public const string Temp = "HotLove";
         public const string Good = "GoodLove";
-        public const string Honey = "HoneyLove";
         public static string[] AllTags =
         [
-            Dry, Water, Wild, Sun, Cave, Hot, Cold, Evil, Good, Honey
+            Moist, Height, Temp, Good
         ];
         public static int Count => AllTags.Count(); // Total number of tags, used for validation
     }

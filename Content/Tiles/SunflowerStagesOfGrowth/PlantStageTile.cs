@@ -134,7 +134,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
-                
+
                 ModContent.GetInstance<T>().Kill(i, j);
                 NetMessage.SendData(MessageID.TileEntitySharing, number: id);
             }
@@ -323,19 +323,28 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
         public override void Update()
         {
+            // If the type of sunflower is not set, find the closest type based on the plant data
             if (typeOfSunflower == TypeOfSunflower.None)
             {
                 typeOfSunflower = plantData.FindClosestTypeOfSunflower();
             }
+
+            // Skip the update (to not update every frame)
             if (SkipUpdate()) return;
 
+            // Calculate the surrounding area data, difference, and average difference
             surroundingAreaData = CalculateSurroundings();
             difference = surroundingAreaData - plantData;
             averageDifference = CalculateAverageDifference();
+
+            // Calculate the growth level
             growthLevel += CalculateGrowth();
 
+            // Check if the plant is fully grown
             if (IsFullyGrown)
                 ReplacePlantWithNewOne();
+
+            // Send the updated data to the server
             NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
         }
 
@@ -444,7 +453,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
         protected NatureData CalculateSADepth(NatureData saData)
         {
-            if (NatureData.DepthZoneToSeedAffinity.TryGetValue(Depth.GetDepthZone(Position.Y), out var i))
+            if (NatureData.DepthZoneToData.TryGetValue(Depth.GetDepthZone(Position.Y), out var i))
             {
                 saData += i * 0.25f;
             }
@@ -464,21 +473,21 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                                 Framing.GetTileSafely(Position.X + 2, Position.Y + HeightInTiles + 1),];
             foreach (Tile tile in Tiles25p)
             {
-                if (tile.HasTile && NatureData.BlocksToSeedsProperties.TryGetValue(tile.TileType, out NatureData seedData))
+                if (tile.HasTile && NatureData.TilesToData.TryGetValue(tile.TileType, out NatureData seedData))
                 {
                     saData += seedData * 0.25f;
                 }
             }
             foreach (Tile tile in Tiles125p)
             {
-                if (tile.HasTile && NatureData.BlocksToSeedsProperties.TryGetValue(tile.TileType, out NatureData seedData))
+                if (tile.HasTile && NatureData.TilesToData.TryGetValue(tile.TileType, out NatureData seedData))
                 {
                     saData += seedData * 0.125f;
                 }
             }
             foreach (Tile tile in Tiles625p)
             {
-                if (tile.HasTile && NatureData.BlocksToSeedsProperties.TryGetValue(tile.TileType, out NatureData seedData))
+                if (tile.HasTile && NatureData.TilesToData.TryGetValue(tile.TileType, out NatureData seedData))
                 {
                     saData += seedData * 0.0625f;
                 }
@@ -490,10 +499,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         protected float CalculateAverageDifference()
         {
             var diff = difference.Clone();
-            foreach (var seedTag in NatureTags.AllTags)
-            {
-                diff[seedTag] = Math.Abs(diff[seedTag]);
-            }
+            diff = diff.Abs();
             return diff.AverageLove;
         }
     }
