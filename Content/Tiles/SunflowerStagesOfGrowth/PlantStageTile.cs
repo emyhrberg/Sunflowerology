@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using Stubble.Core.Settings;
 using Sunflowerology.Common.Configs;
-using Sunflowerology.Common.PacketHandlers;
-using Sunflowerology.Content.Items.SunflowerSeeds;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -271,8 +268,6 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
         }
 
-
-
         protected bool SkipUpdate()
         {
             updateCounter++;
@@ -375,6 +370,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             // Going through all the plants that need to be grown
             foreach (var (i, j, plantD, errorPD) in growthQueue)
             {
+                // Creaating mutation of the plant data
                 var newPlantData = new NatureData();
                 foreach (string seedTag in NatureTags.AllTags)
                 {
@@ -402,24 +398,37 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                     newPlantData[seedTag] = (int)Math.Round(plantD[seedTag] + change);
                 }
                 newPlantData = newPlantData.Normalize();
+
+                // Finding the closest type of sunflower based on the new plant data
                 var newTypeOfSunflower = (int)newPlantData.FindClosestTypeOfSunflower();
+
                 // Random style for the new plant
                 int randomStyle = random.Next(0, 3);
                 int style = 3 * newTypeOfSunflower;
+
                 // Place the new tile
-                if (!WorldGen.PlaceObject(i, j, NextTileType, mute: true, style: style, random: randomStyle))
+                if (!PlaceNextTile(i, j, newPlantData, randomStyle, style))
                 {
                     continue;
                 }
-                var tod = TileObjectData.GetTileData(NextTileType, style);
-                var point = TileObjectData.TopLeft(i, j);
-                var newEntity = GetEntityOn(point.X, point.Y);
-
-                newEntity.plantData = newPlantData;
-                NetMessage.SendObjectPlacement(-1, i, j, NextTileType, style, 0, randomStyle, -1);
-                NetMessage.SendData(MessageID.TileEntityPlacement, number: newEntity.ID);
             }
             growthQueue.Clear();
+        }
+
+        protected virtual bool PlaceNextTile(int i, int j, NatureData newPlantData, int randomStyle, int style)
+        {
+            if (!WorldGen.PlaceObject(i, j, NextTileType, mute: true, style: style, random: randomStyle))
+            {
+                return false;
+            }
+            //var tod = TileObjectData.GetTileData(NextTileType, style);
+            var point = TileObjectData.TopLeft(i, j);
+            var newEntity = GetEntityOn(point.X, point.Y);
+
+            newEntity.plantData = newPlantData;
+            NetMessage.SendObjectPlacement(-1, i, j, NextTileType, style, 0, randomStyle, -1);
+            NetMessage.SendData(MessageID.TileEntityPlacement, number: newEntity.ID);
+            return true;
         }
 
         protected virtual void ReplacePlantWithNewOne()
@@ -447,13 +456,29 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             var saData = new NatureData();
             saData = CalculateSATiles(saData);
             saData = CalculateSADepth(saData);
+            saData = CalculateSAOcean(saData);
             saData = saData.Normalize();
             return saData;
         }
 
+        protected NatureData CalculateSAOcean(NatureData saData)
+        {
+            if (IsOcean(Position.X))
+            {
+                    saData += NatureData.OceanZoneToData;
+            }
+
+            return saData;
+        }
+
+        public static bool IsOcean(int tileX)
+        {
+            return tileX < 380 || tileX > Main.maxTilesX - 380;
+        }
+
         protected NatureData CalculateSADepth(NatureData saData)
         {
-            if (NatureData.DepthZoneToData.TryGetValue(Depth.GetDepthZone(Position.Y), out var i))
+            if (NatureData.DepthZoneToData.TryGetValue(GetDepthZone(Position.Y), out var i))
             {
                 saData += i * 0.25f;
             }
@@ -501,6 +526,18 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             var diff = difference.Clone();
             diff = diff.Abs();
             return diff.AverageLove;
+        }
+        public static DepthZone GetDepthZone(int tileY)
+        {
+            if (tileY > Main.UnderworldLayer)
+                return DepthZone.Underworld;
+            if (tileY <= Main.UnderworldLayer && tileY > Main.rockLayer)
+                return DepthZone.RockLayer;
+            if (tileY <= Main.rockLayer && tileY > Main.worldSurface)
+                return DepthZone.DirtLayer;
+            if (tileY <= Main.worldSurface && tileY > Main.worldSurface * 0.35)
+                return DepthZone.Overworld;
+            return DepthZone.Sky;
         }
     }
 }

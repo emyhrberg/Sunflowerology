@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Sunflowerology.Content.Items.Sunflowers;
 using Sunflowerology.Content.Items.SunflowerSeeds;
-using Sunflowerology.Content.Tiles.Sunflower;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
+using Terraria.ObjectData;
 
 namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 {
@@ -32,6 +35,15 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 [TypeOfSunflower.Sporeflower] = (BuffID.TikiSpirit, 30),
                 [TypeOfSunflower.Sunflower] = (BuffID.Sunflower, 30), // Happy!
             };
+
+        public override void SetStaticDefaults()
+        {
+            base.SetStaticDefaults();
+            var tileData = TileObjectData.GetTileData(Type, 0);
+            tileData.FlattenAnchors = true;
+            tileData.Origin = new(0, 3);
+            tileData.AnchorBottom = new(Terraria.Enums.AnchorType.SolidTile, tileData.Width, 0);
+        }
 
         public override void NearbyEffects(int i, int j, bool closer)
         {
@@ -63,35 +75,34 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
             int id = ModContent.GetInstance<SunflowerWithSeedsEntity>().Find(i, j);
-            Main.NewText(id);
 
             if (TileEntity.ByID.TryGetValue(id, out TileEntity te) && te is SunflowerWithSeedsEntity ste)
             {
-                var r = new Random();
                 ste.typeOfSunflower = ste.plantData.FindClosestTypeOfSunflower();
 
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
-
-                    int seedItemIndex = Item.NewItem(
-                        new EntitySource_TileBreak(i, j),
-                        i * 16, j * 16, 16, 16,
-                        NatureData.TypeOfSunflowerToSeedItemId[ste.typeOfSunflower],
-                        r.Next(5, 11),
-                        noBroadcast: true
-                    );
-                    int flowerItemIndex = Item.NewItem(
+                    Item.NewItem(
                         new EntitySource_TileBreak(i, j),
                         i * 16, j * 16, 16, 16,
                         NatureData.TypeOfSunflowerToItemId[ste.typeOfSunflower],
                         1
                     );
-                    (Main.item[seedItemIndex].ModItem as SeedItem).seedData = ste.plantData.Clone();
-                    NetMessage.SendData(
-                        MessageID.SyncItem,
-                        number: seedItemIndex
-                    );
-
+                    if (ste.amountOfSeeds > 0)
+                    {
+                        int seedItemIndex = Item.NewItem(
+                            new EntitySource_TileBreak(i, j),
+                            i * 16, j * 16, 16, 16,
+                            NatureData.TypeOfSunflowerToSeedItemId[ste.typeOfSunflower],
+                            ste.amountOfSeeds,
+                            noBroadcast: true
+                        );
+                        (Main.item[seedItemIndex].ModItem as SeedItem).seedData = ste.plantData.Clone();
+                        NetMessage.SendData(
+                            MessageID.SyncItem,
+                            number: seedItemIndex
+                        );
+                    }
                 }
 
             }
@@ -117,9 +128,62 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 return "No tile entity found.";
             }
         }
+        public override void PlaceInWorld(int i, int j, Item item)
+        {
+            int id = ModContent.GetInstance<SunflowerWithSeedsEntity>().Find(i, j-3);
+
+            if (TileEntity.ByID.TryGetValue(id, out TileEntity te) && te is SunflowerWithSeedsEntity ste)
+            {
+                if (item.ModItem is FlowerItem flowerItem &&
+                    NatureData.TypeOfSunflowerToData.TryGetValue(flowerItem.TypeOfSunflower, out NatureData flowerData))
+                {
+                    ste.plantData = flowerData.Clone();
+                }
+                else
+                {
+                    ste.plantData = new NatureData();
+                }
+                ste.typeOfSunflower = ste.plantData.FindClosestTypeOfSunflower();
+            }
+        }
+
+        public override bool CanDrop(int i, int j)
+        {
+            return false; // Prevents dropping the tile as an item
+        }
     }
     public class SunflowerWithSeedsEntity : FinalPlantStageEntity
     {
+
+        public int amountOfSeeds = 0;
+
+        public override void LoadData(TagCompound tag)
+        {
+            base.LoadData(tag);
+            if (tag.TryGet(nameof(amountOfSeeds), out int seeds))
+            {
+                amountOfSeeds = seeds;
+            }
+        }
+
+        public override void SaveData(TagCompound tag)
+        {
+            base.SaveData(tag);
+            tag[nameof(amountOfSeeds)] = amountOfSeeds;
+        }
+
+        public override void NetSend(BinaryWriter writer)
+        {
+            base.NetSend(writer);
+            writer.Write(amountOfSeeds);
+        }
+
+        public override void NetReceive(BinaryReader reader)
+        {
+            base.NetReceive(reader);
+            amountOfSeeds = reader.ReadInt32();
+        }
+
         protected override int TileType => ModContent.TileType<SunflowerWithSeedsTile>();
     }
 

@@ -5,7 +5,6 @@ using System.Linq;
 using Sunflowerology.Common.PacketHandlers;
 using Sunflowerology.Content.Items.Sunflowers;
 using Sunflowerology.Content.Items.SunflowerSeeds;
-using Sunflowerology.Content.Tiles.Sunflower;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -74,7 +73,6 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             }
         }
     }
-
     public class SproutEntity : PlantStageEntity<SeedlingEntity>
     {
         public PairingState Pairing
@@ -398,9 +396,9 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
             // Ocean: Beachflower & Oceanflower-friendly
             [TileID.Coralstone] = new NatureData((NatureTags.Temp, 25),
-        (NatureTags.Height, 0), (NatureTags.Moist, 90), (NatureTags.Good, 40)),
+        (NatureTags.Height, -30), (NatureTags.Moist, 90), (NatureTags.Good, 40)),
             [TileID.ShellPile] = new NatureData((NatureTags.Temp, 35),
-        (NatureTags.Height, 5), (NatureTags.Moist, 50), (NatureTags.Good, 30)),
+        (NatureTags.Height, -20), (NatureTags.Moist, 50), (NatureTags.Good, 30)),
         };
         public static readonly Dictionary<DepthZone, NatureData> DepthZoneToData = new()
         {
@@ -419,6 +417,9 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             [DepthZone.Underworld] = new NatureData((NatureTags.Temp, 100),
                 (NatureTags.Height, -100), (NatureTags.Moist, -70), (NatureTags.Good, -20)),
         };
+        public static readonly NatureData OceanZoneToData = new NatureData(
+        (NatureTags.Moist, 120),
+        (NatureTags.Good, 40));
         public static readonly Dictionary<TypeOfSunflower, NatureData> TypeOfSunflowerToData = new()
         {
             [TypeOfSunflower.Sunflower] = new NatureData(
@@ -516,19 +517,6 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             [TypeOfSunflower.Sporeflower] = ModContent.ItemType<Sporeflower>(),
             [TypeOfSunflower.Deadflower] = ModContent.ItemType<Deadflower>(),
             [TypeOfSunflower.Obsidianflower] = ModContent.ItemType<Obsidianflower>(),
-        };
-        public static readonly Dictionary<TypeOfSunflower, int> TypeOfSunflowerToTileId = new()
-        {
-            [TypeOfSunflower.Sunflower] = TileID.Sunflower,
-            [TypeOfSunflower.Dryflower] = ModContent.TileType<DryflowerTile>(),
-            [TypeOfSunflower.Fireflower] = ModContent.TileType<FireflowerTile>(),
-            [TypeOfSunflower.Snowflower] = ModContent.TileType<SnowflowerTile>(),
-            [TypeOfSunflower.Iceflower] = ModContent.TileType<IceflowerTile>(),
-            [TypeOfSunflower.Beachflower] = ModContent.TileType<BeachflowerTile>(),
-            [TypeOfSunflower.Oceanflower] = ModContent.TileType<OceanflowerTile>(),
-            [TypeOfSunflower.Sporeflower] = ModContent.TileType<SporeflowerTile>(),
-            [TypeOfSunflower.Deadflower] = ModContent.TileType<DeadflowerTile>(),
-            [TypeOfSunflower.Obsidianflower] = ModContent.TileType<ObsidianflowerTile>(),
         };
 
         private readonly Dictionary<string, int> loves = new();
@@ -683,23 +671,6 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             Moist, Height, Temp, Good
         ];
         public static int Count => AllTags.Count(); // Total number of tags, used for validation
-    }
-    public static class Depth
-    {
-        public static DepthZone GetDepthZone(int tileY)
-        {
-            if (tileY > Main.UnderworldLayer)
-                return DepthZone.Underworld;
-            if (tileY <= Main.UnderworldLayer && tileY > Main.rockLayer)
-                return DepthZone.RockLayer;
-            if (tileY <= Main.rockLayer && tileY > Main.worldSurface)
-                return DepthZone.DirtLayer;
-            if (tileY <= Main.worldSurface && tileY > Main.worldSurface * 0.35)
-                return DepthZone.Overworld;
-            return DepthZone.Sky;
-        }
-
-
     }
     public enum TypeOfSunflower
     {

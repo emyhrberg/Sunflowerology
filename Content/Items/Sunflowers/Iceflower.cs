@@ -4,6 +4,6 @@ namespace Sunflowerology.Content.Items.Sunflowers
 {
     internal class Iceflower : FlowerItem
     {
-        protected override TypeOfSunflower TypeOfSunflower => TypeOfSunflower.Iceflower;
+        public override TypeOfSunflower TypeOfSunflower => TypeOfSunflower.Iceflower;
     }
 }

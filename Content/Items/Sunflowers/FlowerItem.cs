@@ -1,14 +1,15 @@
 ﻿using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
+using Terraria;
 using Terraria.ModLoader;
 
 namespace Sunflowerology.Content.Items.Sunflowers
 {
     internal abstract class FlowerItem : ModItem
     {
-        protected abstract TypeOfSunflower TypeOfSunflower { get; }
+        public abstract TypeOfSunflower TypeOfSunflower { get; }
         public override void SetDefaults()
         {
-            Item.DefaultToPlaceableTile(NatureData.TypeOfSunflowerToTileId[TypeOfSunflower]);
+            Item.DefaultToPlaceableTile(ModContent.TileType<SunflowerWithSeedsTile>());
             Item.width = 30;
             Item.height = 28;
             Item.maxStack = 9999;
