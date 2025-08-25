@@ -151,6 +151,11 @@ Configs: {
 			Label: Grow Fast
 			Tooltip: ""
 		}
+
+		PlantUpdateInterval: {
+			Tooltip: ""
+			Label: Plant Update Interval
+		}
 	}
 }
 

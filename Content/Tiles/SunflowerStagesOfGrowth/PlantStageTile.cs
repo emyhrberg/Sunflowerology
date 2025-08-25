@@ -1,9 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Humanizer;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Sunflowerology.Common.Configs;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using Terraria;
 using Terraria.DataStructures;
@@ -28,7 +30,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         {
             if (TileEntity.TryGet(i, j, out T tileEntity))
             {
-                string res = $"Growth: {tileEntity.growthLevel}, Diff: {tileEntity.averageDifference}";
+                string res = $"Growth: {(int)tileEntity.growthLevel}, Diff: {tileEntity.averageDifference:F2}";
                 foreach (var seedTag in NatureTags.AllTags)
                 {
                     res += $"\n{seedTag}: {tileEntity.plantData[seedTag]}, " +
@@ -183,6 +185,8 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         public NatureData plantData = new NatureData();
         protected abstract int TileType { get; }
 
+        public bool IsDead => typeOfSunflower == TypeOfSunflower.Deadflower;
+
         // Technical variables
         protected int updateCounter = 0;
         protected int PlantUpdateInterval => Conf.C.PlantUpdateInterval;
@@ -260,7 +264,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
         public override void Update()
         {
-            if (typeOfSunflower == TypeOfSunflower.None)
+            if (typeOfSunflower == TypeOfSunflower.None && !IsDead)
             {
                 typeOfSunflower = plantData.FindClosestTypeOfSunflower();
             }
@@ -319,7 +323,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         public override void Update()
         {
             // If the type of sunflower is not set, find the closest type based on the plant data
-            if (typeOfSunflower == TypeOfSunflower.None)
+            if (typeOfSunflower == TypeOfSunflower.None && !IsDead)
             {
                 typeOfSunflower = plantData.FindClosestTypeOfSunflower();
             }
@@ -371,36 +375,44 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             foreach (var (i, j, plantD, errorPD) in growthQueue)
             {
                 // Creaating mutation of the plant data
-                var newPlantData = new NatureData();
-                foreach (string seedTag in NatureTags.AllTags)
+                var newPlantData = plantD.Clone();
+                if (!IsDead)
                 {
-                    int randomInt = random.Next(0, 10);
-                    float change = 0f;
-
-                    if (randomInt == 0)
+                    foreach (string seedTag in NatureTags.AllTags)
                     {
-                        // Make the plant grow with a bit of error
-                        change = -(float)errorPD[seedTag] * 2f / 3f;
-                    }
-                    else if (randomInt > 0 && randomInt < 9)
-                    {
-                        // Make the plant grow with a lesser error
-                        change = (float)errorPD[seedTag] / 3f;
-                    }
-                    else if (randomInt == 9)
-                    {
-                        // Make the plant grow with even lesser error
-                        change = (float)errorPD[seedTag] * 3 / 4;
-                    }
+                        int randomInt = random.Next(0, 10);
+                        float change = 0f;
 
-                    change = Math.Clamp(change, -10, 10);
+                        if (randomInt == 0)
+                        {
+                            // Make the plant grow with a bit of error
+                            change = -(float)errorPD[seedTag] * 2f / 3f;
+                        }
+                        else if (randomInt > 0 && randomInt < 9)
+                        {
+                            // Make the plant grow with a lesser error
+                            change = (float)errorPD[seedTag] / 3f;
+                        }
+                        else if (randomInt == 9)
+                        {
+                            // Make the plant grow with even lesser error
+                            change = (float)errorPD[seedTag] * 3 / 4;
+                        }
 
-                    newPlantData[seedTag] = (int)Math.Round(plantD[seedTag] + change);
+                        change = Math.Clamp(change, -10, 10);
+
+                        newPlantData[seedTag] = (int)Math.Round(plantD[seedTag] + change);
+                    }
                 }
+
                 newPlantData = newPlantData.Normalize();
 
                 // Finding the closest type of sunflower based on the new plant data
                 var newTypeOfSunflower = (int)newPlantData.FindClosestTypeOfSunflower();
+                if (IsDead)
+                {
+                    newTypeOfSunflower = (int)TypeOfSunflower.Deadflower;
+                }
 
                 // Random style for the new plant
                 int randomStyle = random.Next(0, 3);
@@ -426,6 +438,10 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             var newEntity = GetEntityOn(point.X, point.Y);
 
             newEntity.plantData = newPlantData;
+            if (IsDead)
+            {
+                newEntity.typeOfSunflower = TypeOfSunflower.Deadflower;
+            }
             NetMessage.SendObjectPlacement(-1, i, j, NextTileType, style, 0, randomStyle, -1);
             NetMessage.SendData(MessageID.TileEntityPlacement, number: newEntity.ID);
             return true;
@@ -442,13 +458,40 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
         }
 
-        protected float CalculateGrowth()
+        protected virtual float CalculateGrowth()
         {
             if (Main.rand.NextBool((int)Math.Ceiling(Math.Pow(averageDifference, 2) / 10) + 2) || Conf.C.GrowFast)
             {
-                return Conf.C.GrowFast ? PlantUpdateInterval / 3 : PlantUpdateInterval / 30;
+                // Chance to become a deadflower if the average difference is too high
+                DeadflowerChance();
+
+                // Conf.C.GrowFast invokes CalculateGrowth 10 times per update instead of 1
+                if (Conf.C.GrowFast)
+                {
+                    for (int k = 0; k < 9; k++)
+                    {
+                        DeadflowerChance();
+                    }
+                    return PlantUpdateInterval / 3f;
+                }
+
+                // Return normal growth
+                return PlantUpdateInterval / 30f;
             }
             return 0f;
+        }
+
+        private void DeadflowerChance()
+        {
+            if (!IsDead && Main.rand.NextBool(100 - (int)averageDifference) && Main.rand.NextBool(100))
+            {
+                typeOfSunflower = TypeOfSunflower.Deadflower;
+                plantData[NatureTags.Good] = -100 + Main.rand.Next(0, 10);
+                plantData[NatureTags.Moist] += -50 + Main.rand.Next(0, 20);
+                plantData[NatureTags.Temp] += -50 + Main.rand.Next(0, 20);
+                plantData[NatureTags.Height] += -50 + Main.rand.Next(0, 20);
+                plantData = plantData.Normalize();
+            }
         }
 
         protected NatureData CalculateSurroundings()
@@ -465,7 +508,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         {
             if (IsOcean(Position.X))
             {
-                    saData += NatureData.OceanZoneToData;
+                saData += NatureData.OceanZoneToData;
             }
 
             return saData;

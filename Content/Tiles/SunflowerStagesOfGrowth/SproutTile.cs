@@ -125,7 +125,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         public override void Update()
         {
             // If the type of sunflower is not set, find the closest type based on the plant data
-            if (typeOfSunflower == TypeOfSunflower.None)
+            if (typeOfSunflower == TypeOfSunflower.None && !IsDead)
             {
                 typeOfSunflower = plantData.FindClosestTypeOfSunflower();
             }
@@ -188,6 +188,17 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             NetMessage.SendTileSquare(-1, Position.X, Position.Y, 2, 2, TileChangeType.None);
             NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
             NetMessage.SendData(MessageID.TileEntitySharing, number: pairedEntity.ID);
+        }
+
+        protected override float CalculateGrowth()
+        {
+            var res = base.CalculateGrowth();
+            if (IsPaired && IsDead)
+            {
+                if(!pairedEntity.IsDead)
+                    pairedEntity.typeOfSunflower = TypeOfSunflower.Deadflower;
+            }
+            return res;
         }
 
         /// <summary>
@@ -423,10 +434,10 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         public static readonly Dictionary<TypeOfSunflower, NatureData> TypeOfSunflowerToData = new()
         {
             [TypeOfSunflower.Sunflower] = new NatureData(
-        (NatureTags.Moist, 40),
-        (NatureTags.Height, 50),
-        (NatureTags.Temp, 30),
-        (NatureTags.Good, 50)
+        (NatureTags.Moist, 48),
+        (NatureTags.Height, 60),
+        (NatureTags.Temp, 40),
+        (NatureTags.Good, 60)
     ),
 
             [TypeOfSunflower.Dryflower] = new NatureData(

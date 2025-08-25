@@ -78,7 +78,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
             if (TileEntity.ByID.TryGetValue(id, out TileEntity te) && te is SunflowerWithSeedsEntity ste)
             {
-                ste.typeOfSunflower = ste.plantData.FindClosestTypeOfSunflower();
+                ste.typeOfSunflower = !ste.IsDead ? ste.plantData.FindClosestTypeOfSunflower() : TypeOfSunflower.Deadflower;
 
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {

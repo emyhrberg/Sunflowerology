@@ -30,7 +30,7 @@ namespace Sunflowerology.Common.Configs
         public bool GrowFast = true;
 
         [DefaultValue(30)]
-        internal int PlantUpdateInterval = 30;
+        public int PlantUpdateInterval = 30;
     }
 
 

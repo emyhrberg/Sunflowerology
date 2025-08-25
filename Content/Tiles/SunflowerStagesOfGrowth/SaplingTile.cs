@@ -23,8 +23,9 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
         protected override bool PlaceNextTile(int i, int j, NatureData newPlantData, int randomStyle, int style)
         {
-            if (!WorldGen.PlaceObject(i, j, NextTileType, mute: true, style: style, random: randomStyle))
+            if (!WorldGen.PlaceObject(i, j+3, NextTileType, mute: true, style: style, random: randomStyle))
             {
+                Main.NewText("Failed to place the next tile.");
                 return false;
             }
             //var tod = TileObjectData.GetTileData(NextTileType, style);
