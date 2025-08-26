@@ -288,7 +288,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         protected virtual bool IsFullyGrown => growthLevel >= 100;
         public int HeightInTiles => TileObjectData.GetTileData(TileType, 0).Height;
 
-        protected static List<(int X, int Y, NatureData Data, NatureData Surround)> growthQueue = new();
+        protected static List<(int X, int Y, NatureData Data, NatureData Surround, bool isdead)> growthQueue = new();
 
         // ModTileEntity's methods
         public override void SaveData(TagCompound tag)
@@ -372,11 +372,11 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             Random random = new Random();
 
             // Going through all the plants that need to be grown
-            foreach (var (i, j, plantD, errorPD) in growthQueue)
+            foreach (var (i, j, plantD, errorPD, isdead) in growthQueue)
             {
                 // Creaating mutation of the plant data
                 var newPlantData = plantD.Clone();
-                if (!IsDead)
+                if (!isdead)
                 {
                     foreach (string seedTag in NatureTags.AllTags)
                     {
@@ -409,7 +409,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
                 // Finding the closest type of sunflower based on the new plant data
                 var newTypeOfSunflower = (int)newPlantData.FindClosestTypeOfSunflower();
-                if (IsDead)
+                if (isdead)
                 {
                     newTypeOfSunflower = (int)TypeOfSunflower.Deadflower;
                 }
@@ -449,10 +449,16 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
         protected virtual void ReplacePlantWithNewOne()
         {
+            var tileAboveLeft = Framing.GetTileSafely(Position.X, Position.Y - 1);
+            var tileAboveRight = Framing.GetTileSafely(Position.X + 1, Position.Y - 1);
+            if (tileAboveLeft.HasTile || tileAboveRight.HasTile)
+            {
+                return;
+            }
             WorldGen.KillTile(Position.X, Position.Y, false, false, true);
             Kill(Position.X, Position.Y);
 
-            growthQueue.Add((Position.X, Position.Y - 1, plantData.Clone(), difference.Clone()));
+            growthQueue.Add((Position.X, Position.Y - 1, plantData.Clone(), difference.Clone(), IsDead));
 
             NetMessage.SendTileSquare(-1, Position.X, Position.Y, 2, 4);
             NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
@@ -483,7 +489,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
         private void DeadflowerChance()
         {
-            if (!IsDead && Main.rand.NextBool(100 - (int)averageDifference) && Main.rand.NextBool(100))
+            if (!IsDead && Main.rand.NextBool(100 - (int)averageDifference) && Main.rand.NextBool(1000))
             {
                 typeOfSunflower = TypeOfSunflower.Deadflower;
                 plantData[NatureTags.Good] = -100 + Main.rand.Next(0, 10);

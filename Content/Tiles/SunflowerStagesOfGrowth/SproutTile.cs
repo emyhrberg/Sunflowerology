@@ -179,12 +179,18 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 
         protected override void ReplacePlantWithNewOne()
         {
+            var tileAboveLeft = Framing.GetTileSafely(Position.X, Position.Y - 1);
+            var tileAboveRight = Framing.GetTileSafely(Position.X + 1, Position.Y - 1);
+            if (tileAboveLeft.HasTile || tileAboveRight.HasTile)
+            {
+                return;
+            }
             WorldGen.KillTile(Position.X, Position.Y, false, false, true);
             WorldGen.KillTile(pairedEntity.Position.X, pairedEntity.Position.Y, false, false, true);
             pairedEntity.Kill(pairedEntity.Position.X, pairedEntity.Position.Y);
             Kill(Position.X, Position.Y);
 
-            growthQueue.Add((Position.X, Position.Y - 1, (plantData + pairedEntity.plantData) / 2, difference.Clone()));
+            growthQueue.Add((Position.X, Position.Y - 1, (plantData + pairedEntity.plantData) / 2, difference.Clone(), IsDead || pairedEntity.IsDead));
             NetMessage.SendTileSquare(-1, Position.X, Position.Y, 2, 2, TileChangeType.None);
             NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
             NetMessage.SendData(MessageID.TileEntitySharing, number: pairedEntity.ID);
@@ -383,7 +389,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             [TileID.JungleGrass] = new NatureData((NatureTags.Temp, 60),
         (NatureTags.Height, 45), (NatureTags.Moist, 70), (NatureTags.Good, 20)),
             [TileID.Mud] = new NatureData((NatureTags.Temp, 50),
-        (NatureTags.Height, 35), (NatureTags.Moist, 65), (NatureTags.Good, 10)),
+        (NatureTags.Height, 35), (NatureTags.Moist, 50), (NatureTags.Good, 10)),
 
             // Underworld: Fireflower-friendly
             [TileID.Ash] = new NatureData((NatureTags.Temp, 90),
@@ -414,23 +420,23 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         public static readonly Dictionary<DepthZone, NatureData> DepthZoneToData = new()
         {
             [DepthZone.Sky] = new NatureData((NatureTags.Temp, -20),
-                (NatureTags.Height, 100), (NatureTags.Moist, -20), (NatureTags.Good, 0)),
+                (NatureTags.Height, 100), (NatureTags.Moist, -10), (NatureTags.Good, 0)),
 
             [DepthZone.Overworld] = new NatureData((NatureTags.Temp, 30),
-                (NatureTags.Height, 50), (NatureTags.Moist, 40), (NatureTags.Good, 50)),
+                (NatureTags.Height, 50), (NatureTags.Moist, 10), (NatureTags.Good, 50)),
 
             [DepthZone.DirtLayer] = new NatureData((NatureTags.Temp, 15),
-                (NatureTags.Height, 30), (NatureTags.Moist, 50), (NatureTags.Good, 30)),
+                (NatureTags.Height, 30), (NatureTags.Moist, 30), (NatureTags.Good, 30)),
 
             [DepthZone.RockLayer] = new NatureData((NatureTags.Temp, 0),
-                (NatureTags.Height, -20), (NatureTags.Moist, 40), (NatureTags.Good, 10)),
+                (NatureTags.Height, -20), (NatureTags.Moist, 0), (NatureTags.Good, 10)),
 
             [DepthZone.Underworld] = new NatureData((NatureTags.Temp, 100),
                 (NatureTags.Height, -100), (NatureTags.Moist, -70), (NatureTags.Good, -20)),
         };
         public static readonly NatureData OceanZoneToData = new NatureData(
-        (NatureTags.Moist, 120),
-        (NatureTags.Good, 40));
+        (NatureTags.Moist, 20),
+        (NatureTags.Good, 5));
         public static readonly Dictionary<TypeOfSunflower, NatureData> TypeOfSunflowerToData = new()
         {
             [TypeOfSunflower.Sunflower] = new NatureData(
@@ -441,52 +447,52 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
     ),
 
             [TypeOfSunflower.Dryflower] = new NatureData(
-        (NatureTags.Temp, 60),
-        (NatureTags.Height, -30),
-        (NatureTags.Moist, -40),
-        (NatureTags.Good, 0)
+        (NatureTags.Temp, 72),
+        (NatureTags.Height, 2),
+        (NatureTags.Moist, -30),
+        (NatureTags.Good, 22)
     ),
 
             [TypeOfSunflower.Fireflower] = new NatureData(
         (NatureTags.Temp, 100),
         (NatureTags.Height, -100),
-        (NatureTags.Moist, -70),
-        (NatureTags.Good, -30)
+        (NatureTags.Moist, -88),
+        (NatureTags.Good, -23)
     ),
 
             [TypeOfSunflower.Snowflower] = new NatureData(
-        (NatureTags.Temp, -50),
-        (NatureTags.Height, 70),
-        (NatureTags.Moist, 40),
+        (NatureTags.Temp, -30),
+        (NatureTags.Height, 74),
+        (NatureTags.Moist, 50),
         (NatureTags.Good, 50)
     ),
 
             [TypeOfSunflower.Iceflower] = new NatureData(
-        (NatureTags.Temp, -100),
-        (NatureTags.Moist, 70),
-        (NatureTags.Height, -100),
-        (NatureTags.Good, 60)
+        (NatureTags.Temp, -80),
+        (NatureTags.Moist, 62),
+        (NatureTags.Height, -67),
+        (NatureTags.Good, 20)
     ),
 
             [TypeOfSunflower.Beachflower] = new NatureData(
-        (NatureTags.Temp, 30),
+        (NatureTags.Temp, 56),
         (NatureTags.Moist, 70),
-        (NatureTags.Height, 40),
-        (NatureTags.Good, 30)
+        (NatureTags.Height, 46),
+        (NatureTags.Good, 27)
     ),
 
             [TypeOfSunflower.Oceanflower] = new NatureData(
-        (NatureTags.Temp, 10),
+        (NatureTags.Temp, 26),
         (NatureTags.Moist, 100),
-        (NatureTags.Height, 0),
-        (NatureTags.Good, 30)
+        (NatureTags.Height, -37),
+        (NatureTags.Good, 45)
     ),
 
             [TypeOfSunflower.Sporeflower] = new NatureData(
-        (NatureTags.Temp, 70),
-        (NatureTags.Moist, 70),
-        (NatureTags.Height, 50),
-        (NatureTags.Good, -20)
+        (NatureTags.Temp, 66),
+        (NatureTags.Moist, 78),
+        (NatureTags.Height, 54),
+        (NatureTags.Good, 26)
     ),
 
             [TypeOfSunflower.Deadflower] = new NatureData(
@@ -673,10 +679,10 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
     }
     public static class NatureTags
     {
-        public const string Moist = "WaterLove";
-        public const string Height = "SunLove";
-        public const string Temp = "HotLove";
-        public const string Good = "GoodLove";
+        public const string Moist = "Moist";
+        public const string Height = "Height";
+        public const string Temp = "Temp";
+        public const string Good = "Good";
         public static string[] AllTags =
         [
             Moist, Height, Temp, Good
