@@ -141,5 +141,17 @@ namespace Sunflowerology.Helpers
                 Main.spriteBatch.Draw(drawData.glowTexture, position, (Rectangle?)drawData.glowSourceRect, drawData.glowColor, 0f, Vector2.Zero, 1f, drawData.tileSpriteEffect, 0f);
             }
         }
+
+        /// <summary>
+        /// Checks if a tile is solid, meaning it has a tile and is not actuated, and is in the Main.tileSolid array.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public static bool IsTileSolid(int x, int y)
+        {
+            Tile tile = Framing.GetTileSafely(x, y);
+            return tile.HasTile && tile.HasUnactuatedTile && Main.tileSolid[tile.TileType];
+        }
     }
 }

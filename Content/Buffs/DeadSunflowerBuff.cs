@@ -1,5 +1,7 @@
-﻿using Terraria;
+﻿using Microsoft.Xna.Framework;
+using Terraria;
 using Terraria.ModLoader;
+using Terraria.Utilities.Terraria.Utilities;
 
 namespace Sunflowerology.Content.Buffs
 {
@@ -13,7 +15,7 @@ namespace Sunflowerology.Content.Buffs
 
         public override void Update(Player player, ref int buffIndex)
         {
-            player.statLifeMax2 -= 5;             // flat bonus, stacks with other sources
+            player.statLifeMax2 -= player.statLifeMax2/2;             // flat bonus, stacks with other sources
         }
     }
 }

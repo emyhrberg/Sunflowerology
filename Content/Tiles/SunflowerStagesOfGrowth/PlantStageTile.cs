@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -30,13 +31,15 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         {
             if (TileEntity.TryGet(i, j, out T tileEntity))
             {
-                string res = $"Growth: {(int)tileEntity.growthLevel}, Diff: {tileEntity.averageDifference:F2}";
-                foreach (var seedTag in NatureTags.AllTags)
-                {
-                    res += $"\n{seedTag}: {tileEntity.plantData[seedTag]}, " +
-                        $"S:{tileEntity.surroundingAreaData[seedTag]}, " +
-                        $"D: {tileEntity.difference[seedTag]}";
-                }
+                string res = $"Growth: {(int)tileEntity.growthLevel}";
+                /*string res = $"Growth: {(int)tileEntity.growthLevel}, Diff: {tileEntity.averageDifference:F2}";
+foreach (var seedTag in NatureTags.AllTags)
+{
+    res += $"\n{seedTag}: {tileEntity.plantData[seedTag]}, " +
+        $"S:{tileEntity.surroundingAreaData[seedTag]}, " +
+        $"D: {tileEntity.difference[seedTag]}";
+}
+                 */
                 return res;
             }
             else
@@ -62,6 +65,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             TileObjectData.newTile.RandomStyleRange = 3;
             TileObjectData.newTile.StyleWrapLimit = 3;
             TileObjectData.newTile.StyleHorizontal = true;
+            TileObjectData.newTile.AnchorValidTiles = NatureData.TilesToData.Keys.ToArray();
             if (IsSpecialHook)
             {
                 //TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<T>().Hook_AfterPlacement, -1, 0, true);

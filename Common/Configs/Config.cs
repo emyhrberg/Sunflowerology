@@ -11,23 +11,8 @@ namespace Sunflowerology.Common.Configs
 
         [Header("JamOfBiomology")]
 
-        [DefaultValue(true)]
-        public bool ShowMessageWhenEnteringWorld;
-
-        [DefaultValue(true)]
-        public bool DestabilizeTiles = true;
-
-        [DefaultValue(3)]
-        public int RadiusOfSunflower = 3;
-
-        [DefaultValue(25)]
-        public int HowFastSunGrassDecays = 25;
-
-        [DefaultValue(60f)]
-        public int HowMuchYouNeedBlocksForDayland = 60;
-
-        [DefaultValue(true)]
-        public bool GrowFast = true;
+        [DefaultValue(false)]
+        public bool GrowFast = false;
 
         [DefaultValue(30)]
         public int PlantUpdateInterval = 30;

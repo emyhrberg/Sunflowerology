@@ -8,6 +8,7 @@ using Terraria.ModLoader;
 
 namespace Sunflowerology.Common.Systems
 {
+    /*
     public class SunGrassTileCount : ModSystem
     {
         private static int sunGrassTileCount = 0;
@@ -37,5 +38,5 @@ namespace Sunflowerology.Common.Systems
         {
             UpdateInfluence();
         }
-    }
+    }*/
 }

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
-using Sunflowerology.Content.Items;
+﻿using Sunflowerology.Content.Items;
+using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
+using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -29,6 +31,7 @@ namespace Sunflowerology.Content.Tiles
             TileObjectData.newTile.CoordinateWidth = 16;
             TileObjectData.newTile.CoordinateHeights = new int[] { 16, 16, 16, 16, 16, 16, 16, 18 };
             TileObjectData.newTile.StyleHorizontal = true;
+            TileObjectData.newTile.AnchorValidTiles = NatureData.TilesToData.Keys.ToArray();
             TileObjectData.addTile(Type);
 
             AddMapEntry(new Color(10, 10, 0));
@@ -41,23 +44,8 @@ namespace Sunflowerology.Content.Tiles
 
             Player player = Main.LocalPlayer;
 
-            float rangePixels = 20 * 16;
-            Vector2 tileCenter = new((i + 1) * 16f, (j + 1) * 16f);
+            player.AddBuff(ModContent.BuffType<Buffs.ZenithflowerBuff>(), 30);
 
-            bool withinRange = Vector2.Distance(player.Center, tileCenter) <= rangePixels;
-            if (withinRange)
-            {
-                int dur = 30; // Duration of the buffs in frames (1 second = 60 frames)
-                player.AddBuff(BuffID.Flipper, dur);
-                player.AddBuff(BuffID.Calm, dur);
-                player.AddBuff(BuffID.Inferno, dur);
-                //player.AddBuff(BuffID.IceBarrier, dur);
-                player.AddBuff(BuffID.ObsidianSkin, dur);
-                player.AddBuff(BuffID.Gills, dur);
-                player.AddBuff(BuffID.Warmth, dur);
-                player.AddBuff(BuffID.TikiSpirit, dur);
-                // player.AddBuff(BuffID.Happy, duration);
-            }
         }
 
         public override IEnumerable<Item> GetItemDrops(int i, int j)

@@ -157,6 +157,7 @@ namespace Sunflowerology.Content.Tiles.SunGrass
             }
         }
 
+        /*
         [Obsolete("This method is not needed anymore, Cotlim had some idea about only keeping the seed but making it fade when no sunflower is on it, but I don't think it is needed anymore, so I removed it. If you want to use this method, please contact me on Discord")]
         private void CheckForSunflower()
         {
@@ -195,6 +196,6 @@ namespace Sunflowerology.Content.Tiles.SunGrass
                 Kill(i, j);
                 return;
             }
-        }
+        }*/
     }
 }

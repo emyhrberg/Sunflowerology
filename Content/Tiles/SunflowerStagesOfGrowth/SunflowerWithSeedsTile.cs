@@ -24,15 +24,15 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         private static readonly Dictionary<TypeOfSunflower, (int buffId, int buffDuration)> SunflowerBuffs
             = new()
             {
-                [TypeOfSunflower.Fireflower] = (BuffID.OnFire, 30),
+                [TypeOfSunflower.Fireflower] = (BuffID.Inferno, 30),
                 [TypeOfSunflower.Beachflower] = (BuffID.Flipper, 30),
-                [TypeOfSunflower.Deadflower] = (ModContent.BuffType<Buffs.DeadSunflowerBuff>(), 30), // Reduced life (-5 HP)
-                [TypeOfSunflower.Dryflower] = (BuffID.Calm, 30),
-                [TypeOfSunflower.Iceflower] = (BuffID.IceBarrier, 30),
+                [TypeOfSunflower.Deadflower] = (ModContent.BuffType<Buffs.DeadSunflowerBuff>(), 30), // Reduced life
+                [TypeOfSunflower.Dryflower] = (BuffID.Endurance, 30),
+                [TypeOfSunflower.Iceflower] = (BuffID.Heartreach, 30),
                 [TypeOfSunflower.Obsidianflower] = (BuffID.ObsidianSkin, 30),
                 [TypeOfSunflower.Oceanflower] = (BuffID.Gills, 30),
-                [TypeOfSunflower.Snowflower] = (BuffID.Warmth, 30),
-                [TypeOfSunflower.Sporeflower] = (BuffID.TikiSpirit, 30),
+                [TypeOfSunflower.Snowflower] = (BuffID.Mining, 30),
+                [TypeOfSunflower.Sporeflower] = (BuffID.DryadsWard, 30),
                 [TypeOfSunflower.Sunflower] = (BuffID.Sunflower, 30), // Happy!
             };
 
@@ -62,7 +62,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             // Apply buff based on type
             if (SunflowerBuffs.TryGetValue(type, out var buffData))
             {
-                float rangePixels = 20f * 16f; // example range
+                float rangePixels = 60f * 16f; // example range
                 Player player = Main.LocalPlayer;
                 Vector2 tileCenter = new((i + 1) * 16f, (j + 1) * 16f);
                 bool withinRange = Vector2.Distance(player.Center, tileCenter) <= rangePixels;
@@ -112,6 +112,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             }
             base.KillMultiTile(i, j, frameX, frameY);
         }
+        /*
         protected override string GetmouseOverPlantText(int i, int j)
         {
             if (TileEntity.TryGet(i, j, out SunflowerWithSeedsEntity tileEntity))
@@ -127,6 +128,11 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             {
                 return "No tile entity found.";
             }
+        }
+        */
+
+        public override void MouseOver(int i, int j)
+        {
         }
         public override void PlaceInWorld(int i, int j, Item item)
         {

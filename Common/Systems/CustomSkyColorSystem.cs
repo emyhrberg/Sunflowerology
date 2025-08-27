@@ -5,6 +5,7 @@ using Terraria.ModLoader;
 
 namespace Sunflowerology.Common.Systems
 {
+    /*
     internal class CustomSkyColorSystem : ModSystem
     {
         public override void OnWorldLoad()
@@ -48,5 +49,5 @@ namespace Sunflowerology.Common.Systems
             Main.ColorOfTheSkies = new Color(colorReal);
         }
 
-    }
+    }*/
 }

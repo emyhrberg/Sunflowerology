@@ -5,6 +5,7 @@ using System.Linq;
 using Sunflowerology.Common.PacketHandlers;
 using Sunflowerology.Content.Items.Sunflowers;
 using Sunflowerology.Content.Items.SunflowerSeeds;
+using Sunflowerology.Content.Tiles.SunGrass;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -16,13 +17,6 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
 {
     internal class SproutTile : PlantStageTile<SproutEntity>
     {
-        public override void SetStaticDefaults()
-        {
-            base.SetStaticDefaults();
-            var tileData = TileObjectData.GetTileData(Type, 0);
-            tileData.AnchorValidTiles = NatureData.TilesToData.Keys.ToArray();
-            tileData.StyleWrapLimit = 3;
-        }
         public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
         {
             if (TileEntity.TryGet(i, j, out SproutEntity tileEntity))
@@ -337,7 +331,8 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             // Overworld: Sunflower-friendly
             [TileID.Grass] = new NatureData((NatureTags.Temp, 30),
         (NatureTags.Height, 50), (NatureTags.Moist, 40), (NatureTags.Good, 50)),
-
+            [ModContent.TileType<SunGrassTile>()] = new NatureData((NatureTags.Temp, 40),
+        (NatureTags.Height, 70), (NatureTags.Moist, 40), (NatureTags.Good, 70)),
             [TileID.Dirt] = new NatureData((NatureTags.Temp, 25),
         (NatureTags.Height, 45), (NatureTags.Moist, 35), (NatureTags.Good, 40)),
 

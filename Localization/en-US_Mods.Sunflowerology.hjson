@@ -3,6 +3,11 @@ Buffs: {
 		DisplayName: Dead Sunflower!
 		Description: The dead flower is hurting your life, remove it!
 	}
+
+	ZenithflowerBuff: {
+		DisplayName: Zenithflower Buff
+		Description: Mods.Sunflowerology.Buffs.ZenithflowerBuff.Description
+	}
 }
 
 Items: {

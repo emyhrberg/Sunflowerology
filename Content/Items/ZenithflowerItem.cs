@@ -22,7 +22,7 @@ namespace Sunflowerology.Content.Items
             var recipe = CreateRecipe();
             for (int i = 0; i < 10; i++)
             {
-                recipe.AddIngredient(NatureData.TypeOfSunflowerToItemId[(TypeOfSunflower)i], 1);
+                recipe.AddIngredient(NatureData.TypeOfSunflowerToItemId[(TypeOfSunflower)i], 99);
             }
             recipe.AddTile(TileID.WorkBenches)
                 .Register();

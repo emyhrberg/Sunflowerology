@@ -17,7 +17,7 @@ namespace Sunflowerology.Content.Items.SunflowerSeeds
             Item.DefaultToPlaceableTile(ModContent.TileType<SproutTile>());
             Item.width = 20;
             Item.height = 26;
-            Item.value = 1000;
+            Item.value = 10;
             Item.placeStyle = 9 * (int)TypeOfSunflower;
             seedData = NatureData.TypeOfSunflowerToData[TypeOfSunflower];
         }

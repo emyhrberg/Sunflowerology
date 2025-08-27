@@ -40,8 +40,15 @@ namespace Sunflowerology.Common.Systems
                 for (int j = providedInfo.reachableStartY; j <= providedInfo.reachableEndY; j++)
                 {
                     Tile tile = Main.tile[i, j];
-                    bool flag = !Main.tile[i - 1, j].active() || !Main.tile[i, j + 1].active() || !Main.tile[i + 1, j].active() || !Main.tile[i, j - 1].active();
-                    bool flag2 = !Main.tile[i - 1, j - 1].active() || !Main.tile[i - 1, j + 1].active() || !Main.tile[i + 1, j + 1].active() || !Main.tile[i + 1, j - 1].active();
+                    bool flag = !SJUtils.IsTileSolid(i - 1, j) ||
+                        !SJUtils.IsTileSolid(i, j + 1) ||
+                        !SJUtils.IsTileSolid(i + 1, j) ||
+                        !SJUtils.IsTileSolid(i, j - 1);
+
+                    bool flag2 = !SJUtils.IsTileSolid(i - 1, j - 1) ||
+                        !SJUtils.IsTileSolid(i - 1, j + 1) ||
+                        !SJUtils.IsTileSolid(i + 1, j + 1) ||
+                        !SJUtils.IsTileSolid(i + 1, j - 1);
                     if (tile.active() && !tile.inActive() && (flag || flag2))
                     {
                         bool flag3 = false;
@@ -100,18 +107,6 @@ namespace Sunflowerology.Common.Systems
             }
 
             SmartCursorHelper._targets.Clear();
-        }
-
-        /// <summary>
-        /// Checks if a tile is solid, meaning it has a tile and is not actuated, and is in the Main.tileSolid array.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        public static bool IsTileSolid(int x, int y)
-        {
-            Tile tile = Framing.GetTileSafely(x, y);
-            return tile.HasTile && tile.HasUnactuatedTile && Main.tileSolid[tile.TileType];
         }
     }
 }
