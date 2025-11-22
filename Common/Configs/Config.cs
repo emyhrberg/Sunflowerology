@@ -11,9 +11,6 @@ namespace Sunflowerology.Common.Configs
 
         [Header("JamOfBiomology")]
 
-        [DefaultValue(false)]
-        public bool GrowFast = false;
-
         [DefaultValue(30)]
         public int PlantUpdateInterval = 30;
     }

@@ -31,16 +31,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         {
             if (TileEntity.TryGet(i, j, out T tileEntity))
             {
-                string res = $"Growth: {(int)tileEntity.growthLevel}";
-                /*string res = $"Growth: {(int)tileEntity.growthLevel}, Diff: {tileEntity.averageDifference:F2}";
-foreach (var seedTag in NatureTags.AllTags)
-{
-    res += $"\n{seedTag}: {tileEntity.plantData[seedTag]}, " +
-        $"S:{tileEntity.surroundingAreaData[seedTag]}, " +
-        $"D: {tileEntity.difference[seedTag]}";
-}
-                 */
-                return res;
+                return $"Growth: {(int)tileEntity.growthLevel}";
             }
             else
             {
@@ -148,7 +139,6 @@ foreach (var seedTag in NatureTags.AllTags)
 
         }
 
-        //TODO: Make this more beautifull
         public override void MouseOver(int i, int j)
         {
             Player player = Main.LocalPlayer;
@@ -437,7 +427,6 @@ foreach (var seedTag in NatureTags.AllTags)
             {
                 return false;
             }
-            //var tod = TileObjectData.GetTileData(NextTileType, style);
             var point = TileObjectData.TopLeft(i, j);
             var newEntity = GetEntityOn(point.X, point.Y);
 
@@ -470,20 +459,10 @@ foreach (var seedTag in NatureTags.AllTags)
 
         protected virtual float CalculateGrowth()
         {
-            if (Main.rand.NextBool((int)Math.Ceiling(Math.Pow(averageDifference, 2) / 10) + 2) || Conf.C.GrowFast)
+            if (Main.rand.NextBool((int)Math.Ceiling(Math.Pow(averageDifference, 2) / 10) + 2))
             {
                 // Chance to become a deadflower if the average difference is too high
                 DeadflowerChance();
-
-                // Conf.C.GrowFast invokes CalculateGrowth 10 times per update instead of 1
-                if (Conf.C.GrowFast)
-                {
-                    for (int k = 0; k < 9; k++)
-                    {
-                        DeadflowerChance();
-                    }
-                    return PlantUpdateInterval / 3f;
-                }
 
                 // Return normal growth
                 return PlantUpdateInterval / 30f;
@@ -542,13 +521,13 @@ foreach (var seedTag in NatureTags.AllTags)
         protected NatureData CalculateSATiles(NatureData saData)
         {
             Tile[] Tiles25p = [Framing.GetTileSafely(Position.X, Position.Y + HeightInTiles),
-                                Framing.GetTileSafely(Position.X + 1, Position.Y + HeightInTiles)];
+                Framing.GetTileSafely(Position.X + 1, Position.Y + HeightInTiles)];
             Tile[] Tiles125p = [Framing.GetTileSafely(Position.X, Position.Y + HeightInTiles + 1),
-                                Framing.GetTileSafely(Position.X + 1, Position.Y + HeightInTiles + 1)];///FINISH THIS
+                Framing.GetTileSafely(Position.X + 1, Position.Y + HeightInTiles + 1)];
             Tile[] Tiles625p = [Framing.GetTileSafely(Position.X - 1, Position.Y + HeightInTiles),
-                                Framing.GetTileSafely(Position.X + 2, Position.Y + HeightInTiles),
-                                Framing.GetTileSafely(Position.X - 1, Position.Y + HeightInTiles + 1),
-                                Framing.GetTileSafely(Position.X + 2, Position.Y + HeightInTiles + 1),];
+                Framing.GetTileSafely(Position.X + 2, Position.Y + HeightInTiles),
+                Framing.GetTileSafely(Position.X - 1, Position.Y + HeightInTiles + 1),
+                Framing.GetTileSafely(Position.X + 2, Position.Y + HeightInTiles + 1),];
             foreach (Tile tile in Tiles25p)
             {
                 if (tile.HasTile && NatureData.TilesToData.TryGetValue(tile.TileType, out NatureData seedData))
