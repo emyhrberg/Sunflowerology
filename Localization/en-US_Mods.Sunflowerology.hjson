@@ -117,8 +117,13 @@ Items: {
 	}
 
 	ZenithflowerItem: {
-		DisplayName: Zenithflower
-		Tooltip: ""
+		DisplayName: True Sunflower
+		Tooltip:
+			'''
+			Everything, everywhere, all at once.
+			Truth. Power. Beauty.
+			Sunflower.
+			'''
 	}
 }
 
