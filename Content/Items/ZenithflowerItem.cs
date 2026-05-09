@@ -13,8 +13,10 @@ namespace Sunflowerology.Content.Items
             Item.width = 30;
             Item.height = 28;
             Item.scale = 2f;
-            Item.maxStack = 9999;
-            Item.value = 1000;
+            Item.maxStack = 1;
+            Item.value = Terraria.Item.buyPrice(platinum: 5);
+            Item.consumable = false;
+
         }
 
         public override void AddRecipes()

@@ -45,10 +45,10 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
             Main.tileNoFail[Type] = true;
             Main.tileObsidianKill[Type] = true;
             Main.tileLighted[Type] = true;
-
+            
             DustType = DustID.Grass;
 
-            TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);
+            TileObjectData.newTile.CopyFrom(TileObjectData.GetTileData(TileID.Sunflower, 0));
             TileObjectData.newTile.Width = WidthInTiles;
             TileObjectData.newTile.Height = HeightInTiles;
             TileObjectData.newTile.CoordinateHeights = Heights;
@@ -81,11 +81,12 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 return;
             }
             Tile tile = Main.tile[i, j];
+            var tileData = TileObjectData.GetTileData(Type, 0);
             Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
 
             spriteBatch.Draw(
                 glowTexture.Value,
-                new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero,
+                new Vector2(i * 16 - (int)Main.screenPosition.X + tileData.DrawXOffset, j * 16 - (int)Main.screenPosition.Y + tileData.DrawYOffset) + zero,
                 new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 16),
                 Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }

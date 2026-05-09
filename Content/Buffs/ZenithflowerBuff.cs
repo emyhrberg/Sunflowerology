@@ -12,28 +12,15 @@ namespace Sunflowerology.Content.Buffs
         public override void SetStaticDefaults()
         {
             Main.buffNoTimeDisplay[Type] = true;  // hide the ticking timer
+            Main.debuff[Type] = true; // player can't manually remove this buff
+            Main.buffNoSave[Type] = true;
+            BuffID.Sets.NurseCannotRemoveDebuff[Type] = true;
         }
 
         public override void Update(Player player, ref int buffIndex)
         {
             player.allDamage.Multiplicative += 10;
-        }
-    }
-
-    public class ZenithflowerBuffNPC : GlobalNPC
-    {
-        public override void ModifyHitByProjectile(NPC npc, Projectile projectile, ref NPC.HitModifiers modifiers)
-        {
-            // Only player attacks should benefit from this buff, hence the NPC and trap checks.
-            if (projectile.npcProj || projectile.trap)
-                return;
-
-            if (npc.HasBuff<ZenithflowerBuff>())
-            {
-                // Apply the scaling bonus to the next hit, and then remove the buff, like the vanilla firecracker
-                modifiers.ScalingBonusDamage += 9 * ZenithflowerBuff.projTagMultiplier;
-                npc.RequestBuffRemoval(ModContent.BuffType<ZenithflowerBuff>());
-            }
+            player.buffImmune[ModContent.BuffType<DeadSunflowerBuff>()] = true;
         }
     }
 }

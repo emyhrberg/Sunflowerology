@@ -3,7 +3,7 @@ using Terraria.ModLoader;
 
 namespace Sunflowerology.Content.Items
 {
-    public class SunflowerAcornItem : ModItem
+    public abstract class SunflowerAcornItem : ModItem
     {
         public override void SetStaticDefaults()
         {
