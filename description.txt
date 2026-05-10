@@ -1,1 +1,6 @@
-Modify this file with a description of your mod.
+This mod allows you to grow more sunflowers. There are new sunflower seeds and trees. There are mechanics in place for you to figure out how to grow all the sunflower types. Can you grow all sunflowers and craft the mighty True Sunflower?!
+
+--- Links ---
+Wiki: https://terrariamods.wiki.gg/wiki/Sunflowerology
+GitHub: https://github.com/emyhrberg/Sunflowerology
+Discord: https://discord.gg/6ykWs5uS

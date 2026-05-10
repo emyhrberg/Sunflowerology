@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using Sunflowerology.Content.Dusts;
 using Sunflowerology.Content.Items;
 using Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using Terraria.ObjectData;
 
 namespace Sunflowerology.Content.Tiles
 {
-    internal class ZenithflowerTile : ModTile
+    internal class TrueSunflowerTile : ModTile
     {
 
         protected Asset<Texture2D> glowTexture = null;
@@ -24,7 +25,8 @@ namespace Sunflowerology.Content.Tiles
             Main.tileObsidianKill[Type] = true;
             Main.tileLighted[Type] = true;
 
-            DustType = DustID.Asphalt;
+            DustType = ModContent.DustType<TrueSunflowerKillTileDust>();
+            
 
             TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);
             TileObjectData.newTile.Width = 4;
@@ -53,7 +55,7 @@ namespace Sunflowerology.Content.Tiles
 
             Player player = Main.LocalPlayer;
 
-            player.AddBuff(ModContent.BuffType<Buffs.ZenithflowerBuff>(), 30);
+            player.AddBuff(ModContent.BuffType<Buffs.TrueSunflowerBuff>(), 30);
 
         }
 

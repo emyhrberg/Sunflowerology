@@ -5,11 +5,11 @@ using Terraria.ModLoader;
 
 namespace Sunflowerology.Content.Items
 {
-    internal class ZenithflowerItem : ModItem
+    internal class TrueSunflowerItem : ModItem
     {
         public override void SetDefaults()
         {
-            Item.DefaultToPlaceableTile(ModContent.TileType<ZenithflowerTile>());
+            Item.DefaultToPlaceableTile(ModContent.TileType<TrueSunflowerTile>());
             Item.width = 30;
             Item.height = 28;
             Item.scale = 2f;

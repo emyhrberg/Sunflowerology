@@ -6,7 +6,7 @@ using Terraria.Utilities.Terraria.Utilities;
 
 namespace Sunflowerology.Content.Buffs
 {
-    internal class ZenithflowerBuff : ModBuff
+    internal class TrueSunflowerBuff : ModBuff
     {
         public static readonly float projTagMultiplier = 9f;
         public override void SetStaticDefaults()

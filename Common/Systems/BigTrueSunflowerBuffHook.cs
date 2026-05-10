@@ -109,7 +109,7 @@ namespace Sunflowerology.Common.Systems
             c.EmitDelegate<Func<int, bool>>((buffIdx) =>
             {
                 Player player = Main.LocalPlayer;
-                return player.buffTime[buffIdx] > 2 && player.buffType[buffIdx] == ModContent.BuffType<ZenithflowerBuff>(); // Big buff timer is not 0 and buff type is Big buff
+                return player.buffTime[buffIdx] > 2 && player.buffType[buffIdx] == ModContent.BuffType<TrueSunflowerBuff>(); // Big buff timer is not 0 and buff type is Big buff
             });
 
             // If the buff is not valid, jump to label_buff_invalid

@@ -1,12 +1,12 @@
 Buffs: {
 	DeadSunflowerBuff: {
-		DisplayName: Dead Sunflower!
-		Description: The dead flower is hurting your life, remove it!
+		DisplayName: Lifecrush!
+		Description: Your life is halved!
 	}
 
-	ZenithflowerBuff: {
-		DisplayName: Zenithflower Buff
-		Description: Mods.Sunflowerology.Buffs.ZenithflowerBuff.Description
+	TrueSunflowerBuff: {
+		DisplayName: True Sunflower Presence
+		Description: The power of the sun is shining within you.
 	}
 }
 
@@ -116,7 +116,7 @@ Items: {
 		Tooltip: ""
 	}
 
-	ZenithflowerItem: {
+	TrueSunflowerItem: {
 		DisplayName: True Sunflower
 		Tooltip:
 			'''
