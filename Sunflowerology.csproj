@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<!-- Import tModLoader mod properties -->
 	<Import Project="..\tModLoader.targets" />
@@ -6,6 +6,7 @@
 	<!-- General -->
 	<PropertyGroup>
 		<LangVersion>preview</LangVersion>
+		<EasyXnbCompiledDir>$(MSBuildProjectDirectory)\..\EasyXnb\Compiled</EasyXnbCompiledDir>
 	</PropertyGroup>
 
 	<!-- References -->
@@ -26,6 +27,17 @@
 	<ItemGroup>
 		<PackageReference Include="Krafs.Publicizer" PrivateAssets="true" Version="2.2.1" />
 		<Publicize Include="tModLoader" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
+		<Publicize Include="ReLogic" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
 	</ItemGroup>
+
+	<Target Name="CompileFx" BeforeTargets="Build" Condition="'$(OS)' == 'Windows_NT' and Exists('$(EasyXnbCompiledDir)')">
+		<ItemGroup>
+			<FxFiles Include="Assets\**\*.fx" />
+			<FxCompiledOutputs Include="@(FxFiles->'$(EasyXnbCompiledDir)\%(Filename).xnb')" />
+		</ItemGroup>
+		<Copy SourceFiles="@(FxFiles)" DestinationFolder="$(EasyXnbCompiledDir)" SkipUnchangedFiles="true" />
+		<Exec Command="&quot;$(EasyXnbCompiledDir)\EasyXnb.exe&quot;" WorkingDirectory="$(EasyXnbCompiledDir)" />
+		<Copy SourceFiles="@(FxCompiledOutputs)" DestinationFiles="@(FxFiles->'$(MSBuildProjectDirectory)\Assets\%(RecursiveDir)%(Filename).xnb')" SkipUnchangedFiles="true" />
+	</Target>
 
 </Project>

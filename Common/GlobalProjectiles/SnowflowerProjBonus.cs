@@ -42,7 +42,7 @@ namespace Sunflowerology.Common.GlobalProjectiles
         private void TrySpawnTrail(Projectile projectile)
         {
             Player player = Main.player[projectile.owner];
-            if (projectile.damage <= 0 || player.ownedProjectileCounts[projectile.type] > 50 || (player.position - projectile.Center).Length() > 16*70)
+            if (projectile.damage <= 0 || projectile.hostile || player.ownedProjectileCounts[projectile.type] > 50 || (player.position - projectile.Center).Length() > 16*70)
                 return;
             float distance = (projectile.Center - posLastSnowflake.Value).Length();
             int count = Math.Min(10, (int)(distance / SNOWFLAKE_MIN_DISTANCE));

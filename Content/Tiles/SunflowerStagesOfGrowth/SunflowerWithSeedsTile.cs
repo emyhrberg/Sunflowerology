@@ -28,7 +28,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 [TypeOfSunflower.Beachflower] = (BuffID.Flipper, 30),
                 [TypeOfSunflower.Deadflower] = (ModContent.BuffType<Buffs.DeadSunflowerBuff>(), 30), // Reduced life
                 [TypeOfSunflower.Dryflower] = (BuffID.Endurance, 30),
-                [TypeOfSunflower.Iceflower] = (BuffID.Heartreach, 30),
+                [TypeOfSunflower.Iceflower] = (ModContent.BuffType<Buffs.IceflowerBuff>(), 30),
                 [TypeOfSunflower.Obsidianflower] = (BuffID.ObsidianSkin, 30),
                 [TypeOfSunflower.Oceanflower] = (BuffID.Gills, 30),
                 [TypeOfSunflower.Snowflower] = (ModContent.BuffType<Buffs.SnowflowerBuff>(), 30),

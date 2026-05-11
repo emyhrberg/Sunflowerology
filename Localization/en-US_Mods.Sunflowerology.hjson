@@ -13,6 +13,11 @@ Buffs: {
 		DisplayName: Snowshower
 		Description: Weapons occasionally release snowflakes that damage enemies!
 	}
+
+	IceflowerBuff: {
+		DisplayName: Iceshock
+		Description: Weapons occasionally release shockwaves that damage enemies... and sometimes friends...
+	}
 }
 
 Items: {
@@ -193,4 +198,7 @@ NPCs: {
 	}
 }
 
-Projectiles.SnowflakeProjectile.DisplayName: Snowflake Projectile
+Projectiles: {
+	SnowflakeProjectile.DisplayName: Snowshower Snowflake
+	ShockwaveProjectile.DisplayName: Shockwave Projectile
+}
