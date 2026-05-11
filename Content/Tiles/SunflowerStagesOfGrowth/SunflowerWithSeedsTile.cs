@@ -31,7 +31,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
                 [TypeOfSunflower.Iceflower] = (BuffID.Heartreach, 30),
                 [TypeOfSunflower.Obsidianflower] = (BuffID.ObsidianSkin, 30),
                 [TypeOfSunflower.Oceanflower] = (BuffID.Gills, 30),
-                [TypeOfSunflower.Snowflower] = (BuffID.Mining, 30),
+                [TypeOfSunflower.Snowflower] = (ModContent.BuffType<Buffs.SnowflowerBuff>(), 30),
                 [TypeOfSunflower.Sporeflower] = (BuffID.DryadsWard, 30),
                 [TypeOfSunflower.Sunflower] = (BuffID.Sunflower, 30), // Happy!
             };

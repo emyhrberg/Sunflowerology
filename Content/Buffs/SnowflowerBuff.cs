@@ -6,7 +6,7 @@ using Terraria.Utilities.Terraria.Utilities;
 
 namespace Sunflowerology.Content.Buffs
 {
-    internal class TrueSunflowerBuff : ModBuff
+    internal class SnowflowerBuff : ModBuff
     {
         public override void SetStaticDefaults()
         {
@@ -18,8 +18,7 @@ namespace Sunflowerology.Content.Buffs
 
         public override void Update(Player player, ref int buffIndex)
         {
-            player.allDamage.Multiplicative += 10;
-            player.buffImmune[ModContent.BuffType<DeadSunflowerBuff>()] = true;
+            player.buffImmune[BuffID.Chilled] = true;
         }
     }
 }

@@ -8,6 +8,11 @@ Buffs: {
 		DisplayName: True Sunflower Presence
 		Description: The power of the sun is shining within you.
 	}
+
+	SnowflowerBuff: {
+		DisplayName: Snowshower
+		Description: Weapons occasionally release snowflakes that damage enemies!
+	}
 }
 
 Items: {
@@ -187,3 +192,5 @@ NPCs: {
 		Census.SpawnCondition: Conditions unknown
 	}
 }
+
+Projectiles.SnowflakeProjectile.DisplayName: Snowflake Projectile
