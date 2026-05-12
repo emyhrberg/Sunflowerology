@@ -1,71 +1,110 @@
-﻿using Sunflowerology.Common.Systems;
+﻿using Microsoft.Xna.Framework;
+using Sunflowerology.Common.Systems;
 using Sunflowerology.Content.Buffs;
 using Sunflowerology.Content.Projectiles;
 using System;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ModLoader;
 
 namespace Sunflowerology.Common.GlobalProjectiles
 {
-    internal class IceflowerProjBonus : GlobalProjectile
-    {
+	internal static class IceflowerShockwaveSpawner
+	{
+		public static bool CanSpawn(Player player, Vector2 hitPosition, int maxOwnedShockwaves)
+		{
+			return player.HasBuff<IceflowerBuff>() &&
+				   !player.dead &&
+				   player.active &&
+				   !player.ghost &&
+				   player.ownedProjectileCounts[ModContent.ProjectileType<ShockwaveProjectile>()] <= maxOwnedShockwaves &&
+				   (player.position - hitPosition).Length() <= 16 * 70;
+		}
 
-        public override void OnKill(Projectile projectile, int timeLeft)
-        {
-            TrySpawnShockwave(projectile);
-        }
+		public static void SpawnBurst(IEntitySource source, Player player, Vector2 hitPosition, int owner, int baseDamage)
+		{
+			Projectile.NewProjectile(
+				source,
+				hitPosition,
+				Vector2.Zero,
+				ModContent.ProjectileType<ShockwaveProjectile>(),
+				(int)Math.Ceiling(baseDamage / 10f),
+				0f,
+				owner);
 
-        public override void OnHitNPC(Projectile projectile, NPC target, NPC.HitInfo hit, int damageDone)
-        {
-            TrySpawnShockwave(projectile);
-        }
+			int iceShockDamage = player.HasBuff<SnowflowerBuff>() ? (int)Math.Ceiling(baseDamage / 30f) : 0;
+			float ai2 = player.HasBuff<SnowflowerBuff>() ? 3f : 2f;
 
-        private static void TrySpawnShockwave(Projectile projectile)
-        {
-            if (IceflowerProjBonusCounter.ShockwaveSpawnCooldown > 0 || projectile.type == ModContent.ProjectileType<ShockwaveProjectile>())
-                return;
+			for (int j = 0; j <= 5; j++)
+			{
+				Projectile.NewProjectile(
+					source,
+					hitPosition,
+					Vector2.Zero,
+					ModContent.ProjectileType<IceshockProjectile>(),
+					iceShockDamage,
+					0f,
+					owner,
+					Main.rand.Next(3),
+					MathHelper.TwoPi / 6 * j,
+					ai2);
+			}
+		}
+	}
 
-            Player player = Main.player[projectile.owner];
-            if (projectile.damage <= 0 || projectile.hostile || player.ownedProjectileCounts[ModContent.ProjectileType<ShockwaveProjectile>()] > 5 || (player.position - projectile.Center).Length() > 16 * 70)
-                return;
+	internal class IceflowerProjBonus : GlobalProjectile
+	{
+		public override void OnKill(Projectile projectile, int timeLeft)
+		{
+			TrySpawnShockwave(projectile);
+		}
 
-            IceflowerProjBonusCounter.ResetCounter();
+		public override void OnHitNPC(Projectile projectile, NPC target, NPC.HitInfo hit, int damageDone)
+		{
+			TrySpawnShockwave(projectile);
+		}
 
-            if (projectile.owner == Main.myPlayer &&
-                player.HasBuff<IceflowerBuff>() &&
-                !player.dead &&
-                player.active &&
-                !player.ghost)
-            {
-                Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center,
-                    Vector2.Zero, ModContent.ProjectileType<ShockwaveProjectile>(),
-                    (int)Math.Ceiling(projectile.damage / 10f), 0, projectile.owner);
-            }
-        }
-    }
+		private static void TrySpawnShockwave(Projectile projectile)
+		{
+			if (IceflowerProjBonusCounter.ShockwaveSpawnCooldown > 0 || 
+				projectile.type == ModContent.ProjectileType<ShockwaveProjectile>() ||
+				projectile.type == ModContent.ProjectileType<SnowflakeProjectile>() || 
+				projectile.type == ModContent.ProjectileType<IceshockProjectile>())
+				return;
 
-    internal class IceflowerProjBonusMele : GlobalItem
-    {
-        public override void OnHitNPC(Item item, Player player, NPC target, NPC.HitInfo hit, int damageDone)
-        {
-            TrySpawnShockwave(player, target, hit);
-        }
-        private void TrySpawnShockwave(Player player, NPC target, NPC.HitInfo hit)
-        {
-            if (IceflowerProjBonusCounter.ShockwaveSpawnCooldown > 0)
-                return;
-            if (player.ownedProjectileCounts[ModContent.ProjectileType<ShockwaveProjectile>()] > 50 || (player.position - target.Center).Length() > 16 * 70)
-                return;
-            IceflowerProjBonusCounter.ResetCounter();
-            if (player.HasBuff<IceflowerBuff>() &&
-                !player.dead &&
-                player.active &&
-                !player.ghost)
-            {
-                Projectile.NewProjectile(player.GetSource_FromThis(), target.Center,
-                    Vector2.Zero, ModContent.ProjectileType<ShockwaveProjectile>(),
-                    (int)Math.Ceiling(hit.Damage / 10f), 0, player.whoAmI);
-            }
-        }
-    }
+			Player player = Main.player[projectile.owner];
+			if (projectile.damage <= 0 || projectile.hostile)
+				return;
+
+			if (projectile.owner == Main.myPlayer &&
+				IceflowerShockwaveSpawner.CanSpawn(player, projectile.Center, 5))
+			{
+				IceflowerProjBonusCounter.ResetCounter();
+				IceflowerShockwaveSpawner.SpawnBurst(projectile.GetSource_FromThis(), player, projectile.Center, projectile.owner, projectile.damage);
+			}
+		}
+	}
+
+	internal class IceflowerProjBonusMele : GlobalItem
+	{
+		public override void OnHitNPC(Item item, Player player, NPC target, NPC.HitInfo hit, int damageDone)
+		{
+			TrySpawnShockwave(player, target, hit);
+		}
+
+		private void TrySpawnShockwave(Player player, NPC target, NPC.HitInfo hit)
+		{
+			if (IceflowerProjBonusCounter.ShockwaveSpawnCooldown > 0)
+				return;
+			if (hit.Damage <= 0)
+				return;
+
+			if (player.whoAmI == Main.myPlayer &&
+				IceflowerShockwaveSpawner.CanSpawn(player, target.Center, 50))
+			{
+				IceflowerProjBonusCounter.ResetCounter();
+				IceflowerShockwaveSpawner.SpawnBurst(player.GetSource_FromThis(), player, target.Center, player.whoAmI, hit.Damage);
+			}
+		}
+	}
 }

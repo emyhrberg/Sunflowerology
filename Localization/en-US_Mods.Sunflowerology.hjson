@@ -200,5 +200,6 @@ NPCs: {
 
 Projectiles: {
 	SnowflakeProjectile.DisplayName: Snowshower Snowflake
-	ShockwaveProjectile.DisplayName: Shockwave Projectile
+	ShockwaveProjectile.DisplayName: Iceshock Shockwave
+	IceshockProjectile.DisplayName: Iceshock Snowflake
 }
