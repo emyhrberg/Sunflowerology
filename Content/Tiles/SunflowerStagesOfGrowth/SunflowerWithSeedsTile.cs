@@ -24,7 +24,7 @@ namespace Sunflowerology.Content.Tiles.SunflowerStagesOfGrowth
         private static readonly Dictionary<TypeOfSunflower, (int buffId, int buffDuration)> SunflowerBuffs
             = new()
             {
-                [TypeOfSunflower.Fireflower] = (BuffID.Inferno, 30),
+                [TypeOfSunflower.Fireflower] = (ModContent.BuffType<Buffs.FireflowerBuff>(), 30),
                 [TypeOfSunflower.Beachflower] = (BuffID.Flipper, 30),
                 [TypeOfSunflower.Deadflower] = (ModContent.BuffType<Buffs.DeadSunflowerBuff>(), 30), // Reduced life
                 [TypeOfSunflower.Dryflower] = (ModContent.BuffType<Buffs.DryflowerBuff>(), 30),
