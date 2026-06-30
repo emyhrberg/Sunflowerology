@@ -38,7 +38,7 @@ float4 PixelShaderFunction(float2 coords : TEXCOORD0) : COLOR0
 
         float denom = max(CurrentTime * Dist * 40.0, 0.001);
         sampleCoord += ((DiffTexCoord * DiffTime) / denom);
-        color = tex2D(uImage0, sampleCoord);
+        color = tex2D(uImage0, sampleCoord) * uOpacity + color * (1.0 - uOpacity);
 
         color += (color * ScaleDiff) / denom * uOpacity;
     }
