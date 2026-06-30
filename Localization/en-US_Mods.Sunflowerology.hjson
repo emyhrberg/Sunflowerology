@@ -18,6 +18,11 @@ Buffs: {
 		DisplayName: Iceshock
 		Description: Weapons occasionally release shockwaves that damage enemies... and sometimes friends...
 	}
+
+	DryflowerBuff: {
+		DisplayName: Dry Winds
+		Description: Your jumps are filled with warm air
+	}
 }
 
 Items: {
