@@ -20,6 +20,7 @@ namespace Sunflowerology.Content.Buffs
         {
             player.buffImmune[BuffID.Chilled] = true;
             player.buffImmune[BuffID.Frozen] = true;
+            player.buffImmune[ModContent.BuffType<DryflowerBuff>()] = true;
         }
     }
 }

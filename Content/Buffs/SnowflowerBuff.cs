@@ -19,6 +19,7 @@ namespace Sunflowerology.Content.Buffs
         public override void Update(Player player, ref int buffIndex)
         {
             player.buffImmune[BuffID.Chilled] = true;
+            player.buffImmune[ModContent.BuffType<DryflowerBuff>()] = true;
         }
     }
 }
