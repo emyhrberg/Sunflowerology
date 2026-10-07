@@ -10,7 +10,7 @@ namespace Sunflowerology.Content.Items
 	public class FireflowerWings : ModItem
 	{
 		public override void SetStaticDefaults() {
-			ArmorIDs.Wing.Sets.Stats[Item.wingSlot] = new WingStats(180, 9f, 2.5f);
+			ArmorIDs.Wing.Sets.Stats[Item.wingSlot] = new WingStats(80, 5, 1f);
 		}
 
 		public override void SetDefaults() {
@@ -23,10 +23,10 @@ namespace Sunflowerology.Content.Items
 
 		public override void VerticalWingSpeeds(Player player, ref float ascentWhenFalling, ref float ascentWhenRising,
 			ref float maxCanAscendMultiplier, ref float maxAscentMultiplier, ref float constantAscend) {
-			ascentWhenFalling = 0.85f; // Falling glide speed
-			ascentWhenRising = 0.15f; // Rising speed
+			ascentWhenFalling = 0.95f; // Falling glide speed
+			ascentWhenRising = 0.05f; // Rising speed
 			maxCanAscendMultiplier = 1f;
-			maxAscentMultiplier = 3f;
+			maxAscentMultiplier = 1.15f;
 			constantAscend = 0.135f;
 		}
 	}

@@ -147,7 +147,7 @@ Items: {
 	}
 
 	FireflowerWings: {
-		Tooltip: "Uh-oh, you should not have this item! Please contact us at support@unintensionallacesstofireflowerwingspleasedonotcontactthisemailthisisnotreal.com"
+		Tooltip: Uh-oh, you should not have this item! Please contact us at support@unintensionallacesstofireflowerwingspleasedonotcontactthisemailthisisnotreal.com
 		DisplayName: Flamier Wings
 	}
 }
